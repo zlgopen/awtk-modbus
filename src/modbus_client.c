@@ -43,7 +43,6 @@ error:
 }
 
 modbus_client_t* modbus_client_create(const char* url) {
-  url_t* aurl = NULL;
   tk_iostream_t* io = NULL;
   modbus_client_t* client = NULL;
   return_value_if_fail(url != NULL, NULL);

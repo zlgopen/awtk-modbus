@@ -38,10 +38,10 @@ modbus_memory_t* modbus_memory_create(uint32_t bits_start, uint32_t bits_count,
   memory->input_registers_start = input_registers_start;
   memory->input_registers_count = input_registers_count;
 
-  memory->bits_data = TKMEM_ALLOC(modbus_bits_to_bytes(bits_count));
+  memory->bits_data = TKMEM_ALLOC(bits_count);
   goto_error_if_fail(memory->bits_data != NULL);
 
-  memory->input_bits_data = TKMEM_ALLOC(modbus_bits_to_bytes(input_bits_count));
+  memory->input_bits_data = TKMEM_ALLOC(input_bits_count);
   goto_error_if_fail(memory->input_bits_data != NULL);
 
   memory->registers_data = TKMEM_ALLOC(registers_count * sizeof(uint16_t));
@@ -253,16 +253,16 @@ ret_t modbus_memory_write_registers(modbus_memory_t* memory, uint16_t addr, uint
 ret_t modbus_memory_destroy(modbus_memory_t* memory) {
   return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
 
-  if (memory->bits_data == NULL) {
+  if (memory->bits_data != NULL) {
     TKMEM_FREE(memory->bits_data);
   }
-  if (memory->input_bits_data == NULL) {
+  if (memory->input_bits_data != NULL) {
     TKMEM_FREE(memory->input_bits_data);
   }
-  if (memory->registers_data == NULL) {
+  if (memory->registers_data != NULL) {
     TKMEM_FREE(memory->registers_data);
   }
-  if (memory->input_registers_data == NULL) {
+  if (memory->input_registers_data != NULL) {
     TKMEM_FREE(memory->input_registers_data);
   }
   TKMEM_FREE(memory);

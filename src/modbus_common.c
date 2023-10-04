@@ -417,6 +417,7 @@ ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common) {
 
 ret_t modbus_common_deinit(modbus_common_t* common) {
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
+  wbuffer_deinit(common->wbuffer);
   TK_OBJECT_UNREF(common->io);
 
   return RET_OK;
