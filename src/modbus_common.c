@@ -39,13 +39,13 @@ static ret_t modbus_common_pack_uint8(modbus_common_t* common, uint8_t value) {
 static ret_t modbus_common_write_crc16(modbus_common_t* common) {
   uint16_t crc = 0;
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
-  crc = tkc_crc16_modbus(common->wbuffer->data, common->wbuffer->cursor);
+  crc = tk_crc16_modbus(common->wbuffer->data, common->wbuffer->cursor);
 
   return wbuffer_write_uint16(common->wbuffer, crc);
 }
 
 static ret_t modbus_common_pack_header(modbus_common_t* common,
-                                       modbus_function_code_t function_code, u_int16_t data_len) {
+                                       modbus_function_code_t function_code, uint16_t data_len) {
   wbuffer_t* wb = NULL;
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
 
@@ -131,7 +131,7 @@ static uint32_t modbus_common_get_resp_playload_length(modbus_common_t* common, 
 static ret_t modbus_common_check_crc(modbus_common_t* common, const uint8_t* data, uint32_t size) {
   if (common->proto == MODBUS_PROTO_RTU) {
     uint16_t get_crc = 0;
-    uint16_t calc_crc = tkc_crc16_modbus(data, size);
+    uint16_t calc_crc = tk_crc16_modbus(data, size);
     int32_t len = modbus_common_read_len(common, (uint8_t*)&get_crc, 2);
 
     return (len != 2 || get_crc != calc_crc) ? RET_CRC : RET_OK;
@@ -302,7 +302,7 @@ ret_t modbus_common_send_read_bits_req(modbus_common_t* common, uint16_t func_co
 ret_t modbus_common_recv_read_bits_resp(modbus_common_t* common, uint16_t func_code,
                                         uint8_t* buffer, uint16_t* count) {
   ret_t ret = RET_OK;
-  u_int16_t n_bits = 0;
+  uint16_t n_bits = 0;
   modbus_resp_data_t resp;
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(buffer != NULL && count != NULL, RET_BAD_PARAMS);
@@ -325,7 +325,7 @@ ret_t modbus_common_send_read_registers_req(modbus_common_t* common, uint16_t fu
 ret_t modbus_common_recv_read_registers_resp(modbus_common_t* common, uint16_t func_code,
                                              uint16_t* buffer, uint16_t* count) {
   ret_t ret = RET_OK;
-  u_int16_t n_registers = 0;
+  uint16_t n_registers = 0;
   modbus_resp_data_t resp;
 
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);

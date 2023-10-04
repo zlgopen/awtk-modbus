@@ -169,7 +169,7 @@ typedef struct _modbus_resp_header_t {
      * @property {uint8_t} data_len
      * 数据长度。
      */
-  u_int8_t data_len;
+  uint8_t data_len;
 } modbus_resp_header_t;
 
 /**
