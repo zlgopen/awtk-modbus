@@ -1,0 +1,1718 @@
+[
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "url",
+            "desc": "modbus server的url。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus client。\n\n示例(TCP)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n```\n示例(RTU)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial:///dev/ttys125\");\nmodbus_client_set_slave(client, 1);\n```",
+        "name": "modbus_client_create",
+        "return": {
+          "type": "modbus_client_t*",
+          "desc": "返回modbus client对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "tk_iostream_t*",
+            "name": "io",
+            "desc": "io对象。"
+          },
+          {
+            "type": "modbus_proto_t",
+            "name": "proto",
+            "desc": "协议。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus client。",
+        "name": "modbus_client_create_with_io",
+        "return": {
+          "type": "modbus_client_t*",
+          "desc": "返回modbus client对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buff",
+            "desc": "读取的数据(每个bit在buff中占据1个字节)。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取bits。",
+        "name": "modbus_client_read_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buff",
+            "desc": "读取的数据(每个bit在buff中占据1个字节)。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取input bits。",
+        "name": "modbus_client_read_input_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取registers。",
+        "name": "modbus_client_read_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取input registers。",
+        "name": "modbus_client_read_input_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入bit。",
+        "name": "modbus_client_write_bit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入register。",
+        "name": "modbus_client_write_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint8_t*",
+            "name": "buff",
+            "desc": "写入的数据(每个bit在buff中占据1个字节)。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入bits。",
+        "name": "modbus_client_write_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint16_t*",
+            "name": "buff",
+            "desc": "写入的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入registers。",
+        "name": "modbus_client_write_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "slave",
+            "desc": "slave。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置slave。",
+        "name": "modbus_client_set_slave",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁modbus client。",
+        "name": "modbus_client_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "src/modbus_client.h",
+    "desc": "modbus client\n\n示例\n\n```c\nuint8_t read_bits_result[4];\nuint8_t write_bits[] = {TRUE, FALSE, TRUE, FALSE};\nuint16_t read_registers_result[4];\nuint16_t write_registers[] = {0x1122, 0x2233, 0x3344, 0x4455};\n\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n\nENSURE(modbus_client_write_bit(client, MODBUS_DEMO_BITS_ADDRESS, 1) == RET_OK);\nENSURE(modbus_client_read_bits(client, MODBUS_DEMO_BITS_ADDRESS, 1, read_bits_result) == RET_OK);\nENSURE(read_bits_result[0] == TRUE);\n\nENSURE(modbus_client_write_bits(client, MODBUS_DEMO_BITS_ADDRESS, 4, write_bits) == RET_OK);\nENSURE(modbus_client_read_bits(client, MODBUS_DEMO_BITS_ADDRESS, 4, read_bits_result) == RET_OK);\nENSURE(read_bits_result[0] == TRUE);\nENSURE(read_bits_result[1] == FALSE);\nENSURE(read_bits_result[2] == TRUE);\nENSURE(read_bits_result[3] == FALSE);\n\nENSURE(modbus_client_write_register(client, MODBUS_DEMO_REGISTERS_ADDRESS, 0xaabb) == RET_OK);\nENSURE(modbus_client_read_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 1, read_registers_result) == RET_OK);\nENSURE(read_registers_result[0] == 0xaabb);\n\nENSURE(modbus_client_write_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 4, write_registers) == RET_OK);\nENSURE(modbus_client_read_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 4, read_registers_result) == RET_OK);\nENSURE(read_registers_result[0] == 0x1122);\nENSURE(read_registers_result[1] == 0x2233);\nENSURE(read_registers_result[2] == 0x3344);\nENSURE(read_registers_result[3] == 0x4455);\n\nENSURE(modbus_client_read_input_bits(client, MODBUS_DEMO_INPUT_BITS_ADDRESS, 1, read_bits_result) == RET_OK);\nENSURE(modbus_client_read_input_registers(client, MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, 1, read_registers_result) == RET_OK);\n\nmodbus_client_destroy(client);\n```",
+    "name": "modbus_client_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "tk_iostream_t*",
+            "name": "io",
+            "desc": "io对象。"
+          },
+          {
+            "type": "modbus_proto_t",
+            "name": "proto",
+            "desc": "协议。"
+          }
+        ],
+        "annotation": {},
+        "desc": "初始化modbus_common_t对象。",
+        "name": "modbus_common_init",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "func_code",
+            "desc": "功能码。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送读取bits请求。",
+        "name": "modbus_common_send_read_bits_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "func_code",
+            "desc": "功能码。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buffer",
+            "desc": "读取的数据。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "count",
+            "desc": "读取的个数(即作输入又作输出)。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收读取bits响应。",
+        "name": "modbus_common_recv_read_bits_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "func_code",
+            "desc": "功能码。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送读取registers请求。",
+        "name": "modbus_common_send_read_registers_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "func_code",
+            "desc": "功能码。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buffer",
+            "desc": "读取的数据。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "count",
+            "desc": "读取的个数(即作输入又作输出)。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收读取registers响应。",
+        "name": "modbus_common_recv_read_registers_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送写入bit请求。",
+        "name": "modbus_common_send_write_bit_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收写入bit响应。",
+        "name": "modbus_common_recv_write_bit_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送写入register请求。",
+        "name": "modbus_common_send_write_register_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收写入register响应。",
+        "name": "modbus_common_recv_write_register_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint8_t*",
+            "name": "buff",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送写入bits请求。",
+        "name": "modbus_common_send_write_bits_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收写入bits响应。",
+        "name": "modbus_common_recv_write_bits_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint16_t*",
+            "name": "buff",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送写入registers请求。",
+        "name": "modbus_common_send_write_registers_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "接收写入registers响应。",
+        "name": "modbus_common_recv_write_registers_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取最后一次的错误码。",
+        "name": "modbus_common_get_last_exception_code",
+        "return": {
+          "type": "modbus_exeption_code_t",
+          "desc": "返回最后一次的错误码。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取最后一次的错误码字符串。",
+        "name": "modbus_common_get_last_exception_str",
+        "return": {
+          "type": "const char*",
+          "desc": "返回最后一次的错误码字符串。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "释放modbus_common_t对象。",
+        "name": "modbus_common_deinit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "modbus_req_data_t*",
+            "name": "req_data",
+            "desc": "请求数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "解包请求。",
+        "name": "modbus_common_recv_req",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "modbus_resp_data_t*",
+            "name": "resp_data",
+            "desc": "响应数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送响应。",
+        "name": "modbus_common_send_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_common_t*",
+            "name": "common",
+            "desc": "modbus_common_t对象。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "func_code",
+            "desc": "功能码。"
+          },
+          {
+            "type": "modbus_exeption_code_t",
+            "name": "code",
+            "desc": "异常码。"
+          }
+        ],
+        "annotation": {},
+        "desc": "发送异常响应。",
+        "name": "modbus_common_send_exception_resp",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "proto",
+        "desc": "协议。",
+        "type": "modbus_proto_t"
+      },
+      {
+        "name": "wbuffer",
+        "desc": "wbuffer。",
+        "type": "wbuffer_t*"
+      },
+      {
+        "name": "io",
+        "desc": "io对象。",
+        "type": "tk_iostream_t*"
+      },
+      {
+        "name": "write_timeout",
+        "desc": "写超时。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "read_timeout",
+        "desc": "读超时。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "slave",
+        "desc": "从站地址。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "transaction_id",
+        "desc": "事务ID。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "last_exception_code",
+        "desc": "最后一次的错误码。",
+        "type": "modbus_exeption_code_t"
+      }
+    ],
+    "header": "src/modbus_common.h",
+    "desc": "modbus common",
+    "name": "modbus_common_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "modbus hook对象。"
+          },
+          {
+            "type": "modbus_req_data_t*",
+            "name": "req",
+            "desc": "modbus请求数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "处理modbus请求之前的hook。",
+        "name": "modbus_hook_before_request",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "modbus hook对象。"
+          },
+          {
+            "type": "modbus_resp_data_t*",
+            "name": "resp",
+            "desc": "modbus响应数据。"
+          },
+          {
+            "type": "ret_t",
+            "name": "code",
+            "desc": "modbus响应码。"
+          }
+        ],
+        "annotation": {},
+        "desc": "处理modbus请求之后的hook。",
+        "name": "modbus_hook_after_request",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "modbus hook对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁modbus hook。",
+        "name": "modbus_hook_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "src/modbus_hook.h",
+    "desc": "modbus hook",
+    "name": "modbus_hook_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "uint32_t",
+            "name": "bits_start",
+            "desc": "位起始地址。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "bits_count",
+            "desc": "位数量。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "input_bits_start",
+            "desc": "输入位起始地址。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "input_bits_count",
+            "desc": "输入位数量。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "registers_start",
+            "desc": "寄存器起始地址。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "registers_count",
+            "desc": "寄存器数量。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "input_registers_start",
+            "desc": "输入寄存器起始地址。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "input_registers_count",
+            "desc": "输入寄存器数量。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus memory。",
+        "name": "modbus_memory_create",
+        "return": {
+          "type": "modbus_memory_t*",
+          "desc": "返回modbus memory对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取bits。",
+        "name": "modbus_memory_read_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取input bits。",
+        "name": "modbus_memory_read_input_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取registers。",
+        "name": "modbus_memory_read_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buff",
+            "desc": "读取的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取input registers。",
+        "name": "modbus_memory_read_input_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入bit。",
+        "name": "modbus_memory_write_bit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入register。",
+        "name": "modbus_memory_write_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint8_t*",
+            "name": "buff",
+            "desc": "写入的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入bits。",
+        "name": "modbus_memory_write_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "个数。"
+          },
+          {
+            "type": "const uint16_t*",
+            "name": "buff",
+            "desc": "写入的数据。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入registers。",
+        "name": "modbus_memory_write_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁modbus memory。",
+        "name": "modbus_memory_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "bits_start",
+        "desc": "位起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "bits_count",
+        "desc": "位数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "bits_data",
+        "desc": "位数据。",
+        "type": "uint8_t*"
+      },
+      {
+        "name": "input_bits_start",
+        "desc": "输入位起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_bits_count",
+        "desc": "输入位数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_bits_data",
+        "desc": "输入位数据。",
+        "type": "uint8_t*"
+      },
+      {
+        "name": "registers_start",
+        "desc": "寄存器起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "registers_count",
+        "desc": "寄存器数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "registers_data",
+        "desc": "寄存器数据。",
+        "type": "uint16_t*"
+      },
+      {
+        "name": "input_registers_start",
+        "desc": "输入寄存器起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_registers_count",
+        "desc": "输入寄存器数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_registers_data",
+        "desc": "输入寄存器数据。",
+        "type": "uint16_t*"
+      }
+    ],
+    "header": "src/modbus_memory.h",
+    "desc": "modbus memory",
+    "name": "modbus_memory_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "event_source_manager_t*",
+            "name": "esm",
+            "desc": "事件管理对象(为NULL则阻塞运行)。"
+          },
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "内存对象。"
+          },
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "hook对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "url",
+            "desc": "URL。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus service RTU。",
+        "name": "modbus_service_rtu_start",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "src/modbus_service_rtu.h",
+    "desc": "modbus service rtu",
+    "name": "modbus_service_rtu_t",
+    "annotation": {
+      "fake": true
+    },
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "event_source_manager_t*",
+            "name": "esm",
+            "desc": "事件管理对象(为NULL则阻塞运行)。"
+          },
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "内存对象。"
+          },
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "hook对象。"
+          },
+          {
+            "type": "int",
+            "name": "port",
+            "desc": "端口。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus service TCP。",
+        "name": "modbus_service_tcp_start",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "src/modbus_service_tcp.h",
+    "desc": "modbus service tcp",
+    "name": "modbus_service_tcp_t",
+    "annotation": {
+      "fake": true
+    },
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "tk_iostream_t*",
+            "name": "io",
+            "desc": "io对象。"
+          },
+          {
+            "type": "modbus_proto_t",
+            "name": "proto",
+            "desc": "协议。"
+          },
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "memory对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus service。",
+        "name": "modbus_service_create_with_io",
+        "return": {
+          "type": "modbus_service_t*",
+          "desc": "返回modbus service对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          },
+          {
+            "type": "modbus_hook_t*",
+            "name": "hook",
+            "desc": "hook对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置hook。",
+        "name": "modbus_service_set_hook",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "分发请求。",
+        "name": "modbus_service_dispatch",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁modbus service。",
+        "name": "modbus_service_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          },
+          {
+            "type": "event_source_manager_t*",
+            "name": "esm",
+            "desc": "事件管理器。"
+          }
+        ],
+        "annotation": {},
+        "desc": "关联到esm。",
+        "name": "modbus_service_attach_to_event_source_manager",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "阻塞运行。",
+        "name": "modbus_service_run",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "src/modbus_service.h",
+    "desc": "modbus service",
+    "name": "modbus_service_t",
+    "level": 1
+  },
+  {
+    "type": "enum",
+    "desc": "MODBUS 功能码",
+    "consts": [
+      {
+        "desc": "读取COILS。",
+        "name": "MODBUS_FC_READ_COILS"
+      },
+      {
+        "desc": "读取DISCRETE_INPUTS。",
+        "name": "MODBUS_FC_READ_DISCRETE_INPUTS"
+      },
+      {
+        "desc": "读取HOLDING_REGISTERS。",
+        "name": "MODBUS_FC_READ_HOLDING_REGISTERS"
+      },
+      {
+        "desc": "读取INPUT_REGISTERS。",
+        "name": "MODBUS_FC_READ_INPUT_REGISTERS"
+      },
+      {
+        "desc": "写入单个COIL。",
+        "name": "MODBUS_FC_WRITE_SINGLE_COIL"
+      },
+      {
+        "desc": "写入单个HOLDING_REGISTER。",
+        "name": "MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER"
+      },
+      {
+        "desc": "写入多个COILS。",
+        "name": "MODBUS_FC_WRITE_MULTIPLE_COILS"
+      },
+      {
+        "desc": "写入多个HOLDING_REGISTERS。",
+        "name": "MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "name": "modbus_function_code_t",
+    "prefix": "MODBUS_FC_",
+    "level": 1
+  },
+  {
+    "type": "enum",
+    "desc": "MODBUS 协议类型",
+    "consts": [
+      {
+        "desc": "RTU 协议。",
+        "name": "MODBUS_PROTO_RTU"
+      },
+      {
+        "desc": "TCP 协议。",
+        "name": "MODBUS_PROTO_TCP"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "name": "modbus_proto_t",
+    "prefix": "MODBUS_PROTO_",
+    "level": 1
+  },
+  {
+    "type": "enum",
+    "desc": "MODBUS 异常码",
+    "consts": [
+      {
+        "desc": "非法功能。",
+        "name": "MODBUS_EXCEPTION_ILLEGAL_FUNCTION"
+      },
+      {
+        "desc": "非法数据地址。",
+        "name": "MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS"
+      },
+      {
+        "desc": "非法数据值。",
+        "name": "MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE"
+      },
+      {
+        "desc": "从站设备故障。",
+        "name": "MODBUS_EXCEPTION_SERVER_DEVICE_FAILURE"
+      },
+      {
+        "desc": "确认。",
+        "name": "MODBUS_EXCEPTION_ACKNOWLEDGE"
+      },
+      {
+        "desc": "从站设备忙。",
+        "name": "MODBUS_EXCEPTION_SERVER_DEVICE_BUSY"
+      },
+      {
+        "desc": "否认。",
+        "name": "MODBUS_EXCEPTION_NEGATIVE_ACKNOWLEDGE"
+      },
+      {
+        "desc": "内存奇偶校验错误。",
+        "name": "MODBUS_EXCEPTION_MEMORY_PARITY_ERROR"
+      },
+      {
+        "desc": "网关路径不可用。",
+        "name": "MODBUS_EXCEPTION_GATEWAY_PATH_UNAVAILABLE"
+      },
+      {
+        "desc": "网关目标设备无响应。",
+        "name": "MODBUS_EXCEPTION_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "name": "modbus_exeption_code_t",
+    "prefix": "MODBUS_EXCEPTION_",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "slave_addr",
+        "desc": "从站地址。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "func_code",
+        "desc": "功能码。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "data_len",
+        "desc": "数据长度。",
+        "type": "uint8_t"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "desc": "resp header",
+    "name": "modbus_resp_header_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "func_code",
+        "desc": "功能码。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "addr",
+        "desc": "地址。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "count",
+        "desc": "个数。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "bytes",
+        "desc": "数据长度。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "data",
+        "desc": "数据。",
+        "type": "uint8_t*"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "desc": "modbus data",
+    "name": "modbus_req_data_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "transaction_id",
+        "desc": "事务ID。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "protocol_id",
+        "desc": "协议ID。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "length",
+        "desc": "长度。",
+        "type": "uint16_t"
+      },
+      {
+        "name": "unit_id",
+        "desc": "单元ID。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "func_code",
+        "desc": "功能码。",
+        "type": "uint8_t"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "desc": "modbus tcp header",
+    "name": "modbus_tcp_header_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "slave",
+        "desc": "slave ID。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "func_code",
+        "desc": "功能码。",
+        "type": "uint8_t"
+      }
+    ],
+    "header": "src/modbus_types_def.h",
+    "desc": "modbus rtu header",
+    "name": "modbus_rtu_header_t",
+    "level": 1
+  }
+]
