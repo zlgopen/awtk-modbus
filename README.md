@@ -4,13 +4,13 @@ Modbus 协议是一种通信协议，用于在工业自动化系统中实现设�
 
 Modbus 协议简单、易于实现和使用，因此在工业自动化领域得到广泛应用。它可以用于监控和控制各种设备，如传感器、执行器、电机驱动器等。通过使用 Modbus 协议，不同厂家的设备可以方便地进行集成和通信，实现设备之间的数据交换和控制操作。
 
-AWTK-MODBUS 实现了 Modbus 协议的基本功能。其主要特色有：
+[AWTK-MODBUS](https://github.com/zlgopen/awtk-modbus.git) 实现了 Modbus 协议的基本功能。其主要特色有：
 
 * 小巧。充分利用 [TKC](https://github.com/zlgopen/tkc.git) 中的函数，大大减少代码量。
 * 可移植。可以在 PC 和嵌入式设备上运行。
 * 支持 TCP 和 RTU 两种通信方式。
 * 支持客户端 (Master) 和 服务器 (Slave)。
-* 与 AWTK 无缝集成。服务端 (Slave) 可以集成到 AWTK 的主循环。
+* 与  [AWTK](https://github.com/zlgopen/awtk.git) 无缝集成。服务端 (Slave) 可以集成到 AWTK 的主循环。
 * 服务器 (Slave) 支持设置钩子函数，在处理请求的前后被调用，方便对数据进行预读和刷新。
 
 ## 准备
@@ -22,13 +22,14 @@ git clone https://github.com/zlgopen/awtk.git
 cd awtk; scons; cd -
 ```
 
+* 编译 awtk-modbus 并编译
+
+```
+git clone https://github.com/zlgopen/awtk-modbus.git
+cd awtk-modbus; scons; cd -
+```
+
 > 注意：awtk 和 awtk-modbus 并列放在同一级目录。
-
-* 编译 PC 版本
-
-```
-scons
-```
 
 * 编译 LINUX FB 版本
 
