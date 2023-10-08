@@ -219,6 +219,14 @@ static void demo_tcp(void) {
   uint16_t write_registers[] = {0x1122, 0x2233, 0x3344, 0x4455};
 
   modbus_client_t* client = modbus_client_create("tcp://localhost:502");
+  /*
+   * RTU: Windows style
+   * modbus_client_t* client = modbus_client_create("serial://COM5");
+   */
+  /*
+   * RTU: Linux style
+   * modbus_client_t* client = modbus_client_create("serial:///dev/ttys125");
+   */
 
   ENSURE(modbus_client_write_bit(client, MODBUS_DEMO_BITS_ADDRESS, 1) == RET_OK);
   ENSURE(modbus_client_read_bits(client, MODBUS_DEMO_BITS_ADDRESS, 1, read_bits_result) == RET_OK);
