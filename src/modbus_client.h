@@ -88,6 +88,11 @@ typedef struct _modbus_client_t {
  *```c
  *  modbus_client_t* client = modbus_client_create("tcp://localhost:502");
  *```
+ * 示例(RTU over TCP)
+ *
+ *```c
+ *  modbus_client_t* client = modbus_client_create("rtu+tcp://localhost:502");
+ *```
  * 示例(RTU)
  *
  *```c

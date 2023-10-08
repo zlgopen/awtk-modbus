@@ -1365,6 +1365,11 @@
             "type": "int",
             "name": "port",
             "desc": "端口。"
+          },
+          {
+            "type": "modbus_proto_t",
+            "name": "proto",
+            "desc": "协议。"
           }
         ],
         "annotation": {},

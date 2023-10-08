@@ -48,11 +48,17 @@ modbus_client_t* modbus_client_create(const char* url) {
   modbus_client_t* client = NULL;
   return_value_if_fail(url != NULL, NULL);
 
-  io = tk_stream_factory_create_iostream(url);
+  if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
+    io = tk_stream_factory_create_iostream(url + 4/*rtu+*/);
+  } else {
+    io = tk_stream_factory_create_iostream(url);
+  }
   return_value_if_fail(io != NULL, NULL);
 
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
+  } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
+    client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else if (tk_str_start_with(url, STR_SCHEMA_SERIAL)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else {
@@ -305,3 +311,4 @@ ret_t modbus_client_destroy(modbus_client_t* client) {
 
   return RET_OK;
 }
+

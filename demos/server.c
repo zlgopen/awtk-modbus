@@ -34,12 +34,12 @@ static ret_t start_rtu(const char* url, modbus_memory_t* memory) {
   return modbus_service_rtu_start(NULL, memory, hook, url);
 }
 
-static ret_t start_tcp(const char* url, modbus_memory_t* memory) {
+static ret_t start_tcp(const char* url, modbus_memory_t* memory, modbus_proto_t proto) {
   const char* p = strrchr(url, ':');
   int port = p != NULL ? tk_atoi(p + 1) : 502;
   modbus_hook_t* hook = modbus_hook_log_get();
 
-  return modbus_service_tcp_start(NULL, memory, hook, port);
+  return modbus_service_tcp_start(NULL, memory, hook, port, proto);
 }
 
 /*生成测试数据*/
@@ -71,8 +71,10 @@ int main(int argc, char* argv[]) {
 
   modbus_memory_init_demo_data(memory);
 
-  if (tk_str_start_with(url, "tcp://")) {
-    start_tcp(url, memory);
+  if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
+    start_tcp(url, memory, MODBUS_PROTO_TCP);
+  }else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
+    start_tcp(url, memory, MODBUS_PROTO_RTU);
   } else {
     start_rtu(url, memory);
   }

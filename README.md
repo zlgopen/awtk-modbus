@@ -42,40 +42,64 @@ scons LINUX_FB=true
 
 ## 运行示例
 
-* TCP 服务端 (Slave)
+### MODBUS-TCP
+
+* 服务端
 
 ```
 ./bin/modbus_server tcp://localhost:502
 ```
 
-或（集成到 AWTK 主循环）
+* 服务端 (集成到AWTK主循环)
 
 ```
-./bin/modbus_server_awtk serial:///dev/ttys124
+./bin/modbus_server_awtk tcp://localhost:502
 ```
 
-* TCP 客户端 (Master)
+* 客户端
 
 ```
 ./bin/modbus_client data/tcp.ini
 ```
 
-* RTU 服务端 (Slave)
+### MODBUS-RTU
+
+* 服务端
 
 ```
 ./bin/modbus_server serial:///dev/ttys124
 ```
 
-或（集成到 AWTK 主循环）
+* 服务端 (集成到AWTK主循环)
 
 ```
 ./bin/modbus_server_awtk serial:///dev/ttys124
 ```
 
-* RTU 客户端 (Master)
+* 客户端
 
 ```
 ./bin/modbus_client data/rtu.ini
+```
+
+### MODBUS-RTU-OVER-TCP
+
+* 服务端
+
+```
+./bin/modbus_server rtu+tcp://localhost:502
+```
+
+* 服务端 (集成到AWTK主循环)
+
+```
+./bin/modbus_server_awtk rtu+tcp://localhost:502
+```
+
+* 客户端
+
+```
+./bin/modbus_client data/rtu_over_tcp.ini
 ```
 
 > MacOS 上可以用 socat 模拟串口。如：
