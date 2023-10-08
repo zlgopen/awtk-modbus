@@ -11,7 +11,7 @@
           }
         ],
         "annotation": {},
-        "desc": "创建modbus client。\n\n示例(TCP)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n```\n示例(RTU)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial:///dev/ttys125\");\nmodbus_client_set_slave(client, 1);\n```",
+        "desc": "创建modbus client。\n\n示例(TCP)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n```\n示例(RTU)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial:///dev/ttys125\");\nmodbus_client_set_slave(client, 1);\n```\n示例(RTU Windows)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial://COM5\");\nmodbus_client_set_slave(client, 1);\n```",
         "name": "modbus_client_create",
         "return": {
           "type": "modbus_client_t*",
