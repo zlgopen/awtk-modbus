@@ -11,7 +11,7 @@
           }
         ],
         "annotation": {},
-        "desc": "创建modbus client。\n\n示例(TCP)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n```\n示例(RTU)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial:///dev/ttys125\");\nmodbus_client_set_slave(client, 1);\n```\n示例(RTU Windows)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial://COM5\");\nmodbus_client_set_slave(client, 1);\n```",
+        "desc": "创建modbus client。\n\n示例(TCP)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n```\n示例(RTU)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial:///dev/ttys125\");\nmodbus_client_set_slave(client, 1);\n```\n示例(RTU Windows)\n\n```c\nmodbus_client_t* client = modbus_client_create(\"serial://COM5\");\nmodbus_client_set_slave(client, 1);\n```\n\n串口URL参数说明：\n* baudrate {int} 波特率。常用值： 9600, 38400, 57600, 115200。(默认值：115200)\n* stopbits {string} 停止位。可选值：1, 1.5, 2。(默认值：1)\n* parity {string} 校验位。可选值：none, odd, even, mark, space。(默认值：none)\n* flowcontrol {string} 流控。可选值：none, hardware, software。(默认值：none)\n* bytesize {string} 数据位。可选值：5, 6, 7, 8 。(默认值：8)\n\n> 示例：\n* serial://COM1?baudrate=115200\n* serial://COM2?baudrate=115200&stopbits=1&parity=odd&flowcontrol=soft&bytesize=8",
         "name": "modbus_client_create",
         "return": {
           "type": "modbus_client_t*",
@@ -1296,7 +1296,7 @@
           }
         ],
         "annotation": {},
-        "desc": "创建modbus service RTU。",
+        "desc": "创建modbus service RTU。\n\n串口URL参数说明：\n* baudrate {int} 波特率。常用值： 9600, 38400, 57600, 115200。(默认值：115200)\n* stopbits {string} 停止位。可选值：1, 1.5, 2。(默认值：1)\n* parity {string} 校验位。可选值：none, odd, even, mark, space。(默认值：none)\n* flowcontrol {string} 流控。可选值：none, hardware, software。(默认值：none)\n* bytesize {string} 数据位。可选值：5, 6, 7, 8 。(默认值：8)\n\n> 示例：\n* serial://COM1?baudrate=115200\n* serial://COM2?baudrate=115200&stopbits=1&parity=odd&flowcontrol=soft&bytesize=8",
         "name": "modbus_service_rtu_start",
         "return": {
           "type": "ret_t",
