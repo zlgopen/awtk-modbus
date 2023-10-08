@@ -47,6 +47,27 @@
             "desc": "modbus client对象。"
           },
           {
+            "type": "uint32_t",
+            "name": "retry_times",
+            "desc": "重试次数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置重试次数。",
+        "name": "modbus_client_set_retry_times",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "modbus client对象。"
+          },
+          {
             "type": "uint16_t",
             "name": "addr",
             "desc": "地址。"
@@ -316,7 +337,13 @@
       }
     ],
     "events": [],
-    "properties": [],
+    "properties": [
+      {
+        "name": "retry_times",
+        "desc": "重试次数。",
+        "type": "uint32_t"
+      }
+    ],
     "header": "src/modbus_client.h",
     "desc": "modbus client\n\n示例\n\n```c\nuint8_t read_bits_result[4];\nuint8_t write_bits[] = {TRUE, FALSE, TRUE, FALSE};\nuint16_t read_registers_result[4];\nuint16_t write_registers[] = {0x1122, 0x2233, 0x3344, 0x4455};\n\nmodbus_client_t* client = modbus_client_create(\"tcp://localhost:502\");\n\nENSURE(modbus_client_write_bit(client, MODBUS_DEMO_BITS_ADDRESS, 1) == RET_OK);\nENSURE(modbus_client_read_bits(client, MODBUS_DEMO_BITS_ADDRESS, 1, read_bits_result) == RET_OK);\nENSURE(read_bits_result[0] == TRUE);\n\nENSURE(modbus_client_write_bits(client, MODBUS_DEMO_BITS_ADDRESS, 4, write_bits) == RET_OK);\nENSURE(modbus_client_read_bits(client, MODBUS_DEMO_BITS_ADDRESS, 4, read_bits_result) == RET_OK);\nENSURE(read_bits_result[0] == TRUE);\nENSURE(read_bits_result[1] == FALSE);\nENSURE(read_bits_result[2] == TRUE);\nENSURE(read_bits_result[3] == FALSE);\n\nENSURE(modbus_client_write_register(client, MODBUS_DEMO_REGISTERS_ADDRESS, 0xaabb) == RET_OK);\nENSURE(modbus_client_read_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 1, read_registers_result) == RET_OK);\nENSURE(read_registers_result[0] == 0xaabb);\n\nENSURE(modbus_client_write_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 4, write_registers) == RET_OK);\nENSURE(modbus_client_read_registers(client, MODBUS_DEMO_REGISTERS_ADDRESS, 4, read_registers_result) == RET_OK);\nENSURE(read_registers_result[0] == 0x1122);\nENSURE(read_registers_result[1] == 0x2233);\nENSURE(read_registers_result[2] == 0x3344);\nENSURE(read_registers_result[3] == 0x4455);\n\nENSURE(modbus_client_read_input_bits(client, MODBUS_DEMO_INPUT_BITS_ADDRESS, 1, read_bits_result) == RET_OK);\nENSURE(modbus_client_read_input_registers(client, MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, 1, read_registers_result) == RET_OK);\n\nmodbus_client_destroy(client);\n```",
     "name": "modbus_client_t",

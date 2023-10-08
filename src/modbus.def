@@ -2,6 +2,7 @@ LIBRARY   modbus
 EXPORTS
     modbus_client_create
     modbus_client_create_with_io
+    modbus_client_set_retry_times
     modbus_client_read_bits
     modbus_client_read_input_bits
     modbus_client_read_registers

@@ -71,6 +71,12 @@ BEGIN_C_DECLS
  */
 typedef struct _modbus_client_t {
   modbus_common_t common;
+
+  /**
+   * @property {uint32_t} retry_times
+   * 重试次数。
+   */
+  uint32_t retry_times;
 } modbus_client_t;
 
 /**
@@ -119,6 +125,15 @@ modbus_client_t* modbus_client_create(const char* url);
  * @return {modbus_client_t*} 返回modbus client对象。
  */
 modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t proto);
+
+/**
+ * @method modbus_client_set_retry_times
+ * 设置重试次数。
+ * @param {modbus_client_t*} client modbus client对象。
+ * @param {uint32_t} retry_times 重试次数。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_times);
 
 /**
  * @method modbus_client_read_bits

@@ -34,6 +34,7 @@ modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t 
   goto_error_if_fail(client != NULL);
 
   modbus_common_init(&client->common, io, proto);
+  modbus_client_set_retry_times(client, 3);
 
   return client;
 error:
@@ -61,6 +62,14 @@ modbus_client_t* modbus_client_create(const char* url) {
   return client;
 }
 
+ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_times) {
+  return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+
+  client->retry_times = retry_times;
+
+  return RET_OK;
+}
+
 static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_code, uint16_t addr,
                                         uint16_t count, uint8_t* buff) {
   ret_t ret = RET_OK;
@@ -73,14 +82,42 @@ static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_c
   return modbus_common_recv_read_bits_resp(common, func_code, buff, &count);
 }
 
+#define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC || (ret) == RET_TIMEOUT || (ret) == RET_IO)
+
 ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
                               uint8_t* buff) {
-  return modbus_client_read_bits_ex(client, MODBUS_FC_READ_COILS, addr, count, buff);
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_read_bits_ex(client, MODBUS_FC_READ_COILS, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
 }
 
 ret_t modbus_client_read_input_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
                                     uint8_t* buff) {
-  return modbus_client_read_bits_ex(client, MODBUS_FC_READ_DISCRETE_INPUTS, addr, count, buff);
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_read_bits_ex(client, MODBUS_FC_READ_DISCRETE_INPUTS, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
 }
 
 static ret_t modbus_client_read_registers_ex(modbus_client_t* client, uint16_t func_code,
@@ -97,16 +134,43 @@ static ret_t modbus_client_read_registers_ex(modbus_client_t* client, uint16_t f
 
 ret_t modbus_client_read_registers(modbus_client_t* client, uint16_t addr, uint16_t count,
                                    uint16_t* buff) {
-  return modbus_client_read_registers_ex(client, MODBUS_FC_READ_HOLDING_REGISTERS, addr, count,
-                                         buff);
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_read_registers_ex(client, MODBUS_FC_READ_HOLDING_REGISTERS, addr, count,
+                                          buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
 }
 
 ret_t modbus_client_read_input_registers(modbus_client_t* client, uint16_t addr, uint16_t count,
                                          uint16_t* buff) {
-  return modbus_client_read_registers_ex(client, MODBUS_FC_READ_INPUT_REGISTERS, addr, count, buff);
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret =
+        modbus_client_read_registers_ex(client, MODBUS_FC_READ_INPUT_REGISTERS, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
 }
 
-ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t value) {
+static ret_t modbus_client_write_bit_impl(modbus_client_t* client, uint16_t addr, uint8_t value) {
   ret_t ret = RET_OK;
   modbus_common_t* common = (modbus_common_t*)client;
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
@@ -117,7 +181,8 @@ ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t va
   return modbus_common_recv_write_bit_resp(common);
 }
 
-ret_t modbus_client_write_register(modbus_client_t* client, uint16_t addr, uint16_t value) {
+static ret_t modbus_client_write_register_impl(modbus_client_t* client, uint16_t addr,
+                                               uint16_t value) {
   ret_t ret = RET_OK;
   modbus_common_t* common = (modbus_common_t*)client;
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
@@ -128,8 +193,8 @@ ret_t modbus_client_write_register(modbus_client_t* client, uint16_t addr, uint1
   return modbus_common_recv_write_register_resp(common);
 }
 
-ret_t modbus_client_write_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
-                               const uint8_t* buff) {
+static ret_t modbus_client_write_bits_impl(modbus_client_t* client, uint16_t addr, uint16_t count,
+                                           const uint8_t* buff) {
   ret_t ret = RET_OK;
   modbus_common_t* common = (modbus_common_t*)client;
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
@@ -140,8 +205,8 @@ ret_t modbus_client_write_bits(modbus_client_t* client, uint16_t addr, uint16_t 
   return modbus_common_recv_write_bits_resp(common);
 }
 
-ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint16_t count,
-                                    const uint16_t* buff) {
+static ret_t modbus_client_write_registers_impl(modbus_client_t* client, uint16_t addr,
+                                                uint16_t count, const uint16_t* buff) {
   ret_t ret = RET_OK;
   modbus_common_t* common = (modbus_common_t*)client;
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
@@ -150,6 +215,76 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
   return_value_if_fail(ret == RET_OK, ret);
 
   return modbus_common_recv_write_registers_resp(common);
+}
+
+ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t value) {
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_write_bit_impl(client, addr, value);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
+}
+
+ret_t modbus_client_write_register(modbus_client_t* client, uint16_t addr, uint16_t value) {
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_write_register_impl(client, addr, value);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
+}
+
+ret_t modbus_client_write_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
+                               const uint8_t* buff) {
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_write_bits_impl(client, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
+}
+
+ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint16_t count,
+                                    const uint16_t* buff) {
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_write_registers_impl(client, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  return ret;
 }
 
 ret_t modbus_client_set_slave(modbus_client_t* client, uint8_t slave) {

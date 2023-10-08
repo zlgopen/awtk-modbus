@@ -12,6 +12,7 @@ Modbus 协议简单、易于实现和使用，因此在工业自动化领域得�
 * 支持客户端 (Master) 和 服务器 (Slave)。
 * 与  [AWTK](https://github.com/zlgopen/awtk.git) 无缝集成。服务端 (Slave) 可以集成到 AWTK 的主循环。
 * 服务器 (Slave) 支持设置钩子函数，在处理请求的前后被调用，方便对数据进行预读和刷新。
+* 支持设置自动重试的次数。
 
 ## 准备
 
