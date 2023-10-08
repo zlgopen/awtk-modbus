@@ -88,6 +88,12 @@ typedef struct _modbus_client_t {
  *  modbus_client_t* client = modbus_client_create("serial:///dev/ttys125");
  *  modbus_client_set_slave(client, 1);
  *```
+ * 示例(RTU Windows)
+ *
+ *```c
+ *  modbus_client_t* client = modbus_client_create("serial://COM5");
+ *  modbus_client_set_slave(client, 1);
+ *```
  * @param {const char*} url modbus server的url。
  * @return {modbus_client_t*} 返回modbus client对象。
  */
