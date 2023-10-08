@@ -285,6 +285,7 @@ typedef struct _modbus_rtu_header_t {
 #define MODBUS_DEMO_INPUT_REGISTERS_NB 1000
 
 #define STR_SCHEMA_RTU_OVER_TCP "rtu+tcp://"
+#define STR_SCHEMA_RTU_OVER_UDP "rtu+udp://"
 
 static uint32_t modbus_bits_to_bytes(uint32_t bits) {
   return (bits + 7) / 8;

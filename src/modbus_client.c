@@ -59,6 +59,8 @@ modbus_client_t* modbus_client_create(const char* url) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+  } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_UDP)) {
+    client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else if (tk_str_start_with(url, STR_SCHEMA_SERIAL)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else {
