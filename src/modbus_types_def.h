@@ -265,11 +265,11 @@ typedef struct _modbus_rtu_header_t {
 
 #ifndef MODBUS_WRITE_TIMEOUT
 #define MODBUS_WRITE_TIMEOUT 500 /*0.5s*/
-#endif/*MODBUS_WRITE_TIMEOUT*/
+#endif                           /*MODBUS_WRITE_TIMEOUT*/
 
 #ifndef MODBUS_READ_TIMEOUT
-#define MODBUS_READ_TIMEOUT 500  /*0.5*/
-#endif/*MODBUS_READ_TIMEOUT*/
+#define MODBUS_READ_TIMEOUT 500 /*0.5*/
+#endif                          /*MODBUS_READ_TIMEOUT*/
 
 /*for demo app*/
 #define MODBUS_DEMO_BITS_ADDRESS 0x130

@@ -64,8 +64,8 @@ ret_t application_init(void) {
   if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) || tk_str_start_with(url, STR_SCHEMA_TCP)) {
     const char* p = strrchr(url, ':');
     int port = p != NULL ? tk_atoi(p + 1) : 502;
-    modbus_proto_t proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU
-                                                                      : MODBUS_PROTO_TCP;
+    modbus_proto_t proto =
+        tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;
     return modbus_service_tcp_start(esm, memory, hook, port, proto);
   } else {
     return modbus_service_rtu_start(esm, memory, hook, url);
@@ -74,7 +74,7 @@ ret_t application_init(void) {
 
 ret_t application_exit(void) {
   socket_deinit();
-  modbus_memory_destroy(s_memory); 
+  modbus_memory_destroy(s_memory);
 
   return RET_OK;
 }

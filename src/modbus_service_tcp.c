@@ -28,8 +28,8 @@ typedef struct _modbus_server_info_t {
   modbus_proto_t proto;
 } modbus_server_info_t;
 
-static modbus_server_info_t* modbus_server_info_create(modbus_memory_t* memory,
-                                                       modbus_hook_t* hook, modbus_proto_t proto) {
+static modbus_server_info_t* modbus_server_info_create(modbus_memory_t* memory, modbus_hook_t* hook,
+                                                       modbus_proto_t proto) {
   modbus_server_info_t* info = TKMEM_ZALLOC(modbus_server_info_t);
   return_value_if_fail(info != NULL, NULL);
 

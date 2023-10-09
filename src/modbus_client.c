@@ -48,8 +48,9 @@ modbus_client_t* modbus_client_create(const char* url) {
   modbus_client_t* client = NULL;
   return_value_if_fail(url != NULL, NULL);
 
-  if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
-    io = tk_stream_factory_create_iostream(url + 4/*rtu+*/);
+  if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ||
+      tk_str_start_with(url, STR_SCHEMA_RTU_OVER_UDP)) {
+    io = tk_stream_factory_create_iostream(url + 4 /*rtu+*/);
   } else {
     io = tk_stream_factory_create_iostream(url);
   }
@@ -313,4 +314,3 @@ ret_t modbus_client_destroy(modbus_client_t* client) {
 
   return RET_OK;
 }
-

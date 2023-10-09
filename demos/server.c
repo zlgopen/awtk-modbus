@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
     start_tcp(url, memory, MODBUS_PROTO_TCP);
-  }else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
+  } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
     start_tcp(url, memory, MODBUS_PROTO_RTU);
   } else {
     start_rtu(url, memory);
