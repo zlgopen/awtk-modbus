@@ -68,7 +68,7 @@ ret_t application_init(void) {
         tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;
     return modbus_service_tcp_start(esm, memory, hook, port, proto);
   } else {
-    return modbus_service_rtu_start(esm, memory, hook, url);
+    return modbus_service_rtu_start(esm, memory, hook, url, MODBUS_DEMO_SLAVE_ID);
   }
 }
 

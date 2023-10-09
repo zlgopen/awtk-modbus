@@ -31,7 +31,7 @@
 static ret_t start_rtu(const char* url, modbus_memory_t* memory) {
   modbus_hook_t* hook = modbus_hook_myapp_get(memory);
 
-  return modbus_service_rtu_start(NULL, memory, hook, url);
+  return modbus_service_rtu_start(NULL, memory, hook, url, MODBUS_DEMO_SLAVE_ID);
 }
 
 static ret_t start_tcp(const char* url, modbus_memory_t* memory, modbus_proto_t proto) {

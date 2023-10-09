@@ -1320,6 +1320,11 @@
             "type": "const char*",
             "name": "url",
             "desc": "URL。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "slave",
+            "desc": "从机地址。"
           }
         ],
         "annotation": {},
@@ -1418,6 +1423,27 @@
         "return": {
           "type": "modbus_service_t*",
           "desc": "返回modbus service对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "slave",
+            "desc": "slave。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置slave。",
+        "name": "modbus_service_set_slave",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
         }
       },
       {
@@ -1634,7 +1660,7 @@
     "events": [],
     "properties": [
       {
-        "name": "slave_addr",
+        "name": "slave",
         "desc": "从站地址。",
         "type": "uint8_t"
       },
@@ -1662,6 +1688,11 @@
       {
         "name": "func_code",
         "desc": "功能码。",
+        "type": "uint8_t"
+      },
+      {
+        "name": "slave",
+        "desc": "从站地址。",
         "type": "uint8_t"
       },
       {

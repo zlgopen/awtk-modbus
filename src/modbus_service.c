@@ -53,12 +53,19 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
   ret = modbus_common_recv_req(&service->common, &req_data);
   if (ret == RET_OK) {
     modbus_memory_t* memory = service->memory;
+
+    if (req_data.slave != service->common.slave) {
+      log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
+      return RET_OK;
+    }
+
     modbus_hook_before_request(service->hook, &req_data);
 
     resp_data.addr = req_data.addr;
     resp_data.count = req_data.count;
     resp_data.func_code = req_data.func_code;
     resp_data.data = (uint8_t*)buff;
+    
     switch (req_data.func_code) {
       case MODBUS_FC_READ_COILS: {
         resp_data.bytes = (req_data.count + 7) / 8;
@@ -185,4 +192,13 @@ ret_t modbus_service_run(modbus_service_t* service) {
   } while (TRUE);
 
   return 0;
+}
+
+ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave) {
+  modbus_common_t* common = (modbus_common_t*)service;
+  return_value_if_fail(common != NULL, RET_BAD_PARAMS);
+
+  common->slave = slave;
+
+  return RET_OK;
 }

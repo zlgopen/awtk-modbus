@@ -48,6 +48,7 @@ EXPORTS
     modbus_service_rtu_start
     modbus_service_tcp_start
     modbus_service_create_with_io
+    modbus_service_set_slave
     modbus_service_set_hook
     modbus_service_dispatch
     modbus_service_destroy

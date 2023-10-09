@@ -156,10 +156,10 @@ typedef enum _modbus_exeption_code_t {
 */
 typedef struct _modbus_resp_header_t {
   /**
-     * @property {uint8_t} slave_addr
+     * @property {uint8_t} slave
      * 从站地址。
      */
-  uint8_t slave_addr;
+  uint8_t slave;
   /**
      * @property {uint8_t} func_code
      * 功能码。
@@ -182,6 +182,11 @@ typedef struct _modbus_req_data_t {
    * 功能码。
    */
   uint8_t func_code;
+  /**
+   * @property {uint8_t} slave
+   * 从站地址。
+   */
+  uint8_t slave;
   /**
    * @property {uint16_t} addr
     * 地址。
@@ -283,6 +288,8 @@ typedef struct _modbus_rtu_header_t {
 
 #define MODBUS_DEMO_INPUT_REGISTERS_ADDRESS 0x300
 #define MODBUS_DEMO_INPUT_REGISTERS_NB 1000
+
+#define MODBUS_DEMO_SLAVE_ID 1
 
 #define STR_SCHEMA_RTU_OVER_TCP "rtu+tcp://"
 #define STR_SCHEMA_RTU_OVER_UDP "rtu+udp://"

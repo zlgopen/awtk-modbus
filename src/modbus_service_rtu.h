@@ -51,10 +51,11 @@ BEGIN_C_DECLS
  * @param {modbus_memory_t*} memory 内存对象。
  * @param {modbus_hook_t*} hook hook对象。
  * @param {const char*} url URL。
+ * @param {uint8_t} slave 从机地址。
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* memory,
-                               modbus_hook_t* hook, const char* url);
+                               modbus_hook_t* hook, const char* url, uint8_t slave);
 
 END_C_DECLS
 

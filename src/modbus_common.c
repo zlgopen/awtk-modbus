@@ -493,12 +493,14 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     transaction_id = htons(header->transaction_id);
     return_value_if_fail(transaction_id > common->transaction_id || transaction_id == 0, RET_FAIL);
     common->transaction_id = htons(header->transaction_id);
+    req_data->slave = header->unit_id;
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
     ret = modbus_common_read_len(common, buff, sizeof(*header));
     return_value_if_fail(ret == sizeof(*header), RET_IO);
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
+    req_data->slave = header->slave;
   }
 
   req_data->func_code = func_code;

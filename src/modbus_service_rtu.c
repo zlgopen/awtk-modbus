@@ -23,7 +23,7 @@
 #include "modbus_service_rtu.h"
 
 ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* memory,
-                               modbus_hook_t* hook, const char* url) {
+                               modbus_hook_t* hook, const char* url, uint8_t slave) {
   tk_iostream_t* io = NULL;
   modbus_service_t* service = NULL;
   return_value_if_fail(url != NULL, RET_BAD_PARAMS);
@@ -32,6 +32,8 @@ ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* mem
   return_value_if_fail(io != NULL, RET_OOM);
 
   service = modbus_service_create_with_io(io, MODBUS_PROTO_RTU, memory);
+  modbus_service_set_slave(service, slave);
+  
   goto_error_if_fail(service != NULL);
   modbus_service_set_hook(service, hook);
   if (esm != NULL) {

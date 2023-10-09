@@ -51,6 +51,15 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
                                                 modbus_memory_t* memory);
 
 /**
+ * @method modbus_service_set_slave
+ * 设置slave。
+ * @param {modbus_service_t*} service modbus service对象。
+ * @param {uint8_t} slave slave。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave);
+
+/**
  * @method modbus_service_set_hook
  * 设置hook。
  * @param {modbus_service_t*} service modbus service对象。
