@@ -23,13 +23,13 @@
 #include "modbus_service_rtu.h"
 #include "modbus_service_tcp.h"
 #include "modbus_memory.h"
-#include "modbus_hook_log.c"
+#include "modbus_hook_myapp.c"
 #include "tkc/socket_helper.h"
 #include "streams/stream_factory.h"
 #include "streams/inet/iostream_tcp.h"
 
 static ret_t start_rtu(const char* url, modbus_memory_t* memory) {
-  modbus_hook_t* hook = modbus_hook_log_get();
+  modbus_hook_t* hook = modbus_hook_myapp_get(memory);
 
   return modbus_service_rtu_start(NULL, memory, hook, url);
 }
@@ -37,7 +37,7 @@ static ret_t start_rtu(const char* url, modbus_memory_t* memory) {
 static ret_t start_tcp(const char* url, modbus_memory_t* memory, modbus_proto_t proto) {
   const char* p = strrchr(url, ':');
   int port = p != NULL ? tk_atoi(p + 1) : 502;
-  modbus_hook_t* hook = modbus_hook_log_get();
+  modbus_hook_t* hook = modbus_hook_myapp_get(memory);
 
   return modbus_service_tcp_start(NULL, memory, hook, port, proto);
 }

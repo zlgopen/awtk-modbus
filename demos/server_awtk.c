@@ -22,7 +22,7 @@
 #include "awtk.h"
 #include "modbus_service_tcp.h"
 #include "modbus_service_rtu.h"
-#include "modbus_hook_log.c"
+#include "modbus_hook_myapp.c"
 
 #define ON_CMD_LINE modbus_on_cmd_line
 static const char* s_url = "tcp://localhost:502";
@@ -56,7 +56,7 @@ ret_t application_init(void) {
       MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, MODBUS_DEMO_INPUT_BITS_ADDRESS,
       MODBUS_DEMO_INPUT_BITS_NB, MODBUS_DEMO_REGISTERS_ADDRESS, MODBUS_DEMO_REGISTERS_NB,
       MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, MODBUS_DEMO_INPUT_REGISTERS_NB);
-
+  modbus_hook_t* hook = modbus_hook_myapp_get(memory);
   socket_init();
   main_window_create();
   s_memory = memory;
@@ -66,9 +66,9 @@ ret_t application_init(void) {
     int port = p != NULL ? tk_atoi(p + 1) : 502;
     modbus_proto_t proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU
                                                                       : MODBUS_PROTO_TCP;
-    return modbus_service_tcp_start(esm, memory, NULL, port, proto);
+    return modbus_service_tcp_start(esm, memory, hook, port, proto);
   } else {
-    return modbus_service_rtu_start(esm, memory, NULL, url);
+    return modbus_service_rtu_start(esm, memory, hook, url);
   }
 }
 
