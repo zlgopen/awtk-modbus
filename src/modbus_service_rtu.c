@@ -33,7 +33,7 @@ ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* mem
 
   service = modbus_service_create_with_io(io, MODBUS_PROTO_RTU, memory);
   modbus_service_set_slave(service, slave);
-  
+
   goto_error_if_fail(service != NULL);
   modbus_service_set_hook(service, hook);
   if (esm != NULL) {

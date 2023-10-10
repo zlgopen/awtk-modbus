@@ -39,7 +39,7 @@ static ret_t start_tcp(const char* url, modbus_memory_t* memory, modbus_proto_t 
   int port = p != NULL ? tk_atoi(p + 1) : 502;
   modbus_hook_t* hook = modbus_hook_myapp_get(memory);
 
-  return modbus_service_tcp_start(NULL, memory, hook, port, proto);
+  return modbus_service_tcp_start(NULL, memory, hook, port, proto, MODBUS_DEMO_SLAVE_ID);
 }
 
 /*生成测试数据*/

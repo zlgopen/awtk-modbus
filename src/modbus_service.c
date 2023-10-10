@@ -65,7 +65,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     resp_data.count = req_data.count;
     resp_data.func_code = req_data.func_code;
     resp_data.data = (uint8_t*)buff;
-    
+
     switch (req_data.func_code) {
       case MODBUS_FC_READ_COILS: {
         resp_data.bytes = (req_data.count + 7) / 8;
