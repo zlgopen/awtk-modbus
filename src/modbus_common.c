@@ -619,5 +619,8 @@ ret_t modbus_common_send_exception_resp(modbus_common_t* common, uint8_t func_co
   modbus_common_pack_uint8(common, code);
   modbus_common_pack_tail(common);
 
+  log_debug("send exception resp: %d %s\n", (int)func_code,
+            modbus_common_get_exception_meaning(code));
+
   return modbus_common_send_wbuffer(common);
 }

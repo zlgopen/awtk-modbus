@@ -294,6 +294,11 @@ typedef struct _modbus_rtu_header_t {
 #define STR_SCHEMA_RTU_OVER_TCP "rtu+tcp://"
 #define STR_SCHEMA_RTU_OVER_UDP "rtu+udp://"
 
+/**
+ * 如果485上有多路slave，请定义下面的宏。
+ * #define WITH_MULT_SLAVES 1
+ */
+
 static uint32_t modbus_bits_to_bytes(uint32_t bits) {
   return (bits + 7) / 8;
 }

@@ -55,7 +55,12 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     modbus_memory_t* memory = service->memory;
 
     if (req_data.slave != service->common.slave) {
+#ifdef WITH_MULT_SLAVES
       log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
+#else
+      modbus_common_send_exception_resp(&service->common, req_data.func_code,
+                                        MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS);
+#endif
       return RET_OK;
     }
 
