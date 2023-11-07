@@ -966,13 +966,101 @@
           }
         ],
         "annotation": {},
-        "desc": "创建modbus memory。",
-        "name": "modbus_memory_create",
+        "desc": "创建默认memory。",
+        "name": "modbus_memory_default_create",
         "return": {
           "type": "modbus_memory_t*",
           "desc": "返回modbus memory对象。"
         }
       },
+      {
+        "params": [
+          {
+            "type": "modbus_memory_t*",
+            "name": "memory",
+            "desc": "modbus memory对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "转换为modbus_memory_default_t。",
+        "name": "modbus_memory_default_cast",
+        "return": {
+          "type": "modbus_memory_default_t*",
+          "desc": "返回modbus_memory_default_t对象。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "bits_start",
+        "desc": "位起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "bits_count",
+        "desc": "位数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "bits_data",
+        "desc": "位数据。",
+        "type": "uint8_t*"
+      },
+      {
+        "name": "input_bits_start",
+        "desc": "输入位起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_bits_count",
+        "desc": "输入位数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_bits_data",
+        "desc": "输入位数据。",
+        "type": "uint8_t*"
+      },
+      {
+        "name": "registers_start",
+        "desc": "寄存器起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "registers_count",
+        "desc": "寄存器数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "registers_data",
+        "desc": "寄存器数据。",
+        "type": "uint16_t*"
+      },
+      {
+        "name": "input_registers_start",
+        "desc": "输入寄存器起始地址。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_registers_count",
+        "desc": "输入寄存器数量。",
+        "type": "uint32_t"
+      },
+      {
+        "name": "input_registers_data",
+        "desc": "输入寄存器数据。",
+        "type": "uint16_t*"
+      }
+    ],
+    "header": "src/modbus_memory_default.h",
+    "desc": "modbus的默认实现。",
+    "name": "modbus_memory_default_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
       {
         "params": [
           {
@@ -1229,70 +1317,9 @@
       }
     ],
     "events": [],
-    "properties": [
-      {
-        "name": "bits_start",
-        "desc": "位起始地址。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "bits_count",
-        "desc": "位数量。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "bits_data",
-        "desc": "位数据。",
-        "type": "uint8_t*"
-      },
-      {
-        "name": "input_bits_start",
-        "desc": "输入位起始地址。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "input_bits_count",
-        "desc": "输入位数量。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "input_bits_data",
-        "desc": "输入位数据。",
-        "type": "uint8_t*"
-      },
-      {
-        "name": "registers_start",
-        "desc": "寄存器起始地址。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "registers_count",
-        "desc": "寄存器数量。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "registers_data",
-        "desc": "寄存器数据。",
-        "type": "uint16_t*"
-      },
-      {
-        "name": "input_registers_start",
-        "desc": "输入寄存器起始地址。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "input_registers_count",
-        "desc": "输入寄存器数量。",
-        "type": "uint32_t"
-      },
-      {
-        "name": "input_registers_data",
-        "desc": "输入寄存器数据。",
-        "type": "uint16_t*"
-      }
-    ],
+    "properties": [],
     "header": "src/modbus_memory.h",
-    "desc": "modbus memory",
+    "desc": "modbus memory接口。",
     "name": "modbus_memory_t",
     "level": 1
   },
@@ -1310,11 +1337,6 @@
             "type": "modbus_memory_t*",
             "name": "memory",
             "desc": "内存对象。"
-          },
-          {
-            "type": "modbus_hook_t*",
-            "name": "hook",
-            "desc": "hook对象。"
           },
           {
             "type": "const char*",
@@ -1362,11 +1384,6 @@
             "desc": "内存对象。"
           },
           {
-            "type": "modbus_hook_t*",
-            "name": "hook",
-            "desc": "hook对象。"
-          },
-          {
             "type": "int",
             "name": "port",
             "desc": "端口。"
@@ -1412,6 +1429,27 @@
             "desc": "io对象。"
           },
           {
+            "type": "void*",
+            "name": "args",
+            "desc": "参数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus service。",
+        "name": "modbus_service_create",
+        "return": {
+          "type": "tk_service_t*",
+          "desc": "返回modbus service对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "tk_iostream_t*",
+            "name": "io",
+            "desc": "io对象。"
+          },
+          {
             "type": "modbus_proto_t",
             "name": "proto",
             "desc": "协议。"
@@ -1446,27 +1484,6 @@
         "annotation": {},
         "desc": "设置slave。",
         "name": "modbus_service_set_slave",
-        "return": {
-          "type": "ret_t",
-          "desc": "返回RET_OK表示成功，否则表示失败。"
-        }
-      },
-      {
-        "params": [
-          {
-            "type": "modbus_service_t*",
-            "name": "service",
-            "desc": "modbus service对象。"
-          },
-          {
-            "type": "modbus_hook_t*",
-            "name": "hook",
-            "desc": "hook对象。"
-          }
-        ],
-        "annotation": {},
-        "desc": "设置hook。",
-        "name": "modbus_service_set_hook",
         "return": {
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"

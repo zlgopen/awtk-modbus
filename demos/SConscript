@@ -4,5 +4,5 @@ env=DefaultEnvironment().Clone()
 BIN_DIR=os.environ['BIN_DIR'];
 
 env.Program(os.path.join(BIN_DIR, 'modbus_client'), Glob('client.c'))
-env.Program(os.path.join(BIN_DIR, 'modbus_server'), Glob('server.c'))
-env.Program(os.path.join(BIN_DIR, 'modbus_server_awtk'), Glob('server_awtk.c'))
+env.Program(os.path.join(BIN_DIR, 'modbus_server'), ['server.c', 'modbus_memory_custom.c'])
+env.Program(os.path.join(BIN_DIR, 'modbus_server_awtk'), ['server_awtk.c', 'modbus_memory_custom.c'])

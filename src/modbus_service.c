@@ -35,6 +35,10 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
   service->memory = memory;
   modbus_common_init(&service->common, io, proto);
 
+  if (MODBUS_PROTO_TCP == proto) {
+    modbus_service_set_slave(service, 0xff);
+  }
+
   return service;
 }
 
@@ -51,6 +55,11 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
   memset(&resp_data, 0x00, sizeof(resp_data));
 
   ret = modbus_common_recv_req(&service->common, &req_data);
+
+  if (ret == RET_EOS || ret == RET_IO) {
+    return RET_REMOVE;
+  }
+
   if (ret == RET_OK) {
     modbus_memory_t* memory = service->memory;
 
@@ -63,8 +72,6 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 #endif
       return RET_OK;
     }
-
-    modbus_hook_before_request(service->hook, &req_data);
 
     resp_data.addr = req_data.addr;
     resp_data.count = req_data.count;
@@ -116,7 +123,6 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     }
 
     log_debug("%d done\n", req_data.func_code);
-    modbus_hook_after_request(service->hook, &resp_data, ret);
 
     if (ret == RET_OK) {
       return modbus_common_send_resp(&service->common, &resp_data);
@@ -135,14 +141,6 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 
   log_debug("%d failed\n", req_data.func_code);
   return modbus_common_send_exception_resp(&service->common, req_data.func_code, code);
-}
-
-ret_t modbus_service_set_hook(modbus_service_t* service, modbus_hook_t* hook) {
-  return_value_if_fail(service != NULL, RET_BAD_PARAMS);
-
-  service->hook = hook;
-
-  return RET_OK;
 }
 
 static ret_t service_on_request(event_source_t* source) {
@@ -200,10 +198,27 @@ ret_t modbus_service_run(modbus_service_t* service) {
 }
 
 ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave) {
-  modbus_common_t* common = (modbus_common_t*)service;
-  return_value_if_fail(common != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(service != NULL, RET_BAD_PARAMS);
 
-  common->slave = slave;
+  service->common.slave = slave;
 
   return RET_OK;
+}
+
+tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
+  modbus_service_t* service = NULL;
+  modbus_service_args_t* service_args = (modbus_service_args_t*)args;
+  return_value_if_fail(io != NULL && args != NULL, NULL);
+  
+  service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
+  return_value_if_fail(service != NULL, NULL);
+
+  service->service.dispatch = (tk_service_dispatch_t)modbus_service_dispatch;
+  service->service.destroy = (tk_service_destroy_t)modbus_service_destroy;
+  service->service.io = io;
+
+  if (service_args->proto == MODBUS_PROTO_RTU) {
+    modbus_service_set_slave(service, service_args->slave);
+  }
+  return (tk_service_t*)service;
 }

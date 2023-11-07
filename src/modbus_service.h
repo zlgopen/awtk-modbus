@@ -24,9 +24,15 @@
 
 #include "modbus_common.h"
 #include "modbus_memory.h"
-#include "modbus_hook.h"
+#include "service/service.h"
 
 BEGIN_C_DECLS
+
+typedef struct _modbus_service_args_t {
+  modbus_proto_t proto;
+  modbus_memory_t* memory;
+  uint8_t slave;
+} modbus_service_args_t;
 
 /**
  * @class modbus_service_t
@@ -34,10 +40,19 @@ BEGIN_C_DECLS
  * modbus service
  */
 typedef struct _modbus_service_t {
+  tk_service_t service;
   modbus_common_t common;
   modbus_memory_t* memory;
-  modbus_hook_t* hook;
 } modbus_service_t;
+
+/**
+ * @method modbus_service_create
+ * 创建modbus service。
+ * @param {tk_iostream_t*} io io对象。
+ * @param {void*} args 参数。
+ * @return {tk_service_t*} 返回modbus service对象。
+ */
+tk_service_t* modbus_service_create(tk_iostream_t* io, void* args);
 
 /**
  * @method modbus_service_create_with_io
@@ -58,15 +73,6 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave);
-
-/**
- * @method modbus_service_set_hook
- * 设置hook。
- * @param {modbus_service_t*} service modbus service对象。
- * @param {modbus_hook_t*} hook hook对象。
- * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
- */
-ret_t modbus_service_set_hook(modbus_service_t* service, modbus_hook_t* hook);
 
 /**
  * @method modbus_service_dispatch

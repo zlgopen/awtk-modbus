@@ -321,6 +321,9 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
       iter = conf_node_get_first_child(doc->root);
       times--;
       log_debug("=============%u===============\n", times);
+      if (times == 0) {
+        break;
+      }
     }
   }
 

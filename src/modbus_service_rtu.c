@@ -23,28 +23,13 @@
 #include "modbus_service_rtu.h"
 
 ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* memory,
-                               modbus_hook_t* hook, const char* url, uint8_t slave) {
-  tk_iostream_t* io = NULL;
-  modbus_service_t* service = NULL;
-  return_value_if_fail(url != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
-  io = tk_stream_factory_create_iostream(url);
-  return_value_if_fail(io != NULL, RET_OOM);
+                               const char* url, uint8_t slave) {
+  static modbus_service_args_t args;
+  return_value_if_fail(memory != NULL && url != NULL, RET_BAD_PARAMS);
 
-  service = modbus_service_create_with_io(io, MODBUS_PROTO_RTU, memory);
-  modbus_service_set_slave(service, slave);
+  args.memory = memory;
+  args.proto = MODBUS_PROTO_RTU;
+  args.slave = slave;
 
-  goto_error_if_fail(service != NULL);
-  modbus_service_set_hook(service, hook);
-  if (esm != NULL) {
-    return modbus_service_attach_to_event_source_manager(service, esm);
-  } else {
-    modbus_service_run(service);
-    modbus_service_destroy(service);
-    return RET_OK;
-  }
-error:
-  TK_OBJECT_UNREF(io);
-
-  return RET_OOM;
+  tk_service_start(esm, url, modbus_service_create, &args);
 }

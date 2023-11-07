@@ -21,251 +21,98 @@
 
 #include "modbus_memory.h"
 
-modbus_memory_t* modbus_memory_create(uint32_t bits_start, uint32_t bits_count,
-                                      uint32_t input_bits_start, uint32_t input_bits_count,
-                                      uint32_t registers_start, uint32_t registers_count,
-                                      uint32_t input_registers_start,
-                                      uint32_t input_registers_count) {
-  modbus_memory_t* memory = TKMEM_ZALLOC(modbus_memory_t);
-  return_value_if_fail(memory != NULL, NULL);
-
-  memory->bits_start = bits_start;
-  memory->bits_count = bits_count;
-  memory->input_bits_start = input_bits_start;
-  memory->input_bits_count = input_bits_count;
-  memory->registers_start = registers_start;
-  memory->registers_count = registers_count;
-  memory->input_registers_start = input_registers_start;
-  memory->input_registers_count = input_registers_count;
-
-  memory->bits_data = TKMEM_ALLOC(bits_count);
-  goto_error_if_fail(memory->bits_data != NULL);
-
-  memory->input_bits_data = TKMEM_ALLOC(input_bits_count);
-  goto_error_if_fail(memory->input_bits_data != NULL);
-
-  memory->registers_data = TKMEM_ALLOC(registers_count * sizeof(uint16_t));
-  goto_error_if_fail(memory->registers_data != NULL);
-
-  memory->input_registers_data = TKMEM_ALLOC(input_registers_count * sizeof(uint16_t));
-  goto_error_if_fail(memory->input_registers_data != NULL);
-
-  return memory;
-
-error:
-  modbus_memory_destroy(memory);
-  return NULL;
-}
-
-typedef struct _bits_memory_t {
-  uint32_t start;
-  uint32_t count;
-  uint8_t* data;
-} bits_memory_t;
-
-ret_t modbus_memory_read_bits_impl(bits_memory_t* memory, uint16_t addr, uint16_t count,
-                                   uint8_t* buff) {
-  uint32_t i = 0;
-  uint8_t* p = NULL;
-  uint16_t offset = 0;
-  uint16_t bytes = modbus_bits_to_bytes(count);
-
-  if (count < 1 || count > MODBUS_MAX_READ_BITS) {
-    return RET_EXCEED_RANGE;
-  }
-
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    bits_stream_set(buff, bytes, i, p[i]);
-  }
-
-  return RET_OK;
-}
-
 ret_t modbus_memory_read_bits(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                               uint8_t* buff) {
-  bits_memory_t bits_memory;
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
 
-  bits_memory.start = memory->bits_start;
-  bits_memory.count = memory->bits_count;
-  bits_memory.data = memory->bits_data;
+  if (memory->read_bits != NULL) {
+    return memory->read_bits(memory, addr, count, buff);
+  }
 
-  return modbus_memory_read_bits_impl(&bits_memory, addr, count, buff);
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_read_input_bits(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                     uint8_t* buff) {
-  bits_memory_t bits_memory;
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  bits_memory.start = memory->input_bits_start;
-  bits_memory.count = memory->input_bits_count;
-  bits_memory.data = memory->input_bits_data;
 
-  return modbus_memory_read_bits_impl(&bits_memory, addr, count, buff);
-}
-
-typedef struct _register_memory_t {
-  uint32_t start;
-  uint32_t count;
-  uint16_t* data;
-} register_memory_t;
-
-static ret_t modbus_memory_read_registers_impl(register_memory_t* memory, uint16_t addr,
-                                               uint16_t count, uint16_t* buff) {
-  uint32_t i = 0;
-  uint16_t* p = NULL;
-  uint16_t offset = 0;
-
-  if (count < 1 || count > MODBUS_MAX_READ_REGISTERS) {
-    return RET_EXCEED_RANGE;
+  if (memory->read_input_bits != NULL) {
+    return memory->read_input_bits(memory, addr, count, buff);
   }
 
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    buff[i] = htons(p[i]);
-  }
-
-  return RET_OK;
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_read_registers(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                    uint16_t* buff) {
-  register_memory_t register_memory;
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  register_memory.start = memory->registers_start;
-  register_memory.count = memory->registers_count;
-  register_memory.data = memory->registers_data;
 
-  return modbus_memory_read_registers_impl(&register_memory, addr, count, buff);
+  if (memory->read_registers != NULL) {
+    return memory->read_registers(memory, addr, count, buff);
+  }
+
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_read_input_registers(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                          uint16_t* buff) {
-  register_memory_t register_memory;
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  register_memory.start = memory->input_registers_start;
-  register_memory.count = memory->input_registers_count;
-  register_memory.data = memory->input_registers_data;
-
-  return modbus_memory_read_registers_impl(&register_memory, addr, count, buff);
-}
-
-static ret_t modbus_memory_write_bits_impl(bits_memory_t* memory, uint16_t addr, uint16_t count,
-                                           const uint8_t* buff) {
-  uint32_t i = 0;
-  uint8_t* p = NULL;
-  uint16_t offset = 0;
-  uint16_t bytes = modbus_bits_to_bytes(count);
-
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
 
-  if (count < 1 || count > MODBUS_MAX_WRITE_BITS) {
-    return RET_EXCEED_RANGE;
+  if (memory->read_input_registers != NULL) {
+    return memory->read_input_registers(memory, addr, count, buff);
   }
 
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    bool_t v = FALSE;
-    bits_stream_get(buff, bytes, i, &v);
-    p[i] = v;
-  }
-
-  return RET_OK;
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_write_bit(modbus_memory_t* memory, uint16_t addr, uint8_t value) {
-  return modbus_memory_write_bits(memory, addr, 1, &value);
+  return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
+
+  if (memory->write_bit != NULL) {
+    return memory->write_bit(memory, addr, value);
+  }
+
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_write_bits(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                const uint8_t* buff) {
-  bits_memory_t bits_memory;
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  bits_memory.start = memory->bits_start;
-  bits_memory.count = memory->bits_count;
-  bits_memory.data = memory->bits_data;
 
-  return modbus_memory_write_bits_impl(&bits_memory, addr, count, buff);
+  if (memory->write_bits != NULL) {
+    return memory->write_bits(memory, addr, count, buff);
+  }
+
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_write_register(modbus_memory_t* memory, uint16_t addr, uint16_t value) {
-  return modbus_memory_write_registers(memory, addr, 1, &value);
-}
+  return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
 
-static ret_t modbus_memory_write_registers_impl(register_memory_t* memory, uint16_t addr,
-                                                uint16_t count, const uint16_t* buff) {
-  uint32_t i = 0;
-  uint16_t* p = NULL;
-  uint16_t offset = 0;
-
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-
-  if (count < 1 || count > MODBUS_MAX_WRITE_REGISTERS) {
-    return RET_EXCEED_RANGE;
+  if (memory->write_register != NULL) {
+    return memory->write_register(memory, addr, value);
   }
 
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    p[i] = ntohs(buff[i]);
-  }
-
-  return RET_OK;
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_write_registers(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                     const uint16_t* buff) {
-  register_memory_t register_memory;
   return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  register_memory.start = memory->registers_start;
-  register_memory.count = memory->registers_count;
-  register_memory.data = memory->registers_data;
 
-  return modbus_memory_write_registers_impl(&register_memory, addr, count, buff);
+  if (memory->write_registers != NULL) {
+    return memory->write_registers(memory, addr, count, buff);
+  }
+
+  return RET_NOT_IMPL;
 }
 
 ret_t modbus_memory_destroy(modbus_memory_t* memory) {
   return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
 
-  if (memory->bits_data != NULL) {
-    TKMEM_FREE(memory->bits_data);
+  if (memory->destroy != NULL) {
+    return memory->destroy(memory);
   }
-  if (memory->input_bits_data != NULL) {
-    TKMEM_FREE(memory->input_bits_data);
-  }
-  if (memory->registers_data != NULL) {
-    TKMEM_FREE(memory->registers_data);
-  }
-  if (memory->input_registers_data != NULL) {
-    TKMEM_FREE(memory->input_registers_data);
-  }
-  TKMEM_FREE(memory);
 
   return RET_OK;
 }

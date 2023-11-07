@@ -22,36 +22,38 @@
 #include "modbus_service.h"
 #include "modbus_service_rtu.h"
 #include "modbus_service_tcp.h"
-#include "modbus_memory.h"
-#include "modbus_hook_myapp.c"
+#include "modbus_memory_default.h"
+#include "modbus_memory_custom.h"
 #include "tkc/socket_helper.h"
 #include "streams/stream_factory.h"
 #include "streams/inet/iostream_tcp.h"
 
-static ret_t start_rtu(const char* url, modbus_memory_t* memory) {
-  modbus_hook_t* hook = modbus_hook_myapp_get(memory);
-
-  return modbus_service_rtu_start(NULL, memory, hook, url, MODBUS_DEMO_SLAVE_ID);
+static ret_t start_rtu(event_source_manager_t* esm, const char* url, modbus_memory_t* memory) {
+  return modbus_service_rtu_start(esm, memory, url, MODBUS_DEMO_SLAVE_ID);
 }
 
-static ret_t start_tcp(const char* url, modbus_memory_t* memory, modbus_proto_t proto) {
+static ret_t start_tcp(event_source_manager_t* esm, const char* url, modbus_memory_t* memory, modbus_proto_t proto) {
   const char* p = strrchr(url, ':');
   int port = p != NULL ? tk_atoi(p + 1) : 502;
-  modbus_hook_t* hook = modbus_hook_myapp_get(memory);
 
-  return modbus_service_tcp_start(NULL, memory, hook, port, proto, MODBUS_DEMO_SLAVE_ID);
+  return modbus_service_tcp_start(esm, memory, port, proto, MODBUS_DEMO_SLAVE_ID);
 }
 
 /*生成测试数据*/
 static void modbus_memory_init_demo_data(modbus_memory_t* memory) {
   uint32_t i = 0;
+  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
 
-  for (i = 0; i < memory->input_bits_count; i++) {
-    memory->input_bits_data[i] = i % 2;
+  if (memory_default == NULL) {
+    return;
   }
 
-  for (i = 0; i < memory->input_registers_count; i++) {
-    memory->input_registers_data[i] = (uint16_t)i;
+  for (i = 0; i < memory_default->input_bits_count; i++) {
+    memory_default->input_bits_data[i] = i % 2;
+  }
+
+  for (i = 0; i < memory_default->input_registers_count; i++) {
+    memory_default->input_registers_data[i] = (uint16_t)i;
   }
 
   return;
@@ -59,25 +61,42 @@ static void modbus_memory_init_demo_data(modbus_memory_t* memory) {
 
 int main(int argc, char* argv[]) {
   modbus_memory_t* memory = NULL;
-  const char* url = argc > 1 ? argv[1] : "serial:///dev/ttys124";
+  const char* url = argc > 1 ? argv[1] : "tcp://localhost:502";
+  bool_t use_custom = argc < 3 ? TRUE : FALSE;
+  event_source_manager_t* esm = NULL;
 
   platform_prepare();
   tk_socket_init();
 
-  memory = modbus_memory_create(
-      MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, MODBUS_DEMO_INPUT_BITS_ADDRESS,
-      MODBUS_DEMO_INPUT_BITS_NB, MODBUS_DEMO_REGISTERS_ADDRESS, MODBUS_DEMO_REGISTERS_NB,
-      MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, MODBUS_DEMO_INPUT_REGISTERS_NB);
+  if (use_custom) {
+    log_debug("use custom memory.\n");
+    memory = modbus_memory_custom_create();
+  } else {
+    log_debug("use default memory.\n");
+    memory = modbus_memory_default_create(
+        MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, MODBUS_DEMO_INPUT_BITS_ADDRESS,
+        MODBUS_DEMO_INPUT_BITS_NB, MODBUS_DEMO_REGISTERS_ADDRESS, MODBUS_DEMO_REGISTERS_NB,
+        MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, MODBUS_DEMO_INPUT_REGISTERS_NB);
+  }
 
   modbus_memory_init_demo_data(memory);
+  esm = event_source_manager_default_create();
 
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
-    start_tcp(url, memory, MODBUS_PROTO_TCP);
+    start_tcp(esm, url, memory, MODBUS_PROTO_TCP);
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
-    start_tcp(url, memory, MODBUS_PROTO_RTU);
+    start_tcp(esm, url, memory, MODBUS_PROTO_RTU);
   } else {
-    start_rtu(url, memory);
+    start_rtu(esm, url, memory);
   }
+
+  while(1) {
+    event_source_manager_dispatch(esm);
+
+    sleep_ms(50);
+  }
+
+  event_source_manager_destroy(esm);
 
   modbus_memory_destroy(memory);
   tk_socket_deinit();

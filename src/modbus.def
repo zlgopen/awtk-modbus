@@ -35,7 +35,8 @@ EXPORTS
     modbus_hook_before_request
     modbus_hook_after_request
     modbus_hook_destroy
-    modbus_memory_create
+    modbus_memory_default_create
+    modbus_memory_default_cast
     modbus_memory_read_bits
     modbus_memory_read_input_bits
     modbus_memory_read_registers
@@ -47,9 +48,9 @@ EXPORTS
     modbus_memory_destroy
     modbus_service_rtu_start
     modbus_service_tcp_start
+    modbus_service_create
     modbus_service_create_with_io
     modbus_service_set_slave
-    modbus_service_set_hook
     modbus_service_dispatch
     modbus_service_destroy
     modbus_service_attach_to_event_source_manager
