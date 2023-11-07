@@ -67,6 +67,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 #ifdef WITH_MULT_SLAVES
       log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
 #else
+      log_debug("slave id not match: %d != %d\n", req_data.slave, service->common.slave);
       modbus_common_send_exception_resp(&service->common, req_data.func_code,
                                         MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS);
 #endif

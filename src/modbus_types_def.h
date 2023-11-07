@@ -273,7 +273,7 @@ typedef struct _modbus_rtu_header_t {
 #endif                           /*MODBUS_WRITE_TIMEOUT*/
 
 #ifndef MODBUS_READ_TIMEOUT
-#define MODBUS_READ_TIMEOUT 500 * 1000 /*0.5*/
+#define MODBUS_READ_TIMEOUT 500 /*0.5*/
 #endif                                 /*MODBUS_READ_TIMEOUT*/
 
 /*for demo app*/
