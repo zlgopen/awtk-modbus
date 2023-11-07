@@ -288,7 +288,7 @@ modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits
   return (modbus_memory_t*)memory;
 
 error:
-  modbus_memory_destroy(memory);
+  modbus_memory_destroy((modbus_memory_t*)memory);
   return NULL;
 }
 

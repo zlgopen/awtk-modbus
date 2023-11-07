@@ -31,5 +31,5 @@ ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* mem
   args.proto = MODBUS_PROTO_RTU;
   args.slave = slave;
 
-  tk_service_start(esm, url, modbus_service_create, &args);
+  return tk_service_start(esm, url, modbus_service_create, &args);
 }
