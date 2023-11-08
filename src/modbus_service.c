@@ -33,8 +33,9 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
   return_value_if_fail(service != NULL, NULL);
 
   service->memory = memory;
-  modbus_common_init(&service->common, io, proto);
-
+  tk_service_init(&(service->service), io);
+  modbus_common_init(MODBUS_COMMON(service), io, proto, &(service->service.wb));
+  
   if (MODBUS_PROTO_TCP == proto) {
     modbus_service_set_slave(service, 0xff);
   }
@@ -54,7 +55,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
   memset(&req_data, 0x00, sizeof(req_data));
   memset(&resp_data, 0x00, sizeof(resp_data));
 
-  ret = modbus_common_recv_req(&service->common, &req_data);
+  ret = modbus_common_recv_req(MODBUS_COMMON(service), &req_data);
 
   if (ret == RET_EOS || ret == RET_IO) {
     return RET_REMOVE;
@@ -68,7 +69,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
       log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
 #else
       log_debug("slave id not match: %d != %d\n", req_data.slave, service->common.slave);
-      modbus_common_send_exception_resp(&service->common, req_data.func_code,
+      modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code,
                                         MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS);
 #endif
       return RET_OK;
@@ -126,7 +127,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     log_debug("%d done\n", req_data.func_code);
 
     if (ret == RET_OK) {
-      return modbus_common_send_resp(&service->common, &resp_data);
+      return modbus_common_send_resp(MODBUS_COMMON(service), &resp_data);
     }
   }
 
@@ -141,7 +142,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
   }
 
   log_debug("%d failed\n", req_data.func_code);
-  return modbus_common_send_exception_resp(&service->common, req_data.func_code, code);
+  return modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code, code);
 }
 
 static ret_t service_on_request(event_source_t* source) {
@@ -173,7 +174,7 @@ ret_t modbus_service_attach_to_event_source_manager(modbus_service_t* service,
 ret_t modbus_service_destroy(modbus_service_t* service) {
   return_value_if_fail(service != NULL, RET_BAD_PARAMS);
 
-  modbus_common_deinit(&service->common);
+  modbus_common_deinit(MODBUS_COMMON(service));
   TKMEM_FREE(service);
 
   return RET_OK;

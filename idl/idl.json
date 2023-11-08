@@ -368,6 +368,11 @@
             "type": "modbus_proto_t",
             "name": "proto",
             "desc": "协议。"
+          },
+          {
+            "type": "wbuffer_t*",
+            "name": "wb",
+            "desc": "wbuffer对象。"
           }
         ],
         "annotation": {},

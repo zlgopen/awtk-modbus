@@ -72,9 +72,6 @@ typedef struct _modbus_common_t {
    * 最后一次的错误码。
   */
   modbus_exeption_code_t last_exception_code;
-
-  /*private*/
-  wbuffer_t wb;
 } modbus_common_t;
 
 /**
@@ -83,9 +80,10 @@ typedef struct _modbus_common_t {
  * @param {modbus_common_t*} common modbus_common_t对象。
  * @param {tk_iostream_t*} io io对象。
  * @param {modbus_proto_t} proto 协议。
+ * @param {wbuffer_t*} wb wbuffer对象。
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto);
+ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto, wbuffer_t* wb);
 
 /**
  * @method modbus_common_send_read_bits_req
@@ -265,6 +263,8 @@ ret_t modbus_common_send_resp(modbus_common_t* common, modbus_resp_data_t* resp_
  */
 ret_t modbus_common_send_exception_resp(modbus_common_t* common, uint8_t func_code,
                                         modbus_exeption_code_t code);
+
+#define MODBUS_COMMON(obj) ((obj) != NULL ? &((obj)->common) : NULL)
 
 END_C_DECLS
 

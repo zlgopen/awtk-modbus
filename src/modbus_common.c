@@ -80,17 +80,15 @@ static ret_t modbus_common_pack_tail(modbus_common_t* common) {
   return RET_OK;
 }
 
-ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto) {
-  return_value_if_fail(common != NULL && io != NULL, RET_BAD_PARAMS);
+ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto, wbuffer_t* wb) {
+  return_value_if_fail(common != NULL && io != NULL && wb != NULL, RET_BAD_PARAMS);
 
   common->io = io;
   common->proto = proto;
   common->transaction_id = 1;
   common->read_timeout = MODBUS_READ_TIMEOUT;
   common->write_timeout = MODBUS_WRITE_TIMEOUT;
-  common->wbuffer = wbuffer_init_extendable(&(common->wb));
-
-  wbuffer_extend_capacity(common->wbuffer, 2048);
+  common->wbuffer = wb;
 
   return RET_OK;
 }
@@ -417,8 +415,6 @@ ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common) {
 
 ret_t modbus_common_deinit(modbus_common_t* common) {
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
-  wbuffer_deinit(common->wbuffer);
-  TK_OBJECT_UNREF(common->io);
 
   return RET_OK;
 }

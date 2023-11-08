@@ -22,6 +22,7 @@
 #ifndef TK_MODBUS_CLIENT_H
 #define TK_MODBUS_CLIENT_H
 
+#include "service/client.h"
 #include "modbus_common.h"
 
 BEGIN_C_DECLS
@@ -70,6 +71,7 @@ BEGIN_C_DECLS
  *```  
  */
 typedef struct _modbus_client_t {
+  tk_client_t client;
   modbus_common_t common;
 
   /**

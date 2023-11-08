@@ -33,7 +33,8 @@ modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t 
   client = TKMEM_ZALLOC(modbus_client_t);
   goto_error_if_fail(client != NULL);
 
-  modbus_common_init(&client->common, io, proto);
+  tk_client_init(&(client->client), io);
+  modbus_common_init(&client->common, io, proto, &(client->client.wb));
   modbus_client_set_retry_times(client, 3);
 
   return client;
@@ -82,7 +83,7 @@ ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_time
 static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_code, uint16_t addr,
                                         uint16_t count, uint8_t* buff) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_read_bits_req(common, func_code, addr, count);
@@ -132,7 +133,7 @@ ret_t modbus_client_read_input_bits(modbus_client_t* client, uint16_t addr, uint
 static ret_t modbus_client_read_registers_ex(modbus_client_t* client, uint16_t func_code,
                                              uint16_t addr, uint16_t count, uint16_t* buff) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_read_registers_req(common, func_code, addr, count);
@@ -181,7 +182,7 @@ ret_t modbus_client_read_input_registers(modbus_client_t* client, uint16_t addr,
 
 static ret_t modbus_client_write_bit_impl(modbus_client_t* client, uint16_t addr, uint8_t value) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_write_bit_req(common, addr, value);
@@ -193,7 +194,7 @@ static ret_t modbus_client_write_bit_impl(modbus_client_t* client, uint16_t addr
 static ret_t modbus_client_write_register_impl(modbus_client_t* client, uint16_t addr,
                                                uint16_t value) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_write_register_req(common, addr, value);
@@ -205,7 +206,7 @@ static ret_t modbus_client_write_register_impl(modbus_client_t* client, uint16_t
 static ret_t modbus_client_write_bits_impl(modbus_client_t* client, uint16_t addr, uint16_t count,
                                            const uint8_t* buff) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_write_bits_req(common, addr, count, buff);
@@ -217,7 +218,7 @@ static ret_t modbus_client_write_bits_impl(modbus_client_t* client, uint16_t add
 static ret_t modbus_client_write_registers_impl(modbus_client_t* client, uint16_t addr,
                                                 uint16_t count, const uint16_t* buff) {
   ret_t ret = RET_OK;
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
   ret = modbus_common_send_write_registers_req(common, addr, count, buff);
@@ -297,7 +298,7 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
 }
 
 ret_t modbus_client_set_slave(modbus_client_t* client, uint8_t slave) {
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
   common->slave = slave;
@@ -306,9 +307,10 @@ ret_t modbus_client_set_slave(modbus_client_t* client, uint8_t slave) {
 }
 
 ret_t modbus_client_destroy(modbus_client_t* client) {
-  modbus_common_t* common = (modbus_common_t*)client;
+  modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
+  tk_client_deinit(&(client->client));
   modbus_common_deinit(common);
   TKMEM_FREE(client);
 
