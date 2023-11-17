@@ -33,7 +33,7 @@ modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t 
   client = TKMEM_ZALLOC(modbus_client_t);
   goto_error_if_fail(client != NULL);
 
-  tk_client_init(&(client->client), io);
+  tk_client_init(&(client->client), io, NULL);
   modbus_common_init(&client->common, io, proto, &(client->client.wb));
   modbus_client_set_retry_times(client, 3);
 
