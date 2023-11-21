@@ -109,3 +109,9 @@ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 ```
 
 > 本文以 Linux/MacOS 为例，Windows 可能会微妙差异，请酌情处理。
+
+### 致谢
+
+ * 感谢 QY 同学提供大量建设性意见和使用反馈。
+
+
