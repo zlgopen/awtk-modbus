@@ -19,7 +19,6 @@
  *
  */
 
-#include "delay.h"
 #include "tkc/mem.h"
 #include "base/timer.h"
 #include "tkc/platform.h"
