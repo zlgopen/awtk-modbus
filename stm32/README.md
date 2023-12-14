@@ -101,3 +101,17 @@ platform\uart_hal.c
 ```
 stm32743.inc
 ```
+
+# 其它
+
+* 如果出现下列错误：
+
+```
+Undefined symbol wcscmp
+```
+
+> 请定义下面的宏
+
+```
+WITH_WCSXXX
+```
