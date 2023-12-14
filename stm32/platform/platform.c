@@ -31,13 +31,13 @@ uint32_t s_heap_mem[10240];
 
 ret_t platform_prepare(void) {
   static bool_t inited = FALSE;
-	
+
   if (!inited) {
     inited = TRUE;
     tk_mem_init(s_heap_mem, sizeof(s_heap_mem));
   }
-  
-	sys_tick_init(400);
-	
+
+  sys_tick_init(400);
+
   return RET_OK;
 }
