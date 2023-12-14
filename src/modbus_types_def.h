@@ -22,7 +22,11 @@
 #ifndef TK_MODBUS_TYPES_DEF_H
 #define TK_MODBUS_TYPES_DEF_H
 
-#include "tkc.h"
+#include "tkc/types_def.h"
+#include "tkc/endian.h"
+
+#define TK_HTONS int16_to_big_endian
+#define TK_NTOHS int16_from_big_endian
 
 BEGIN_C_DECLS
 

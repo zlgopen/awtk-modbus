@@ -19,6 +19,7 @@
  *
  */
 
+#include "tkc.h"
 #include "modbus_service.h"
 #include "modbus_service_rtu.h"
 #include "modbus_service_tcp.h"

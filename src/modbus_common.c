@@ -19,11 +19,12 @@
  *
  */
 
+#include "tkc/crc.h"
 #include "modbus_common.h"
 
 static ret_t modbus_common_pack_uint16(modbus_common_t* common, uint16_t value) {
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
-  value = htons(value);
+  value = TK_HTONS(value);
   return_value_if_fail(wbuffer_write_uint16(common->wbuffer, value) == RET_OK, RET_FAIL);
 
   return RET_OK;
@@ -159,7 +160,7 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     func_code = header->func_code;
     return_value_if_fail(header->unit_id == 0xff, RET_FAIL);
     return_value_if_fail(header->protocol_id == 0, RET_FAIL);
-    return_value_if_fail(header->transaction_id == htons(common->transaction_id), RET_FAIL);
+    return_value_if_fail(header->transaction_id == TK_HTONS(common->transaction_id), RET_FAIL);
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
     int32_t ret = modbus_common_read_len(common, buff, sizeof(*header));
@@ -486,9 +487,9 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     func_code = header->func_code;
     return_value_if_fail(header->unit_id == 0xff, RET_FAIL);
     return_value_if_fail(header->protocol_id == 0, RET_FAIL);
-    transaction_id = htons(header->transaction_id);
+    transaction_id = TK_HTONS(header->transaction_id);
     return_value_if_fail(transaction_id > common->transaction_id || transaction_id == 0, RET_FAIL);
-    common->transaction_id = htons(header->transaction_id);
+    common->transaction_id = TK_HTONS(header->transaction_id);
     req_data->slave = header->unit_id;
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;

@@ -20,7 +20,7 @@
  */
 
 #include "tkc/url.h"
-#include "streams/inet/iostream_tcp.h"
+//#include "streams/inet/iostream_tcp.h"
 #include "streams/serial/iostream_serial.h"
 #include "streams/stream_factory.h"
 

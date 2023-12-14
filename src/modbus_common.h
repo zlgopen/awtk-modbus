@@ -23,6 +23,11 @@
 #define TK_MODBUS_COMMON_H
 
 #include "modbus_types_def.h"
+#include "tkc/buffer.h"
+#include "tkc/iostream.h"
+#include "tkc/mem.h"
+#include "tkc/utils.h"
+#include "tkc/fs.h"
 
 BEGIN_C_DECLS
 

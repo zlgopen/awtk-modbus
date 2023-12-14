@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "tkc/utils.h"
 #include "modbus_memory_default.h"
 
 #define BITS_START 0

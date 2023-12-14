@@ -20,6 +20,7 @@
  */
 
 #include "modbus_service.h"
+#include "tkc/event_source_fd.h"
 
 BEGIN_C_DECLS
 

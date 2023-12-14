@@ -20,6 +20,8 @@
  */
 
 #include "modbus_service_tcp.h"
+#ifdef WITH_SOCKET
+
 #include "streams/inet/iostream_tcp.h"
 
 ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* memory, int port,
@@ -35,3 +37,9 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
 
   return tk_service_start(esm, url, modbus_service_create, &args);
 }
+#else
+ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* memory, int port,
+                               modbus_proto_t proto, uint8_t slave) {
+  return RET_NOT_IMPL;
+}
+#endif /*WITH_SOCKET*/

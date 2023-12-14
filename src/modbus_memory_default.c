@@ -18,7 +18,8 @@
  * 2023-10-02 Li XianJing <lixianjing@zlg.cn> created
  *
  */
-
+#include "tkc/mem.h"
+#include "tkc/utils.h"
 #include "modbus_memory_default.h"
 
 typedef struct _bits_memory_t {
@@ -104,7 +105,7 @@ static ret_t modbus_memory_read_registers_impl(register_memory_t* memory, uint16
   p = memory->data + offset;
 
   for (i = 0; i < count; i++) {
-    buff[i] = htons(p[i]);
+    buff[i] = TK_HTONS(p[i]);
   }
 
   return RET_OK;
@@ -206,7 +207,7 @@ static ret_t modbus_memory_write_registers_impl(register_memory_t* memory, uint1
   p = memory->data + offset;
 
   for (i = 0; i < count; i++) {
-    p[i] = ntohs(buff[i]);
+    p[i] = TK_NTOHS(buff[i]);
   }
 
   return RET_OK;

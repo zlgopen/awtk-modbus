@@ -32,9 +32,6 @@ EXPORTS
     modbus_common_recv_req
     modbus_common_send_resp
     modbus_common_send_exception_resp
-    modbus_hook_before_request
-    modbus_hook_after_request
-    modbus_hook_destroy
     modbus_memory_default_create
     modbus_memory_default_cast
     modbus_memory_read_bits
