@@ -34,7 +34,7 @@ static void* modbus_service_func(void* args) {
 
 ret_t modbus_service_start(const char* device) {
   return_value_if_fail(s_modbus_running == FALSE, RET_OK);
-  return_value_if_equal(s_modbus_thread == NULL, RET_FAIL);
+  return_value_if_fail(s_modbus_thread == NULL, RET_FAIL);
 
   s_modbus_thread = tk_thread_create(modbus_service_func, (void*)device);
   return_value_if_fail(s_modbus_thread != NULL, RET_FAIL);
