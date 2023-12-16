@@ -26,7 +26,13 @@
 
 void sys_tick_init(int SYSCLK);
 
-uint32_t s_heap_mem[10240];
+#ifdef STM32F10X_HD
+#define TKC_HEAP_SIZE (1024 * 5)
+#else
+#define TKC_HEAP_SIZE (1024 * 10)
+#endif/*STM32F10X_HD*/
+
+uint32_t s_heap_mem[TKC_HEAP_SIZE];
 
 ret_t platform_prepare(void) {
   static bool_t inited = FALSE;

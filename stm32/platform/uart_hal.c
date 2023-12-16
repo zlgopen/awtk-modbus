@@ -28,7 +28,10 @@
 #include "zdp.inc"
 #elif defined(STM32H743xx)
 #define WITH_UART 1
-#include "stm32743.inc"
+#include "stm32h743.inc"
+#elif defined(STM32F10X_HD)
+#define WITH_UART 1
+#include "stm32f103.inc"
 #endif /*HMI_ZDP1440D*/
 
 /*========================================================*/
