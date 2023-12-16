@@ -34,7 +34,7 @@
 #include "stm32f103.inc"
 #elif defined(STM32F429xx)
 #define WITH_UART 1
-#include "stm32f407.inc"
+#include "stm32f429.inc"
 #endif /*HMI_ZDP1440D*/
 
 /*========================================================*/
