@@ -21,13 +21,13 @@
 #include "task.h"
 
 /************************************************
- ALIENTEK °¢²¨ÂŞSTM32H7¿ª·¢°å ÊµÑé42
- FATFSÊµÑé-HAL¿âº¯Êı°æ
- ¼¼ÊõÖ§³Ö£ºwww.openedv.com
- ÌÔ±¦µêÆÌ£ºhttp://eboard.taobao.com 
- ¹Ø×¢Î¢ĞÅ¹«ÖÚÆ½Ì¨Î¢ĞÅºÅ£º"ÕıµãÔ­×Ó"£¬Ãâ·Ñ»ñÈ¡STM32×ÊÁÏ¡£
- ¹ãÖİÊĞĞÇÒíµç×Ó¿Æ¼¼ÓĞÏŞ¹«Ë¾  
- ×÷Õß£ºÕıµãÔ­×Ó @ALIENTEK
+ ALIENTEK é˜¿æ³¢ç½—STM32H7å¼€å‘æ¿ å®éªŒ42
+ FATFSå®éªŒ-HALåº“å‡½æ•°ç‰ˆ
+ æŠ€æœ¯æ”¯æŒï¼šwww.openedv.com
+ æ·˜å®åº—é“ºï¼šhttp://eboard.taobao.com 
+ å…³æ³¨å¾®ä¿¡å…¬ä¼—å¹³å°å¾®ä¿¡å·ï¼š"æ­£ç‚¹åŸå­"ï¼Œå…è´¹è·å–STM32èµ„æ–™ã€‚
+ å¹¿å·å¸‚æ˜Ÿç¿¼ç”µå­ç§‘æŠ€æœ‰é™å…¬å¸  
+ ä½œè€…ï¼šæ­£ç‚¹åŸå­ @ALIENTEK
 ************************************************/
 
 #include "tkc/platform.h"
@@ -54,11 +54,11 @@ static void system_init(void) {
 
 int main(void)
 {
-	system_init();
+  system_init();
   platform_prepare();
 
   rtos_init();
-	modbus_service_start("1");
+  modbus_service_start("1");
   rtos_start();
 
   return 0;
