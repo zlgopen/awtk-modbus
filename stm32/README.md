@@ -83,8 +83,7 @@ FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1
 
 ## 移植
 
-
-* 移植tick中断
+* 移植 tick 中断
 
 ```
 platform\sys_tick.c
@@ -102,7 +101,25 @@ platform\uart_hal.c
 stm32743.inc
 ```
 
-# 其它
+## 内存配置
+
+* TKC 的内存配置 platform/platform.c
+
+默认为 40K，请根据自己的情况调整，不能少于 10K。
+
+```c
+uint32_t s_heap_mem[10240];
+```
+
+* FreeRTOS 的内存配置 FreeRTOS/Source/FreeRTOSConfig.h
+
+默认为 200K，请根据自己的情况调整，如果线程数 < 4，64K 应该是够的。
+
+```c
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 200 * 1024 ) )
+```
+
+## 其它
 
 * 如果出现下列错误：
 
