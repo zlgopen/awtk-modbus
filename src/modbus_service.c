@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   modbus_service.c
  * Author: AWTK Develop Team
  * Brief:  modbus service

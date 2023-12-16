@@ -132,3 +132,11 @@ Undefined symbol wcscmp
 ```
 WITH_WCSXXX
 ```
+
+* 如果出现下列错误：
+
+```
+..\OBJ\awtk.axf: Error: L6200E: Symbol PendSV_Handler multiply defined (by port.o and stm32f4xx_it.o).
+..\OBJ\awtk.axf: Error: L6200E: Symbol SVC_Handler multiply defined (by port.o and stm32f4xx_it.o).
+..\OBJ\awtk.axf: Error: L6200E: Symbol SysTick_Handler multiply defined (by sys_tick_handler.o and stm32f4xx_it.o).
+```
