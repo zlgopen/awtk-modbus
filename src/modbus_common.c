@@ -46,7 +46,7 @@ static ret_t modbus_common_write_crc16(modbus_common_t* common) {
 }
 
 static ret_t modbus_common_pack_header(modbus_common_t* common,
-                                       modbus_function_code_t function_code, uint16_t data_len) {
+                                       uint8_t function_code, uint16_t data_len) {
   wbuffer_t* wb = NULL;
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
 
@@ -201,7 +201,7 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
   } else if (func_code == (expected_func_code | 0x80)) {
     uint8_t exception_code = 0;
     len = modbus_common_read_len(common, &exception_code, 1);
-    common->last_exception_code = exception_code;
+    common->last_exception_code = (modbus_exeption_code_t)exception_code;
     log_debug("%d: %s\n", expected_func_code, modbus_common_get_last_exception_str(common));
     if (modbus_common_check_crc(common, wb->data, wb->cursor) != RET_OK) {
       return RET_CRC;

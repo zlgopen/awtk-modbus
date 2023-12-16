@@ -197,7 +197,7 @@ ret_t modbus_service_run(modbus_service_t* service) {
     }
   } while (TRUE);
 
-  return 0;
+  return RET_OK;
 }
 
 ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave) {
