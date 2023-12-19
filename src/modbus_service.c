@@ -36,7 +36,7 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
   service->memory = memory;
   tk_service_init(&(service->service), io);
   modbus_common_init(MODBUS_COMMON(service), io, proto, &(service->service.wb));
-  
+
   if (MODBUS_PROTO_TCP == proto) {
     modbus_service_set_slave(service, 0xff);
   }
@@ -181,17 +181,26 @@ ret_t modbus_service_destroy(modbus_service_t* service) {
   return RET_OK;
 }
 
+ret_t modbus_service_wait_for_data(modbus_service_t* service, uint32_t timeout) {
+  tk_iostream_t* io = NULL;
+  tk_istream_t* in = NULL;
+  return_value_if_fail(service != NULL, RET_BAD_PARAMS);
+
+  io = service->common.io;
+  in = tk_iostream_get_istream(io);
+  return_value_if_fail(in != NULL, RET_BAD_PARAMS);
+
+  if (!tk_object_get_prop_bool(TK_OBJECT(in), TK_STREAM_PROP_IS_OK, FALSE)) {
+    return RET_IO;
+  }
+
+  return tk_istream_wait_for_data(in, timeout);
+}
+
 ret_t modbus_service_run(modbus_service_t* service) {
-  tk_iostream_t* io = service->common.io;
   do {
-    tk_istream_t* in = tk_iostream_get_istream(io);
-    if (tk_istream_wait_for_data(in, 1000) == RET_OK) {
-      if (tk_object_get_prop_bool(TK_OBJECT(in), TK_STREAM_PROP_IS_OK, FALSE)) {
-        modbus_service_dispatch(service);
-      } else {
-        log_debug("stream broken\n");
-        break;
-      }
+    if (modbus_service_wait_for_data(service, 1000) == RET_OK) {
+      modbus_service_dispatch(service);
     } else {
       sleep_ms(10);
     }
@@ -212,7 +221,7 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
   modbus_service_t* service = NULL;
   modbus_service_args_t* service_args = (modbus_service_args_t*)args;
   return_value_if_fail(io != NULL && args != NULL, NULL);
-  
+
   service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
   return_value_if_fail(service != NULL, NULL);
 

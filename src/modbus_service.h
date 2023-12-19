@@ -83,6 +83,15 @@ ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave);
 ret_t modbus_service_dispatch(modbus_service_t* service);
 
 /**
+ * @method modbus_service_wait_for_data
+ * 等待数据。
+ * @param {modbus_service_t*} service modbus service对象。
+ * @param {uint32_t} timeout 超时时间。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_service_wait_for_data(modbus_service_t* service, uint32_t timeout);
+
+/**
  * @method modbus_service_destroy
  * 销毁modbus service。
  * @param {modbus_service_t*} service modbus service对象。

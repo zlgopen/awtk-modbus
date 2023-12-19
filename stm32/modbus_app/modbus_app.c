@@ -22,8 +22,11 @@ static void* modbus_service_func(void* args) {
 
   modbus_service_set_slave(service, MODBUS_DEMO_SLAVE_ID);
   while (s_modbus_running) {
-    modbus_service_run(service);
-    sleep_ms(50);
+    if (modbus_service_wait_for_data(service, 10) == RET_OK) {
+      modbus_service_dispatch(service);
+    } else {
+      sleep_ms(10);
+    }
   }
 
   modbus_memory_destroy(memory);
@@ -40,8 +43,8 @@ ret_t modbus_service_start(const char* device) {
   return_value_if_fail(s_modbus_thread != NULL, RET_FAIL);
 
   tk_thread_set_name(s_modbus_thread, "modbus");
-  tk_thread_set_stack_size(s_modbus_thread, 0x2000);
-	
+  tk_thread_set_stack_size(s_modbus_thread, 0x1000);
+
   tk_thread_start(s_modbus_thread);
   s_modbus_running = TRUE;
 
@@ -57,4 +60,3 @@ ret_t modbus_service_stop(void) {
 
   return RET_OK;
 }
-

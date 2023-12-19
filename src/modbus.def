@@ -49,6 +49,7 @@ EXPORTS
     modbus_service_create_with_io
     modbus_service_set_slave
     modbus_service_dispatch
+    modbus_service_wait_for_data
     modbus_service_destroy
     modbus_service_attach_to_event_source_manager
     modbus_service_run

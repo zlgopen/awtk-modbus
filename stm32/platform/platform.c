@@ -44,5 +44,7 @@ ret_t platform_prepare(void) {
 
   sys_tick_init(400);
 
+  tk_mem_init_stage2();
+	
   return RET_OK;
 }

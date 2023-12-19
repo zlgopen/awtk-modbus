@@ -1442,6 +1442,27 @@
             "type": "modbus_service_t*",
             "name": "service",
             "desc": "modbus service对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "timeout",
+            "desc": "超时时间。"
+          }
+        ],
+        "annotation": {},
+        "desc": "等待数据。",
+        "name": "modbus_service_wait_for_data",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_service_t*",
+            "name": "service",
+            "desc": "modbus service对象。"
           }
         ],
         "annotation": {},
