@@ -140,3 +140,5 @@ WITH_WCSXXX
 ..\OBJ\awtk.axf: Error: L6200E: Symbol SVC_Handler multiply defined (by port.o and stm32f4xx_it.o).
 ..\OBJ\awtk.axf: Error: L6200E: Symbol SysTick_Handler multiply defined (by sys_tick_handler.o and stm32f4xx_it.o).
 ```
+
+> 请删除 stm32f4xx_it.c 中对应函数。
