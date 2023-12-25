@@ -54,9 +54,9 @@ static void system_init(void) {
 
 int main(void)
 {
-  system_init();
   platform_prepare();
-
+  system_init();
+	
   rtos_init();
   modbus_service_start("1");
   rtos_start();

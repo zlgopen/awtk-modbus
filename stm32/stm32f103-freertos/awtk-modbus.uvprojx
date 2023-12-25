@@ -363,7 +363,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F10X_HD,WITH_WCSXXX</Define>
+              <Define>USE_STDPERIPH_DRIVER,STM32F10X_HD,WITH_WCSXXX,WITH_OS_MEM</Define>
               <Undefine></Undefine>
               <IncludePath>.\User;.\Libraries\CMSIS;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\APP\led;.\Public;.\APP\beep;.\APP\smg;.\APP\key;.\APP\exti;.\APP\time;.\APP\pwm;.\APP\iwdg;.\APP\wwdg;.\APP\input;.\APP\touch_key;.\APP\wkup;.\APP\adc;.\APP\adc_temp;.\APP\dac;.\APP\pwm_dac;.\APP\dma;.\APP\rtc;.\APP\24Cxx;.\APP\iic;.\APP\ds18b20;.\APP\hwjs;.\APP\rs485;.\APP\can;.\APP\tftlcd;.\APP\spi;.\APP\nrf24l01;.\APP\dht11;.\APP\oled;.\APP\RC522;.\APP\Tetris;.\APP\ball;.\APP\touch;.\APP\snake;..\FreeRTOS\Source\include;..\FreeRTOS\Source;..\FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1;..\..\..\awtk\src;..\..\src;..\modbus_app;..\platform\stm32f103</IncludePath>
             </VariousControls>
@@ -663,6 +663,11 @@
               <FileType>1</FileType>
               <FilePath>..\platform\stm32f103\SysTick.c</FilePath>
             </File>
+            <File>
+              <FileName>memory_freertos.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\platform\memory_freertos.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -697,11 +702,6 @@
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FreeRTOS\Source\timers.c</FilePath>
-            </File>
-            <File>
-              <FileName>heap_4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
             </File>
             <File>
               <FileName>FreeRTOSConfig.h</FileName>

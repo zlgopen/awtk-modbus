@@ -15,7 +15,7 @@
 extern ret_t platform_prepare(void);
 extern void systick_enable_int(void);
 
-void hardware_prepare(void) {
+void system_init(void) {
 	SysTick_Init();
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  
 	LED_Init();
@@ -29,7 +29,7 @@ void hardware_prepare(void) {
 #include "modbus_app.h"
 
 int main() {
-  hardware_prepare();
+  system_init();
   platform_prepare();
 	
   rtos_init();

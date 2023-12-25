@@ -57,9 +57,9 @@
 #define configMINIMAL_STACK_SIZE                ( ( uint16_t ) 128 )
 
 #ifdef STM32F10X_HD
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 40 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 60 * 1024 ) )
 #else
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 64 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 128 * 1024 ) )
 #endif
 
 #define configMAX_TASK_NAME_LEN                 ( 16 )

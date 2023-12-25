@@ -43,6 +43,7 @@ platform\platform.c
 platform\serial_helper.c
 platform\sys_tick.c
 platform\uart_hal.c
+platform\memory_freertos.c
 ```
 
 * awtk-modbus/src 目录中的全部 C 文件（建议放到 modbus 分组中）。
@@ -103,20 +104,21 @@ stm32743.inc
 
 ## 内存配置
 
-* TKC 的内存配置 platform/platform.c
+> 内存全部由 FreeRTOS 统一管理。
 
-默认为 40K，请根据自己的情况调整，不能少于 10K。
+* 在工程中定义宏：WITH_OS_MEM
+* 从工程中去掉文件 malloc.c
+* 添加 platform/memory_freertos.c
+* 老版本需要从工程中去掉文件 heap_4.c
 
-```c
-uint32_t s_heap_mem[10240];
-```
-
-* FreeRTOS 的内存配置 FreeRTOS/Source/FreeRTOSConfig.h
-
-默认为 200K，请根据自己的情况调整，如果线程数 < 4，64K 应该是够的。
+根据自己的情况，修改 FreeRTOS 的内存配置 (FreeRTOS/Source/FreeRTOSConfig.h)
 
 ```c
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 200 * 1024 ) )
+#ifdef STM32F10X_HD
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 60 * 1024 ) )
+#else
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 128 * 1024 ) )
+#endif
 ```
 
 ## 其它

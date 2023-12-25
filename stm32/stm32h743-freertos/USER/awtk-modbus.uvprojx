@@ -363,7 +363,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--gnu</MiscControls>
-              <Define>USE_HAL_DRIVER, STM32H743xx,MPL_LOG_NDEBUG=1,EMPL,MPU9250,EMPL_TARGET_STM32F4</Define>
+              <Define>USE_HAL_DRIVER, STM32H743xx,MPL_LOG_NDEBUG=1,EMPL,MPU9250,EMPL_TARGET_STM32F4,WITH_OS_MEM</Define>
               <Undefine></Undefine>
               <IncludePath>..\CORE;..\USER;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HALLIB\STM32H7xx_HAL_Driver\Inc;..\USMART;..\MALLOC;..\HARDWARE\TOUCH;..\HARDWARE\LED;..\HARDWARE\KEY;..\HARDWARE\TIMER;..\HARDWARE\MPU;..\HARDWARE\LCD;..\HARDWARE\SDRAM;..\HARDWARE\24CXX;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\HARDWARE\QSPI;..\HARDWARE\W25QXX;..\HARDWARE\SPI;..\HARDWARE\SDMMC;..\HARDWARE\NAND;..\HARDWARE\QSPI;..\HARDWARE\W25QXX;..\FATFS\exfuns;..\FATFS\source;..\awtk\src\ext_widgets;..\awtk;..\awtk\src;..\awtk\3rd;..\awtk\3rd\nanovg\base;..\awtk\3rd\nanovg;..\awtk\3rd\agge;..\awtk\3rd\libunibreak;..\awtk-port;.\User;.\Libraries\CMSIS;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\APP\led;.\Public;.\APP\beep;.\APP\smg;.\APP\key;.\APP\exti;.\APP\time;.\APP\pwm;.\APP\iwdg;.\APP\wwdg;.\APP\input;.\APP\touch_key;.\APP\wkup;.\APP\adc;.\APP\adc_temp;.\APP\dac;.\APP\pwm_dac;.\APP\dma;.\APP\rtc;.\APP\24Cxx;.\APP\iic;.\APP\ds18b20;.\APP\hwjs;.\APP\rs485;.\APP\can;.\APP\tftlcd;.\APP\spi;.\APP\nrf24l01;.\APP\dht11;.\APP\oled;.\APP\RC522;.\APP\Tetris;.\APP\ball;.\APP\touch;.\APP\snake;..\..\FreeRTOS\Source\include;..\..\FreeRTOS\Source;..\..\FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1;..\..\..\..\awtk\src;..\..\..\src;..\..\modbus_app</IncludePath>
             </VariousControls>
@@ -722,13 +722,6 @@
         </Group>
         <Group>
           <GroupName>MALLOC</GroupName>
-          <Files>
-            <File>
-              <FileName>malloc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MALLOC\malloc.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>FATFS</GroupName>
@@ -843,6 +836,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\platform\uart_hal.c</FilePath>
             </File>
+            <File>
+              <FileName>memory_freertos.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\memory_freertos.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -882,11 +880,6 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1\port.c</FilePath>
-            </File>
-            <File>
-              <FileName>heap_4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
             </File>
             <File>
               <FileName>FreeRTOSConfig.h</FileName>

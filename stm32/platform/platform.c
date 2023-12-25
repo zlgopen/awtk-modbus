@@ -28,30 +28,22 @@ void sys_tick_init(int SYSCLK);
 
 #ifdef STM32F10X_HD
 #define CPU_FREQ 72
-#define TKC_HEAP_SIZE (1024 * 5)
 #elif defined(STM32F429xx)
 #define CPU_FREQ 180
-#define TKC_HEAP_SIZE (1024 * 10)
 #elif defined(STM32H743xx)
 #define CPU_FREQ 400
-#define TKC_HEAP_SIZE (1024 * 10)
 #else
 #error "not support yet"
 #endif/*STM32F10X_HD*/
-
-uint32_t s_heap_mem[TKC_HEAP_SIZE];
 
 ret_t platform_prepare(void) {
   static bool_t inited = FALSE;
 
   if (!inited) {
     inited = TRUE;
-    tk_mem_init(s_heap_mem, sizeof(s_heap_mem));
   }
 
   sys_tick_init(CPU_FREQ);
-
-  tk_mem_init_stage2();
 	
   return RET_OK;
 }
