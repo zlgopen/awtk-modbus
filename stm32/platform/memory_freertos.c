@@ -2,7 +2,7 @@
 #include "tkc/mem.h"
 #include "../FreeRTOS/Source/portable/MemMang/heap_4.c"
 
-/*保证FreeRTOS提供的函数。*/
+/*封装FreeRTOS提供的函数。*/
 
 ret_t os_mem_init(void) {
   prvHeapInit();
@@ -48,7 +48,7 @@ void* os_mem_calloc(size_t nmemb, size_t size) {
   return ptr;
 }
 
-/*************TKC 内存管理函数****************/
+/*************提供给 TKC 的内存管理函数****************/
 
 /*FreeRTOS会在第一次使用时初始化，本函数无需调用*/
 ret_t tk_mem_init(void* buffer, uint32_t size) {
@@ -75,7 +75,7 @@ void tk_mem_dump(void) {
   return;
 }
 
-/**平台SDK的内存管理函数**/
+/**提供给平台 SDK 的内存管理函数**/
 void myfree(uint8_t memx, void* ptr) {
   tk_free(ptr);
 }
