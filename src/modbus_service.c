@@ -200,7 +200,7 @@ ret_t modbus_service_wait_for_data(modbus_service_t* service, uint32_t timeout) 
 ret_t modbus_service_run(modbus_service_t* service) {
   do {
     if (modbus_service_wait_for_data(service, 1000) == RET_OK) {
-      modbus_service_dispatch(service);
+      if (modbus_service_dispatch(service) == RET_IO) break;
     } else {
       sleep_ms(10);
     }
@@ -208,6 +208,7 @@ ret_t modbus_service_run(modbus_service_t* service) {
 
   return RET_OK;
 }
+
 
 ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave) {
   return_value_if_fail(service != NULL, RET_BAD_PARAMS);

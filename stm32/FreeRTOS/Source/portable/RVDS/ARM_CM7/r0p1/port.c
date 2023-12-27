@@ -743,6 +743,7 @@ __asm uint32_t vPortGetIPSR( void )
 
         /*FIXME: I dont know why this failed for lcd VBI, just return now. -- Jim*/
         return;
+#if 0			
         /* Obtain the number of the currently executing interrupt. */
         ulCurrentInterrupt = vPortGetIPSR();
 
@@ -792,6 +793,7 @@ __asm uint32_t vPortGetIPSR( void )
          * assume a non-zero priority group setting, in which cases using a value
          * of zero will result in unpredictable behaviour. */
         configASSERT( ( portAIRCR_REG & portPRIORITY_GROUP_MASK ) <= ulMaxPRIGROUPValue );
+#endif				
     }
 
 #endif /* configASSERT_DEFINED */
