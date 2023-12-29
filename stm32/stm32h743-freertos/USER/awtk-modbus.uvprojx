@@ -851,6 +851,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\platform\fs_test.c</FilePath>
             </File>
+            <File>
+              <FileName>fs_mt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\awtk-fs-adapter\src\fs_mt.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -55,7 +55,12 @@ platform\memory_freertos.c
 
 * awtk-modbus/src 目录中的全部 C 文件（建议放到 modbus 分组中）。
 
-* awtk-fs-adapter/src 的 fs_os_fatfs.c（建议放到 platform 分组中）。
+* awtk-fs-adapter 目录中的下列文件 （建议放到 platform 分组中）。
+
+```
+src\fs_os_fatfs.c
+src\fs_mt.c
+```
 
 * 添加 FreRTOS 文件 （建议放到 freertos 分组中）。
 
@@ -111,11 +116,15 @@ platform\uart_hal.c
 stm32743.inc
 ```
 
+## 多线程访问文件系统
+
+FATFS 默认不支持多线程访问，TKC FS 做了一层包装（参考 fs_mt.c)，如果需要启用多线程访问。请在工程中定义宏：WITH\_FS\_MT
+
 ## 内存配置
 
 > 内存全部由 FreeRTOS 统一管理。
 
-* 在工程中定义宏：WITH_OS_MEM
+* 在工程中定义宏：WITH\_OS\_MEM
 * 从工程中去掉文件 malloc.c
 * 添加 platform/memory_freertos.c
 * 老版本需要从工程中去掉文件 heap_4.c
