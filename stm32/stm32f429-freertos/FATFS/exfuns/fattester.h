@@ -4,17 +4,18 @@
 #include "ff.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
+//ALIENTEK STM32H7开发板
 //FATFS 测试代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//创建日期:2016/1/7
+//创建日期:2018/8/2
 //版本：V1.0
 //版权所有，盗版必究。
 //Copyright(C) 广州市星翼电子科技有限公司 2014-2024
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
-    
+  
+  
 u8 mf_mount(u8* path,u8 mt);
 u8 mf_open(u8*path,u8 mode);
 u8 mf_close(void);
@@ -29,7 +30,7 @@ u8 mf_lseek(u32 offset);
 u32 mf_tell(void);
 u32 mf_size(void);
 u8 mf_mkdir(u8*pname);
-u8 mf_fmkfs(u8* path,u8 mode,u16 au);
+u8 mf_fmkfs(u8* path,u8 opt,u16 au);
 u8 mf_unlink(u8 *pname);
 u8 mf_rename(u8 *oldname,u8* newname);
 void mf_getlabel(u8 *path);

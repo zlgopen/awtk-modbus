@@ -22,23 +22,7 @@
 #include "tkc/platform.h"
 #include "modbus_app.h"
 
-static ret_t fatfs_test() {
-  FRESULT r;
-
-  r = f_mkdir("0:/test.dir");
-  assert(r == FR_OK);
-
-  r = f_unlink("0:/test.dir");
-  assert(r == FR_OK);
-
-  r = f_mkdir("1:/test.dir");
-  assert(r == FR_OK);
-
-  r = f_unlink("1:/test.dir");
-  assert(r == FR_OK);
-
-  return RET_OK;
-}
+#include "fs_test.h"
 
 static ret_t system_init(void) {
   HAL_Init();                       // ≥ı ºªØHALø‚
@@ -54,7 +38,7 @@ static ret_t system_init(void) {
   f_mount(fs[0], "0:", 1);
   f_mount(fs[1], "1:", 1);
 
-  fatfs_test();
+  tkc_fs_test();
 
   return RET_OK;
 }

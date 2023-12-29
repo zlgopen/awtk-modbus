@@ -365,7 +365,7 @@
               <MiscControls>--gnu</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx,WITH_OS_MEM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\SDRAM;..\HARDWARE\KEY;..\HARDWARE\SDIO;..\HARDWARE\SPI;..\HARDWARE\W25QXX;..\MALLOC;..\USMART;..\FATFS\exfuns;..\FATFS\src;..\TEXT;..\HARDWARE\NAND;..\HARDWARE\TOUCH;..\HARDWARE\24CXX;..\HARDWARE\IIC;..\awtk\src\ext_widgets;..\awtk;..\awtk\src;..\awtk\3rd;..\awtk\3rd\nanovg\base;..\awtk\3rd\nanovg;..\awtk\3rd\agge;..\awtk\3rd\libunibreak;..\awtk-port;.\User;.\Libraries\CMSIS;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\APP\led;.\Public;.\APP\beep;.\APP\smg;.\APP\key;.\APP\exti;.\APP\time;.\APP\pwm;.\APP\iwdg;.\APP\wwdg;.\APP\input;.\APP\touch_key;.\APP\wkup;.\APP\adc;.\APP\adc_temp;.\APP\dac;.\APP\pwm_dac;.\APP\dma;.\APP\rtc;.\APP\24Cxx;.\APP\iic;.\APP\ds18b20;.\APP\hwjs;.\APP\rs485;.\APP\can;.\APP\tftlcd;.\APP\spi;.\APP\nrf24l01;.\APP\dht11;.\APP\oled;.\APP\RC522;.\APP\Tetris;.\APP\ball;.\APP\touch;.\APP\snake;..\..\FreeRTOS\Source\include;..\..\FreeRTOS\Source;..\..\FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1;..\..\..\..\awtk\src;..\..\..\src;..\..\modbus_app</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\SDRAM;..\HARDWARE\KEY;..\HARDWARE\SDIO;..\HARDWARE\SPI;..\HARDWARE\W25QXX;..\MALLOC;..\USMART;..\FATFS\exfuns;..\FATFS\src;..\TEXT;..\HARDWARE\NAND;..\HARDWARE\TOUCH;..\HARDWARE\24CXX;..\HARDWARE\IIC;..\awtk\src\ext_widgets;..\awtk;..\awtk\src;..\awtk\3rd;..\awtk\3rd\nanovg\base;..\awtk\3rd\nanovg;..\awtk\3rd\agge;..\awtk\3rd\libunibreak;..\awtk-port;.\User;.\Libraries\CMSIS;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\APP\led;.\Public;.\APP\beep;.\APP\smg;.\APP\key;.\APP\exti;.\APP\time;.\APP\pwm;.\APP\iwdg;.\APP\wwdg;.\APP\input;.\APP\touch_key;.\APP\wkup;.\APP\adc;.\APP\adc_temp;.\APP\dac;.\APP\pwm_dac;.\APP\dma;.\APP\rtc;.\APP\24Cxx;.\APP\iic;.\APP\ds18b20;.\APP\hwjs;.\APP\rs485;.\APP\can;.\APP\tftlcd;.\APP\spi;.\APP\nrf24l01;.\APP\dht11;.\APP\oled;.\APP\RC522;.\APP\Tetris;.\APP\ball;.\APP\touch;.\APP\snake;..\..\FreeRTOS\Source\include;..\..\FreeRTOS\Source;..\..\FreeRTOS\Source\portable\RVDS\ARM_CM7\r0p1;..\..\..\..\awtk\src;..\..\..\src;..\..\modbus_app;..\..\..\..\awtk-fs-adapter\src;..\..\platform;..\FATFS\source</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -730,6 +730,16 @@
               <FileName>memory_freertos.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\platform\memory_freertos.c</FilePath>
+            </File>
+            <File>
+              <FileName>fs_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\platform\fs_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>fs_os_fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\awtk-fs-adapter\src\fs_os_fatfs.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1307,14 +1317,14 @@
           <GroupName>fatfs</GroupName>
           <Files>
             <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\src\diskio.c</FilePath>
-            </File>
-            <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FATFS\src\ff.c</FilePath>
+              <FilePath>..\FATFS\source\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffunicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\source\ffunicode.c</FilePath>
             </File>
             <File>
               <FileName>exfuns.c</FileName>
@@ -1322,9 +1332,9 @@
               <FilePath>..\FATFS\exfuns\exfuns.c</FilePath>
             </File>
             <File>
-              <FileName>cc936.c</FileName>
+              <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\FATFS\src\option\cc936.c</FilePath>
+              <FilePath>..\FATFS\source\diskio.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -5,19 +5,18 @@
 #include "usart.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
+//ALIENTEK STM32H7开发板
 //FATFS 扩展代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//创建日期:2016/1/7
-//版本：V1.1
+//创建日期:2018/8/2
+//版本：V1.0
 //版权所有，盗版必究。
 //Copyright(C) 广州市星翼电子科技有限公司 2014-2024
 //All rights reserved	
 //********************************************************************************
 //升级说明
-//V1.1
-//修正exf_copy函数,文件进度显示错误的bug
+//无
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 
@@ -36,7 +35,7 @@ u8*const FILE_TYPE_TBL[FILE_MAX_TYPE_NUM][FILE_MAX_SUBT_NUM]=
 {"AVI"},			//视频文件
 };
 ///////////////////////////////公共文件区,使用malloc的时候////////////////////////////////////////////
-FATFS *fs[_VOLUMES];//逻辑磁盘工作区.	 
+FATFS *fs[FF_VOLUMES];//逻辑磁盘工作区.	 
 FIL *file;	  		//文件1
 FIL *ftemp;	  		//文件2.
 UINT br,bw;			//读写变量
@@ -51,7 +50,7 @@ u8 *fatbuf;			//SD卡数据缓存区
 u8 exfuns_init(void)
 {
 	u8 i;
-	for(i=0;i<_VOLUMES;i++)
+	for(i=0;i<FF_VOLUMES;i++)
 	{
 		fs[i]=(FATFS*)mymalloc(SRAMIN,sizeof(FATFS));	//为磁盘i工作区申请内存	
 		if(!fs[i])break;
@@ -59,7 +58,7 @@ u8 exfuns_init(void)
 	file=(FIL*)mymalloc(SRAMIN,sizeof(FIL));		//为file申请内存
 	ftemp=(FIL*)mymalloc(SRAMIN,sizeof(FIL));		//为ftemp申请内存
 	fatbuf=(u8*)mymalloc(SRAMIN,512);				//为fatbuf申请内存
-	if(i==_VOLUMES&&file&&ftemp&&fatbuf)return 0;  //申请有一个失败,即失败.
+	if(i==FF_VOLUMES&&file&&ftemp&&fatbuf)return 0;  //申请有一个失败,即失败.
 	else return 1;	
 }
 
@@ -96,6 +95,7 @@ u8 f_typetell(u8 *fname)
 			break;
 		}
   	}
+	if(attr==0)return 0XFF;
 	strcpy((char *)tbuf,(const char*)attr);//copy
  	for(i=0;i<4;i++)tbuf[i]=char_upper(tbuf[i]);//全部变为大写 
 	for(i=0;i<FILE_MAX_TYPE_NUM;i++)	//大类对比
@@ -128,7 +128,7 @@ u8 exf_getfree(u8 *drv,u32 *total,u32 *free)
 	{											   
 	    tot_sect=(fs1->n_fatent-2)*fs1->csize;	//得到总扇区数
 	    fre_sect=fre_clust*fs1->csize;			//得到空闲扇区数	   
-#if _MAX_SS!=512				  				//扇区大小不是512字节,则转换为512字节
+#if FF_MAX_SS!=512				  				//扇区大小不是512字节,则转换为512字节
 		tot_sect*=fs1->ssize/512;
 		fre_sect*=fs1->ssize/512;
 #endif	  

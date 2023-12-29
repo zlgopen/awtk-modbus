@@ -1,5 +1,5 @@
 #include "fattester.h"	 
-#include "sdio_sdcard.h"
+#include "sdmmc_sdcard.h"
 #include "usmart.h"
 #include "usart.h"
 #include "exfuns.h"
@@ -8,11 +8,11 @@
 #include "string.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
+//ALIENTEK STM32H7开发板
 //FATFS 测试代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//创建日期:2016/1/7
+//创建日期:2018/8/2
 //版本：V1.0
 //版权所有，盗版必究。
 //Copyright(C) 广州市星翼电子科技有限公司 2014-2024
@@ -177,7 +177,7 @@ u32 mf_showfree(u8 *drv)
 	{											   
 	    tot_sect = (fs1->n_fatent - 2) * fs1->csize;//得到总扇区数
 	    fre_sect = fre_clust * fs1->csize;			//得到空闲扇区数	   
-#if _MAX_SS!=512
+#if FF_MAX_SS!=512
 		tot_sect*=fs1->ssize/512;
 		fre_sect*=fs1->ssize/512;
 #endif	  
@@ -225,12 +225,12 @@ u8 mf_mkdir(u8*pname)
 }
 //格式化
 //path:磁盘路径，比如"0:"、"1:"
-//mode:模式
+//opt:模式,FM_FAT,FM_FAT32,FM_EXFAT,FM_ANY等...
 //au:簇大小
 //返回值:执行结果
-u8 mf_fmkfs(u8* path,u8 mode,u16 au)
-{
-	return f_mkfs((const TCHAR*)path,mode,au);//格式化,drv:盘符;mode:模式;au:簇大小
+u8 mf_fmkfs(u8* path,u8 opt,u16 au)
+{ 
+	return f_mkfs((const TCHAR*)path,opt,au,fatbuf,FF_MAX_SS);//格式化,drv:盘符;opt:模式;au:簇大小,workbuf,最少_MAX_SS大小
 } 
 //删除文件/目录
 //pname:文件/目录路径+名字
