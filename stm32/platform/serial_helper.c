@@ -1,11 +1,15 @@
 #include "uart_hal.h"
 #include "tkc/mem.h"
+#include "tkc/utils.h"
 #include "tkc/serial_helper.h"
 
 #if !defined(TK_IS_PC) && !defined(LINUX)
 
 serial_handle_t serial_open(const char* port) {
-  int fd = uart_open(port, 115200);
+  int fd = 0;
+  return_value_if_fail(port != NULL, NULL);
+  port = tk_skip_to_num(port);
+  fd = uart_open(port, 115200);
   serial_handle_t handle = NULL;
   return_value_if_fail(fd >= 0, NULL);
 

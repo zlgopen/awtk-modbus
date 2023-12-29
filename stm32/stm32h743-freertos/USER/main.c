@@ -1,6 +1,6 @@
 #include "sys.h"
 #include "delay.h"
-#include "usart.h" 
+#include "usart.h"
 #include "led.h"
 #include "key.h"
 #include "ltdc.h"
@@ -12,8 +12,8 @@
 #include "malloc.h"
 #include "w25qxx.h"
 #include "sdmmc_sdcard.h"
-#include "nand.h"    
-#include "ftl.h"  
+#include "nand.h"
+#include "ftl.h"
 #include "ff.h"
 #include "touch.h"
 #include "exfuns.h"
@@ -30,37 +30,44 @@
  作者：正点原子 @ALIENTEK
 ************************************************/
 
+#include "tkc/fs.h"
+#include "tkc/path.h"
 #include "tkc/platform.h"
+
+#include "fs_test.h"
+
 #include "modbus_app.h"
 
-
 static void system_init(void) {
-  Cache_Enable();                 
-  MPU_Memory_Protection();        
-  HAL_Init();                   
-  Stm32_Clock_Init(160,5,2,4); 
-  delay_init(400);            
+  Cache_Enable();
+  MPU_Memory_Protection();
+  HAL_Init();
+  Stm32_Clock_Init(160, 5, 2, 4);
+  delay_init(400);
 
-  LED_Init();               
-  KEY_Init();               
-  SDRAM_Init();      
-  LCD_Init();               
-  W25QXX_Init();        
-  LTDC_Display_Dir(1);  
+  LED_Init();
+  KEY_Init();
+  SDRAM_Init();
+  LCD_Init();
+  W25QXX_Init();
+  LTDC_Display_Dir(1);
   FTL_Init();
-  exfuns_init();   
+  exfuns_init();
   tp_dev.init();
+
+  f_mount(fs[0], "0:", 1);
+  f_mount(fs[1], "1:", 1);
+
+  tkc_fs_test();
 }
 
-int main(void)
-{
+int main(void) {
   platform_prepare();
   system_init();
-	
+
   rtos_init();
   modbus_service_start("1");
   rtos_start();
 
   return 0;
 }
-
