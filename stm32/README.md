@@ -1,6 +1,6 @@
 # STM32 移植指南
 
-## 下载 AWTK/AWTK-MODBUS 到同一个目录
+## 下载 AWTK/AWTK-MODBUS/AWTK-FS-ADAPTER 到同一个目录
 
 ```
 git clone https://github.com/zlgopen/awtk
@@ -9,6 +9,12 @@ git clone https://github.com/zlgopen/awtk
 ```
 git clone https://github.com/zlgopen/awtk-modbus
 ```
+
+```
+git clone https://github.com/zlgopen/awtk-fs-adapter
+```
+
+> 如果访问 github 不方便，可以从 gitee 上获取。
 
 ## 打开 keil 模板工程，
 
@@ -33,6 +39,7 @@ awtk\src\platforms\freertos\thread.c
 awtk\src\platforms\raw\cond_var_null.c
 awtk\src\platforms\raw\dl_null.c
 awtk\src\platforms\raw\fs_os.c
+awtk\src\platforms\raw\fs_test.c
 ```
 
 * 当前 platform 目录中的下列文件（建议放到 platform 分组中）。
@@ -47,6 +54,8 @@ platform\memory_freertos.c
 ```
 
 * awtk-modbus/src 目录中的全部 C 文件（建议放到 modbus 分组中）。
+
+* awtk-fs-adapter/src 的 fs_os_fatfs.c（建议放到 platform 分组中）。
 
 * 添加 FreRTOS 文件 （建议放到 freertos 分组中）。
 
