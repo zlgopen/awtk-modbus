@@ -51,6 +51,7 @@ platform\serial_helper.c
 platform\sys_tick.c
 platform\uart_hal.c
 platform\memory_freertos.c
+platform\fs_test.c
 ```
 
 * awtk-modbus/src 目录中的全部 C 文件（建议放到 modbus 分组中）。
