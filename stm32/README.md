@@ -163,3 +163,19 @@ WITH_WCSXXX
 ```
 
 > 请删除 stm32f4xx_it.c 中对应函数。
+
+
+* 如果在 rtos_start 之前调用了 sleep_ms 函数，可能会进入死循环。可以用下面的方法解决：
+
+
+将
+
+```
+static UBaseType_t uxCriticalNesting = 0xaaaaaaaa;
+```
+
+改为
+
+```
+static UBaseType_t uxCriticalNesting = 0;
+```
