@@ -153,6 +153,7 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
   buff = wb->data;
 
   if (common->proto == MODBUS_PROTO_TCP) {
+    uint16_t transaction_id = 0;
     modbus_tcp_header_t* header = (modbus_tcp_header_t*)buff;
     int32_t ret = modbus_common_read_len(common, buff, sizeof(*header));
     return_value_if_fail(ret == sizeof(*header), RET_IO);
@@ -160,7 +161,9 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     func_code = header->func_code;
     return_value_if_fail(header->unit_id == 0xff, RET_FAIL);
     return_value_if_fail(header->protocol_id == 0, RET_FAIL);
-    return_value_if_fail(header->transaction_id == TK_HTONS(common->transaction_id), RET_FAIL);
+
+    transaction_id = TK_HTONS(header->transaction_id);
+    return_value_if_fail(transaction_id == common->transaction_id, RET_FAIL);
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
     int32_t ret = modbus_common_read_len(common, buff, sizeof(*header));
