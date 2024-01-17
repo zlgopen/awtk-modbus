@@ -264,16 +264,16 @@ modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits
   memory->input_registers_start = input_registers_start;
   memory->input_registers_count = input_registers_count;
 
-  memory->bits_data = TKMEM_ALLOC(bits_count);
+  memory->bits_data = TKMEM_ZALLOCN(uint8_t, bits_count);
   goto_error_if_fail(memory->bits_data != NULL);
 
-  memory->input_bits_data = TKMEM_ALLOC(input_bits_count);
+  memory->input_bits_data = TKMEM_ZALLOCN(uint8_t, input_bits_count);
   goto_error_if_fail(memory->input_bits_data != NULL);
 
-  memory->registers_data = TKMEM_ALLOC(registers_count * sizeof(uint16_t));
+  memory->registers_data = TKMEM_ZALLOCN(uint16_t, registers_count);
   goto_error_if_fail(memory->registers_data != NULL);
 
-  memory->input_registers_data = TKMEM_ALLOC(input_registers_count * sizeof(uint16_t));
+  memory->input_registers_data = TKMEM_ZALLOCN(uint16_t, input_registers_count);
   goto_error_if_fail(memory->input_registers_data != NULL);
 
   memory->memory.read_bits = modbus_memory_default_read_bits;
