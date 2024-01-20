@@ -13,7 +13,7 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
                       0,         0,             /*protocol id*/
                       0,         3 + num_bytes, /*data len*/
                       0xff,                     /*Server address (255 if not used)*/
-                      func_code,                /*Function codes as in other variants*/
+                      (uint8_t)func_code,                /*Function codes as in other variants*/
                       num_bytes, value1,
                       value2};
   uint8_t out[1024] = {0};
