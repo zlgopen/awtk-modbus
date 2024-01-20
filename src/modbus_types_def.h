@@ -303,9 +303,7 @@ typedef struct _modbus_rtu_header_t {
  * #define WITH_MULT_SLAVES 1
  */
 
-static inline uint32_t modbus_bits_to_bytes(uint32_t bits) {
-  return (bits + 7) / 8;
-}
+#define modbus_bits_to_bytes(v) tk_bits_to_bytes(v)
 
 END_C_DECLS
 
