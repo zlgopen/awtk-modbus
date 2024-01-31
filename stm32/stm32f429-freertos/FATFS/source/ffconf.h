@@ -2,7 +2,7 @@
 /  FatFs - Configuration file
 /---------------------------------------------------------------------------*/
 
-#define FFCONF_DEF 63463	/* Revision ID */
+#define FFCONF_DEF 80286	/* Revision ID */
 
 /*---------------------------------------------------------------------------/
 / Function Configurations
@@ -262,7 +262,6 @@
 /      lock control is independent of re-entrancy. */
 
 
-#define FF_FS_REENTRANT	0
 #define FF_FS_TIMEOUT	1000
 #define FF_SYNC_t		HANDLE
 /* The option FF_FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
@@ -285,5 +284,14 @@
 /* #include <windows.h>	// O/S definitions  */
 
 
+#define FF_FS_REENTRANT	1
+#define OS_TYPE 3      /* 0:Win32, 1:uITRON4.0, 2:uC/OS-II, 3:FreeRTOS, 4:CMSIS-RTOS */
+#define FF_DIR DIR
+#define FF_LBA64		0
+/* This option switches support for 64-bit LBA. (0:Disable or 1:Enable)
+/  To enable the 64-bit LBA, also exFAT needs to be enabled. (FF_FS_EXFAT == 1) */
+
+
+#define FF_MIN_GPT		0x10000000
 
 /*--- End of configuration options ---*/
