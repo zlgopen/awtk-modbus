@@ -359,7 +359,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--gnu</MiscControls>
@@ -1340,6 +1340,16 @@
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FATFS\source\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffsystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\source\ffsystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\FATFS\source\ffconf.h</FilePath>
             </File>
           </Files>
         </Group>
