@@ -65,7 +65,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     tokenizer_init(&t, init, tk_strlen(init), ", ");
     while (tokenizer_has_more(&t) && i < memory_default->registers_count) {
       int32_t v = tokenizer_next_int(&t, 0);
-      memory_default->registers_data[i] = v != 0;
+      memory_default->registers_data[i] = v;
       i++;
     }
     tokenizer_deinit(&t);
@@ -78,7 +78,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     tokenizer_init(&t, init, tk_strlen(init), ", ");
     while (tokenizer_has_more(&t) && i < memory_default->input_registers_count) {
       int32_t v = tokenizer_next_int(&t, 0);
-      memory_default->input_registers_data[i] = v != 0;
+      memory_default->input_registers_data[i] = v;
       i++;
     }
     tokenizer_deinit(&t);
