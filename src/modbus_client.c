@@ -316,3 +316,4 @@ ret_t modbus_client_destroy(modbus_client_t* client) {
 
   return RET_OK;
 }
+
