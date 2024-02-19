@@ -56,6 +56,15 @@ scons LINUX_FB=true
 ./bin/modbus_server_awtk tcp://localhost:502
 ```
 
+* 服务端 (支持从配置文件加载参数)
+
+> 默认配置文件：config/default.ini
+
+```
+bin/modbus_server_ex
+```
+
+
 * 客户端
 
 ```
