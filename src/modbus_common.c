@@ -159,11 +159,11 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     return_value_if_fail(ret == sizeof(*header), RET_IO);
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
-    return_value_if_fail(header->unit_id == 0xff, RET_FAIL);
-    return_value_if_fail(header->protocol_id == 0, RET_FAIL);
+    return_value_if_fail(header->unit_id == 0xff, RET_IO);
+    return_value_if_fail(header->protocol_id == 0, RET_IO);
 
     transaction_id = TK_HTONS(header->transaction_id);
-    return_value_if_fail(transaction_id == common->transaction_id, RET_FAIL);
+    return_value_if_fail(transaction_id == common->transaction_id, RET_IO);
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
     int32_t ret = modbus_common_read_len(common, buff, sizeof(*header));
@@ -623,4 +623,14 @@ ret_t modbus_common_send_exception_resp(modbus_common_t* common, uint8_t func_co
             modbus_common_get_exception_meaning(code));
 
   return modbus_common_send_wbuffer(common);
+}
+
+ret_t modbus_common_flush_read_buffer(modbus_common_t* common) {
+  return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
+
+  uint8_t flush_buffer[260];
+  while (tk_iostream_read_len(common->io, flush_buffer, sizeof(flush_buffer), 0) > 0) {
+    ;
+  }
+  return RET_OK;
 }

@@ -269,6 +269,14 @@ ret_t modbus_common_send_resp(modbus_common_t* common, modbus_resp_data_t* resp_
 ret_t modbus_common_send_exception_resp(modbus_common_t* common, uint8_t func_code,
                                         modbus_exeption_code_t code);
 
+/**
+ * @method modbus_common_flush_read_buffer
+ * 清空接收缓冲区。
+ * @param {modbus_common_t*} common modbus_common_t对象。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_common_flush_read_buffer(modbus_common_t* common);
+
 #define MODBUS_COMMON(obj) ((obj) != NULL ? &((obj)->common) : NULL)
 
 END_C_DECLS

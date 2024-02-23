@@ -92,6 +92,14 @@ static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_c
   return modbus_common_recv_read_bits_resp(common, func_code, buff, &count);
 }
 
+static ret_t modbus_client_flush_read_buffer(modbus_client_t* client) {
+  modbus_common_t* common = MODBUS_COMMON(client);
+  return_value_if_fail(common != NULL, RET_BAD_PARAMS);
+
+  log_debug("%s flush read buffer\n", __FUNCTION__);
+  return modbus_common_flush_read_buffer(common);
+}
+
 #define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC || (ret) == RET_TIMEOUT || (ret) == RET_IO)
 
 ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
@@ -109,6 +117,8 @@ ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t c
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -127,6 +137,8 @@ ret_t modbus_client_read_input_bits(modbus_client_t* client, uint16_t addr, uint
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -158,6 +170,8 @@ ret_t modbus_client_read_registers(modbus_client_t* client, uint16_t addr, uint1
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -177,6 +191,8 @@ ret_t modbus_client_read_input_registers(modbus_client_t* client, uint16_t addr,
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -241,6 +257,8 @@ ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t va
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -258,6 +276,8 @@ ret_t modbus_client_write_register(modbus_client_t* client, uint16_t addr, uint1
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -276,6 +296,8 @@ ret_t modbus_client_write_bits(modbus_client_t* client, uint16_t addr, uint16_t 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
@@ -294,6 +316,8 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
   return ret;
 }
 
