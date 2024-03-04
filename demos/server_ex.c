@@ -45,8 +45,11 @@ static ret_t start_tcp(event_source_manager_t* esm, const char* url, modbus_memo
 int main(int argc, char* argv[]) {
   modbus_memory_t* memory = NULL;
   event_source_manager_t* esm = NULL;
-  const char* url = "tcp://localhost:502";
-  const char* config = argc > 1 ? argv[1] : "config/default.ini";
+  const char* url = argc > 1 ? argv[1] : "tcp://localhost:502";
+  const char* config = argc > 2 ? argv[2] : "config/default.ini";
+
+  log_debug("usage: %s [url] [config]\n", argv[0]);
+
   memory = server_conf_load(config);
   return_value_if_fail(memory != NULL, -1);
 

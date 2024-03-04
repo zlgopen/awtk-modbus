@@ -58,6 +58,10 @@ scons LINUX_FB=true
 
 * 服务端 (支持从配置文件加载参数)
 
+```
+bin/modbus_server_ex [url] [config]
+```
+
 > 默认配置文件：config/default.ini
 
 ```
