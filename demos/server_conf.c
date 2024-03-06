@@ -25,6 +25,8 @@
 #include "conf_io/conf_ini.h"
 #include "modbus_memory_default.h"
 
+static bool_t s_auto_inc_input_registers = FALSE;
+
 static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* doc) {
   uint32_t i = 0;
   tokenizer_t t;
@@ -104,6 +106,8 @@ static modbus_memory_t* server_conf_load_doc(conf_doc_t* doc) {
       conf_doc_get_int(doc, "input_registers.start", 0);
   uint32_t input_registers_count =
       conf_doc_get_int(doc, "input_registers.count", 0);
+  
+  s_auto_inc_input_registers = conf_doc_get_bool(doc, "input_registers.auto_inc", FALSE);
 
   log_debug("bits:\t\t\t[%d %d]\n", bits_start, bits_count);
   log_debug("input_bits:\t\t[%d %d]\n", input_bits_start, input_bits_count);

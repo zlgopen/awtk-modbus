@@ -56,18 +56,30 @@ scons LINUX_FB=true
 ./bin/modbus_server_awtk tcp://localhost:502
 ```
 
-* 服务端 (支持从配置文件加载参数)
+* 服务端 (支持从配置文件加载参数，方便测试)
 
 ```
 bin/modbus_server_ex [url] [config]
 ```
 
-> 默认配置文件：config/default.ini
+示例：
 
 ```
-bin/modbus_server_ex
+./bin/modbus_server_ex tcp://localhost:502 config/default.ini
 ```
 
+> RTU 可以指定 unit id。
+
+```
+bin/modbus_server_ex [url] [config] [unit_id]
+```
+
+示例：
+
+```
+./bin/modbus_server_ex serial:///dev/ttys017 config/default.ini 1
+./bin/modbus_server_ex serial:///dev/ttys017 config/default.ini 2
+```
 
 * 客户端
 
