@@ -1,0 +1,10 @@
+{   
+    "name" : "write_registers",
+    "unit_id" : 1,
+    "access_type" : 16,
+    "write" : { 
+      "offset" : 0x130,
+      "length" : 16, 
+      "error_handling": "keep_last_value"
+    }   
+  }

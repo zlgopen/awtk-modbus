@@ -1,0 +1,11 @@
+{   
+    "name" : "read_input_registers",
+    "unit_id" : 2,
+    "access_type" : 4,
+    "read" : { 
+      "cycle_time" : 100,
+      "offset" : 0x10,
+      "length" : 8, 
+      "error_handling": "clear"
+    }   
+  }

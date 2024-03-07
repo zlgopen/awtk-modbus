@@ -1,5 +1,16 @@
 LIBRARY   modbus
 EXPORTS
+    modbus_client_channel_create
+    modbus_client_channel_update
+    modbus_client_channel_need_update
+    modbus_client_channel_set_client
+    modbus_client_channel_set_name
+    modbus_client_channel_read
+    modbus_client_channel_write
+    modbus_client_channel_update
+    modbus_client_channel_lock
+    modbus_client_channel_unlock
+    modbus_client_channel_destroy
     modbus_client_create
     modbus_client_create_with_io
     modbus_client_set_retry_times

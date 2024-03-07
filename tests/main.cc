@@ -27,13 +27,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "tkc.h"
+#include "awtk.h"
 #include "gtest/gtest.h"
 
 GTEST_API_ int main(int argc, char** argv) {
-  platform_prepare();
-  printf("Running main() from gtest_main.cc\n");
   testing::InitGoogleTest(&argc, argv);
+  
+  return_value_if_fail(tk_pre_init() == RET_OK, RET_FAIL);
+  tk_socket_init();
+  system_info_init(APP_SIMULATOR, NULL, NULL);
+  tk_init_internal();
+
+  tk_init_internal();
 
   RUN_ALL_TESTS();
 

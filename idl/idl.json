@@ -5,6 +5,355 @@
       {
         "params": [
           {
+            "type": "conf_node_t*",
+            "name": "node",
+            "desc": "配置节点。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus_client_channel对象。",
+        "name": "modbus_client_channel_create",
+        "return": {
+          "type": "modbus_client_channel_t*",
+          "desc": "返回对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "modbus_channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint64_t",
+            "name": "current_time",
+            "desc": "当前时间。"
+          }
+        ],
+        "annotation": {},
+        "desc": "更新数据。",
+        "name": "modbus_client_channel_update",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "modbus_channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint64_t",
+            "name": "current_time",
+            "desc": "当前时间。"
+          }
+        ],
+        "annotation": {},
+        "desc": "是否需要更新数据。",
+        "name": "modbus_client_channel_need_update",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回TRUE表示需要更新，否则表示不需要更新。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "客户端。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置客户端。",
+        "name": "modbus_client_channel_set_client",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "名称。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置名称。",
+        "name": "modbus_client_channel_set_name",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "modbus_channel",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取数据。",
+        "name": "modbus_client_channel_read",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "modbus_channel",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入数据。",
+        "name": "modbus_client_channel_write",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "modbus_channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint64_t",
+            "name": "current_time",
+            "desc": "当前时间。"
+          }
+        ],
+        "annotation": {},
+        "desc": "更新数据(读写数据)。",
+        "name": "modbus_client_channel_update",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "锁定modbus_client_channel对象。",
+        "name": "modbus_client_channel_lock",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "解锁modbus_client_channel对象。",
+        "name": "modbus_client_channel_unlock",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_client_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁modbus_client_channel对象。",
+        "name": "modbus_client_channel_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "name",
+        "desc": "名称。",
+        "type": "char*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "access_type",
+        "desc": "访问类型。",
+        "type": "uint8_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "unit_id",
+        "desc": "RTU模式从站 ID。",
+        "type": "uint8_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "read_offset",
+        "desc": "读取偏移。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "write_offset",
+        "desc": "写入偏移。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "read_buffer",
+        "desc": "读取缓冲区。",
+        "type": "uint8_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "write_buffer",
+        "desc": "写入缓冲区。",
+        "type": "uint8_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "read_buffer_length",
+        "desc": "读取缓冲区长度。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "write_buffer_length",
+        "desc": "写入缓冲区长度。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "update_interval",
+        "desc": "更新间隔。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "next_update_time",
+        "desc": "下次更新时间。",
+        "type": "uint64_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "keep_last_value_if_read_failed",
+        "desc": "读取失败时是否保留上次的值。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "client",
+        "desc": "客户端。",
+        "type": "modbus_client_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "read_ok_count",
+        "desc": "读取成功次数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "read_fail_count",
+        "desc": "读取失败次数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "write_ok_count",
+        "desc": "写入成功次数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "write_fail_count",
+        "desc": "写入失败次数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "src/modbus_client_channel.h",
+    "desc": "modbus_client_channel",
+    "name": "modbus_client_channel_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
             "type": "const char*",
             "name": "url",
             "desc": "modbus server的url。"

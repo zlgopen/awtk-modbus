@@ -1,0 +1,9 @@
+{   
+    "name" : "write_1_bit",
+    "unit_id" : 1,
+    "access_type" : 5,
+    "write" : { 
+      "offset" : 0x130,
+      "length" : 16
+    }   
+  }
