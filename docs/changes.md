@@ -1,3 +1,7 @@
+2024-03-7
+  * 增加 modbus\_client\_channel
+  * 增加 modbus\_init\_req
+
 2024-03-6
   * 完善server_ex。
 

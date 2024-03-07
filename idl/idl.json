@@ -1221,6 +1221,111 @@
       {
         "params": [
           {
+            "type": "conf_node_t*",
+            "name": "node",
+            "desc": "配置节点。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建modbus_init_req对象。",
+        "name": "modbus_init_req_create",
+        "return": {
+          "type": "modbus_init_req_t*",
+          "desc": "返回对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_init_req_t*",
+            "name": "init",
+            "desc": "对象。"
+          },
+          {
+            "type": "modbus_client_t*",
+            "name": "client",
+            "desc": "客户端。"
+          }
+        ],
+        "annotation": {},
+        "desc": "请求初始化数据。",
+        "name": "modbus_init_req_request",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_init_req_t*",
+            "name": "init",
+            "desc": "对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁对象。",
+        "name": "modbus_init_req_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "access_type",
+        "desc": "访问类型。",
+        "type": "uint8_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "unit_id",
+        "desc": "slave ID。",
+        "type": "uint8_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "offset",
+        "desc": "写入偏移。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "length",
+        "desc": "写入大小。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "value",
+        "desc": "写入大小。",
+        "type": "uint16_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "src/modbus_init_req.h",
+    "desc": "初始化数据。",
+    "name": "modbus_init_req_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
             "type": "uint32_t",
             "name": "bits_start",
             "desc": "位起始地址。"

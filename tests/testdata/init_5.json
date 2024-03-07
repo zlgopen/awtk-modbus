@@ -1,0 +1,7 @@
+{
+  "access_type": 5,
+  "offset" : 0x138,
+  "unit_id" : 2,
+  "value"  : 1, 
+  "comment" : "write_single_bit"
+}

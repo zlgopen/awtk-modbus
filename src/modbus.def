@@ -44,6 +44,9 @@ EXPORTS
     modbus_common_send_resp
     modbus_common_send_exception_resp
     modbus_common_flush_read_buffer
+    modbus_init_req_create
+    modbus_init_req_request
+    modbus_init_req_destroy
     modbus_memory_default_create
     modbus_memory_default_cast
     modbus_memory_read_bits

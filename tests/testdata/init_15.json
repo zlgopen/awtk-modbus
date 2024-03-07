@@ -1,0 +1,7 @@
+{
+  "access_type": 15,
+  "offset" : 0x130,
+  "length" : 8,
+  "value"  : 1, 
+  "comment" : "write_bits"
+}

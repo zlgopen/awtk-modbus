@@ -277,8 +277,8 @@ static ret_t modbus_client_channel_load(modbus_client_channel_t* channel, conf_n
 
   channel->name = tk_strdup(conf_node_get_child_value_str(node, "name", NULL));
   channel->access_type = conf_node_get_child_value_int32(node, "access_type", 0);
-  channel->update_interval = conf_node_get_child_value_int32(node, "update_interval", -1);
-  if (channel->update_interval < 0) {
+  channel->update_interval = conf_node_get_child_value_int32(node, "update_interval", 0);
+  if (channel->update_interval == 0) {
     channel->update_interval = conf_node_get_child_value_int32(node, "cycle_time", -1);
   }
   channel->unit_id = conf_node_get_child_value_int32(node, "unit_id", 0);
