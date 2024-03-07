@@ -100,7 +100,7 @@ static ret_t modbus_client_flush_read_buffer(modbus_client_t* client) {
   return modbus_common_flush_read_buffer(common);
 }
 
-#define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC || (ret) == RET_TIMEOUT || (ret) == RET_IO)
+#define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC)
 
 ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
                               uint8_t* buff) {

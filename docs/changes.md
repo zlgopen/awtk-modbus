@@ -4,6 +4,7 @@
 
 2024-03-6
   * 完善server_ex。
+  * retry only when CRC error
 
 2024-02-23
   * 修正通信出错后（比如slave端突然休眠），tid错位导致通信无法恢复的情况。方法是通信出错并重试之后，执行新增的modbus\_client_flush_read_buffer函数读空输入缓冲区(感谢陈谭提供补丁)

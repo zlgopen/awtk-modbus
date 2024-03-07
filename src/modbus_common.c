@@ -21,6 +21,7 @@
 
 #include "tkc/crc.h"
 #include "modbus_common.h"
+#define MODBUS_MAX_PAYLOAD 1024
 
 static ret_t modbus_common_pack_uint16(modbus_common_t* common, uint16_t value) {
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
@@ -174,6 +175,7 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
 
   if (func_code == expected_func_code) {
     bytes = modbus_common_get_resp_playload_length(common, expected_func_code);
+    return_value_if_fail(bytes < MODBUS_MAX_PAYLOAD, RET_IO);
 
     wbuffer_extend_capacity(wb, bytes + wb->cursor + 1);
     buff = wb->data + wb->cursor;
