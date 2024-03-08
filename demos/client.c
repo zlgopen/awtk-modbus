@@ -308,6 +308,21 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
       run_write_bits(name, client, iter);
     } else if (tk_str_eq(name, "write_register") || tk_str_eq(name, "write_registers")) {
       run_write_registers(name, client, iter);
+    } else if (tk_str_eq(name, "rewind")) {
+      iter = conf_node_get_first_child(doc->root);
+      log_debug("rewind\n");
+      continue;
+    } else if (tk_str_eq(name, "goto")) {
+      const char* target = conf_node_get_child_value_str(iter, "target", NULL);
+      iter = conf_node_get_first_child(doc->root);
+      while(iter != NULL) {
+        if (tk_str_eq(conf_node_get_name(iter), target)) {
+          log_debug("goto %s\n", target);
+          break;
+        }
+        iter = iter->next;
+      }
+      continue;
     } else if (tk_str_eq(name, "close")) {
       modbus_client_destroy(client);
       client = NULL;

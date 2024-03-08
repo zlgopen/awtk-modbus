@@ -1,3 +1,6 @@
+2024-03-8
+    * client tool 增加rewind/goto指令。
+
 2024-03-7
   * 增加 modbus\_client\_channel
   * 增加 modbus\_init\_req
