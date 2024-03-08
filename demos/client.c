@@ -34,10 +34,10 @@ static ret_t conf_get_params(conf_node_t* iter, uint16_t* addr, uint16_t* count,
   *addr = value_uint16(&v);
 
   if (conf_node_get_child_value(iter, "count", &v) != RET_OK) {
-    log_debug("get count failed\n");
-    return RET_FAIL;
+    *count = 1;
+  } else {
+    *count = value_uint16(&v);
   }
-  *count = value_uint16(&v);
 
   if (conf_node_get_child_value(iter, "data", &v) == RET_OK) {
     *data = value_str(&v);
@@ -78,6 +78,12 @@ static ret_t run_read_bits(const char* name, modbus_client_t* client, conf_node_
       }
 
       tokenizer_deinit(&t);
+    } else {
+      log_debug("----------read result----------\n");
+      for (uint32_t i = 0; i < count; i++) {
+        log_debug("bit %d:%d\n", i, bits[i]);
+      }
+      log_debug("-------------------------------\n");
     }
 
     log_debug("%s ok\n", name);
@@ -120,6 +126,12 @@ static ret_t run_read_registers(const char* name, modbus_client_t* client, conf_
       }
 
       tokenizer_deinit(&t);
+    } else {
+      log_debug("----------read result----------\n");
+      for (uint32_t i = 0; i < count; i++) {
+        log_debug("register %d:%d\n", i, registers[i]);
+      }
+      log_debug("-------------------------------\n");
     }
 
     log_debug("%s ok\n", name);
@@ -171,6 +183,37 @@ static ret_t run_write_bits(const char* name, modbus_client_t* client, conf_node
   return ret;
 }
 
+#include "tkc/date_time.h"
+static uint32_t s_count = 0;
+static uint16_t parse_register_value(const char* value) {
+  date_time_t dt;
+  date_time_init(&dt);
+  uint16_t ret = 0;
+
+  if (tk_str_eq(value, "second")) {
+    ret = dt.second;
+  } else if (tk_str_eq(value, "minute")) {
+    ret = dt.minute;
+  } else if (tk_str_eq(value, "hour")) {
+    ret = dt.hour;
+  } else if (tk_str_eq(value, "day")) {
+    ret = dt.day;
+  } else if (tk_str_eq(value, "month")) {
+    ret = dt.month;
+  } else if (tk_str_eq(value, "year")) {
+    ret = dt.year;
+  } else if (tk_str_eq(value, "rand")) {
+    ret = random();
+  } else if (tk_str_eq(value, "count")) {
+    ret = s_count++;
+  } else {
+    return tk_atoi(value);
+  }
+
+  log_debug("%s => %d\n", value, ret);
+  return ret;
+}
+
 static ret_t run_write_registers(const char* name, modbus_client_t* client, conf_node_t* iter) {
   ret_t ret = RET_OK;
   uint16_t addr = 0;
@@ -187,8 +230,8 @@ static ret_t run_write_registers(const char* name, modbus_client_t* client, conf
     uint32_t i = 0;
     tokenizer_init(&t, data, tk_strlen(data), ", ");
     while (tokenizer_has_more(&t)) {
-      uint16_t data_iter = (uint16_t)tokenizer_next_int(&t, 0);
-      registers[i] = data_iter;
+      const char* value = tokenizer_next_str(&t);
+      registers[i] = parse_register_value(value);
       i++;
     }
     tokenizer_deinit(&t);
@@ -308,6 +351,10 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
       run_write_bits(name, client, iter);
     } else if (tk_str_eq(name, "write_register") || tk_str_eq(name, "write_registers")) {
       run_write_registers(name, client, iter);
+    } else if (tk_str_eq(name, "sleep")) {
+      uint32_t ms = conf_node_get_child_value_int32(iter, "time", 0);
+      log_debug("sleep %d\n", ms);
+      sleep_ms(ms);
     } else if (tk_str_eq(name, "rewind")) {
       iter = conf_node_get_first_child(doc->root);
       log_debug("rewind\n");
@@ -315,7 +362,7 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
     } else if (tk_str_eq(name, "goto")) {
       const char* target = conf_node_get_child_value_str(iter, "target", NULL);
       iter = conf_node_get_first_child(doc->root);
-      while(iter != NULL) {
+      while (iter != NULL) {
         if (tk_str_eq(conf_node_get_name(iter), target)) {
           log_debug("goto %s\n", target);
           break;
@@ -326,6 +373,8 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
     } else if (tk_str_eq(name, "close")) {
       modbus_client_destroy(client);
       client = NULL;
+    } else {
+      log_debug("unknown command:%s\n", name);
     }
 
     iter = iter->next;

@@ -1,5 +1,7 @@
 2024-03-8
     * client tool 增加rewind/goto指令。
+    * client 支持变量。
+    * 增加client工具配置文档。
 
 2024-03-7
   * 增加 modbus\_client\_channel

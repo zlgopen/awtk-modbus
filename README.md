@@ -87,6 +87,8 @@ bin/modbus_server_ex [url] [config] [unit_id]
 ./bin/modbus_client data/tcp.ini
 ```
 
+配置文件文档请参考 [客户端工具配置格式](docs/client.md)
+
 ### MODBUS-RTU
 
 * 服务端
