@@ -45,6 +45,20 @@ static ret_t start_tcp(event_source_manager_t* esm, const char* url, modbus_memo
   return modbus_service_tcp_start(esm, memory, port, proto, MODBUS_DEMO_SLAVE_ID);
 }
 
+static ret_t update_input_registers(modbus_memory_default_t* memory_default) {
+  if (s_auto_inc_input_registers) {
+    uint16_t* data = (uint16_t*)(memory_default->input_registers->data);
+    uint32_t i = 0;
+    for (i = 0; i < memory_default->input_registers->length; i++) {
+      data[i]++;
+    }
+
+    log_debug("index=%d\n", (int)(*data));
+  }
+
+  return RET_OK;
+}
+
 static ret_t start_modbus_server_with_conf(const char* filename) {
   uint32_t size = 0;
   const char* url = NULL;
@@ -78,14 +92,8 @@ static ret_t start_modbus_server_with_conf(const char* filename) {
   memory_default = MODBUS_MEMORY_DEFAULT(memory);
   while (1) {
     event_source_manager_dispatch(esm);
-    sleep_ms(50);
-    if (s_auto_inc_input_registers) {
-      uint16_t* data = (uint16_t*)(memory_default->input_registers->data);
-      uint32_t i = 0;
-      for (i = 0; i < memory_default->input_registers->length; i++) {
-        data[i]++;
-      }
-    }
+    sleep_ms(100);
+    update_input_registers(memory_default);
   }
 
   event_source_manager_destroy(esm);

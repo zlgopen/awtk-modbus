@@ -1,5 +1,6 @@
 {
-  "url": "tcp://localhost:502",
+  "url": "serial:///dev/ttys017",
+  "unit_id": 1,
   "auto_inc_input_registers": true,
   "channels": [
     {

@@ -92,7 +92,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
 static modbus_memory_t* server_conf_load_doc(conf_doc_t* doc) {
   modbus_memory_t* m = NULL;
   conf_node_t* channels = conf_node_find_child(doc->root, "channels");
-  s_auto_inc_input_registers = conf_doc_get_bool(doc, "input_registers.auto_inc", FALSE);
+  s_auto_inc_input_registers = conf_doc_get_bool(doc, "auto_inc_input_registers", FALSE);
 
   m = modbus_memory_default_create_with_conf(channels);
   return_value_if_fail(m != NULL, NULL);
