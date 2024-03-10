@@ -1,3 +1,6 @@
+2024-03-10
+  * 重构 modbus\_memory\_default。
+
 2024-03-8
     * client tool 增加rewind/goto指令。
     * client 支持变量。
