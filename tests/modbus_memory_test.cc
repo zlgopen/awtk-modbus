@@ -36,7 +36,7 @@ TEST(modbus, memory) {
 
   ASSERT_EQ(modbus_memory_read_bits(memory, BITS_START, 0, bits_data), RET_BAD_PARAMS);
   ASSERT_EQ(modbus_memory_read_bits(memory, BITS_START, MODBUS_MAX_READ_BITS + 1, bits_data),
-            RET_BAD_PARAMS);
+            RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_read_bits(memory, BITS_START, BITS_COUNT + 1, bits_data),
             RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_read_bits(memory, BITS_START - 1, 1, bits_data), RET_INVALID_ADDR);
@@ -45,7 +45,7 @@ TEST(modbus, memory) {
   ASSERT_EQ(modbus_memory_read_input_bits(memory, INPUT_BITS_START, 0, bits_data), RET_BAD_PARAMS);
   ASSERT_EQ(
       modbus_memory_read_input_bits(memory, INPUT_BITS_START, MODBUS_MAX_READ_BITS + 1, bits_data),
-      RET_BAD_PARAMS);
+      RET_INVALID_ADDR);
   ASSERT_EQ(
       modbus_memory_read_input_bits(memory, INPUT_BITS_START, INPUT_BITS_COUNT + 1, bits_data),
       RET_INVALID_ADDR);
@@ -58,11 +58,11 @@ TEST(modbus, memory) {
             RET_BAD_PARAMS);
   ASSERT_EQ(modbus_memory_read_registers(memory, REGISTERS_START, MODBUS_MAX_READ_REGISTERS + 1,
                                          registers_data),
-            RET_BAD_PARAMS);
+            RET_INVALID_ADDR);
 
   ASSERT_EQ(
       modbus_memory_read_registers(memory, REGISTERS_START, REGISTERS_COUNT + 1, registers_data),
-      RET_BAD_PARAMS);
+      RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_read_registers(memory, REGISTERS_START - 1, 1, registers_data),
             RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_read_registers(memory, REGISTERS_START, REGISTERS_COUNT, NULL),
@@ -78,7 +78,7 @@ TEST(modbus, memory) {
             RET_BAD_PARAMS);
   ASSERT_EQ(modbus_memory_write_bits(memory, BITS_START, 0, bits_data), RET_BAD_PARAMS);
   ASSERT_EQ(modbus_memory_write_bits(memory, BITS_START, MODBUS_MAX_WRITE_BITS + 1, bits_data),
-            RET_BAD_PARAMS);
+            RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_write_bits(memory, BITS_START, BITS_COUNT + 1, bits_data),
             RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_write_bits(memory, BITS_START - 1, 1, bits_data), RET_INVALID_ADDR);
@@ -88,11 +88,11 @@ TEST(modbus, memory) {
             RET_BAD_PARAMS);
   ASSERT_EQ(modbus_memory_write_registers(memory, REGISTERS_START, MODBUS_MAX_WRITE_REGISTERS + 1,
                                           registers_data),
-            RET_BAD_PARAMS);
+            RET_INVALID_ADDR);
 
   ASSERT_EQ(
       modbus_memory_write_registers(memory, REGISTERS_START, REGISTERS_COUNT + 1, registers_data),
-      RET_BAD_PARAMS);
+      RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_write_registers(memory, REGISTERS_START - 1, 1, registers_data),
             RET_INVALID_ADDR);
   ASSERT_EQ(modbus_memory_write_registers(memory, REGISTERS_START, REGISTERS_COUNT, NULL),
@@ -193,7 +193,7 @@ TEST(modbus, memory) {
   ((uint16_t*)memory_default->input_registers->data)[3] = 0xdef0;
   ((uint16_t*)memory_default->input_registers->data)[4] = 0x1234;
   ((uint16_t*)memory_default->input_registers->data)[5] = 0x5678;
-  ASSERT_EQ(modbus_memory_read_input_registers(memory, INPUT_REGISTERS_START, INPUT_REGISTERS_COUNT,
+  ASSERT_EQ(modbus_memory_read_input_registers(memory, INPUT_REGISTERS_START, MODBUS_MAX_READ_REGISTERS,
                                                input_registers_data),
             RET_OK);
   ASSERT_EQ(input_registers_data[0], 0x3412);

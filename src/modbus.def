@@ -72,4 +72,10 @@ EXPORTS
     modbus_service_run
     modbus_server_channel_create_with_conf
     modbus_server_channel_create
+    modbus_server_channel_read_bits
+    modbus_server_channel_read_registers
+    modbus_server_channel_write_bits
+    modbus_server_channel_write_bit
+    modbus_server_channel_write_register
+    modbus_server_channel_write_registers
     modbus_server_channel_destroy

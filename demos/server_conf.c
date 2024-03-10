@@ -46,7 +46,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     }
     tokenizer_deinit(&t);
   }
-  
+
   init = conf_doc_get_str(doc, "input_bits.init", NULL);
   if (init != NULL) {
     i = 0;
@@ -59,7 +59,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     }
     tokenizer_deinit(&t);
   }
-  
+
   init = conf_doc_get_str(doc, "registers.init", NULL);
   if (init != NULL) {
     i = 0;
@@ -72,7 +72,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     }
     tokenizer_deinit(&t);
   }
-  
+
   init = conf_doc_get_str(doc, "input_registers.init", NULL);
   if (init != NULL) {
     i = 0;
@@ -91,28 +91,11 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
 
 static modbus_memory_t* server_conf_load_doc(conf_doc_t* doc) {
   modbus_memory_t* m = NULL;
-  conf_node_t* channels = conf_node_find_child(doc->root, "channels"); 
+  conf_node_t* channels = conf_node_find_child(doc->root, "channels");
   s_auto_inc_input_registers = conf_doc_get_bool(doc, "input_registers.auto_inc", FALSE);
 
   m = modbus_memory_default_create_with_conf(channels);
   return_value_if_fail(m != NULL, NULL);
 
   return modbus_memory_init_data(m, doc);
-}
-
-modbus_memory_t* server_conf_load(const char* filename) {
-  modbus_memory_t* m = NULL;
-  char* data = (char*)file_read(filename, NULL);
-  return_value_if_fail(data != NULL, NULL);
-
-  if (data != NULL) {
-    conf_doc_t* doc = conf_doc_load_ini(data);
-    if (doc != NULL) {
-      m = server_conf_load_doc(doc);
-      conf_doc_destroy(doc);
-    }
-    TKMEM_FREE(data);
-  }
-
-  return m;
 }

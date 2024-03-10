@@ -1,0 +1,28 @@
+{
+  "url": "tcp://localhost:502",
+  "channels": [
+    {
+      "name": "bits",
+      "writable": true,
+      "start": 0,
+      "length": 1000
+    },
+    {
+      "name": "input_bits",
+      "start": 0,
+      "length": 1000
+    },
+    {
+      "name": "registers",
+      "writable": true,
+      "start": 0,
+      "length": 1000
+    },
+    {
+      "name": "input_registers",
+      "start": 0,
+      "auto_inc": true,
+      "length": 1000
+    }
+  ]
+}

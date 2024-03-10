@@ -2223,6 +2223,182 @@
             "type": "modbus_server_channel_t*",
             "name": "channel",
             "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "数量。"
+          },
+          {
+            "type": "uint8_t*",
+            "name": "buff",
+            "desc": "缓冲区。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取位数据。",
+        "name": "modbus_server_channel_read_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "数量。"
+          },
+          {
+            "type": "uint16_t*",
+            "name": "buff",
+            "desc": "缓冲区。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取寄存器数据。",
+        "name": "modbus_server_channel_read_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "数量。"
+          },
+          {
+            "type": "const uint8_t*",
+            "name": "buff",
+            "desc": "缓冲区。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入位数据。",
+        "name": "modbus_server_channel_write_bits",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint8_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入位数据。",
+        "name": "modbus_server_channel_write_bit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "value",
+            "desc": "值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入寄存器数据。",
+        "name": "modbus_server_channel_write_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "addr",
+            "desc": "地址。"
+          },
+          {
+            "type": "uint16_t",
+            "name": "count",
+            "desc": "数量。"
+          },
+          {
+            "type": "const uint16_t*",
+            "name": "buff",
+            "desc": "缓冲区。"
+          }
+        ],
+        "annotation": {},
+        "desc": "写入寄存器数据。",
+        "name": "modbus_server_channel_write_registers",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "modbus_server_channel_t*",
+            "name": "channel",
+            "desc": "对象。"
           }
         ],
         "annotation": {},

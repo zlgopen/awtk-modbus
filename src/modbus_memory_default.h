@@ -54,11 +54,10 @@ typedef struct _modbus_memory_default_t {
  * 
  * @return {modbus_memory_t*} 返回modbus_memory_t对象。
  */
-modbus_memory_t* modbus_memory_default_create(
-  modbus_server_channel_t* bits,
-  modbus_server_channel_t* input_bits,
-  modbus_server_channel_t* registers,
-  modbus_server_channel_t* input_registers);
+modbus_memory_t* modbus_memory_default_create(modbus_server_channel_t* bits,
+                                              modbus_server_channel_t* input_bits,
+                                              modbus_server_channel_t* registers,
+                                              modbus_server_channel_t* input_registers);
 
 /**
  * @method modbus_memory_default_create_test
