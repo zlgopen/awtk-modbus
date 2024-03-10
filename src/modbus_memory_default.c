@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  modbus memory default
  *
- * Copyright (c) 2023 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2023 - 2024  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,266 +15,114 @@
 /**
  * History:
  * ================================================================
- * 2023-10-02 Li XianJing <lixianjing@zlg.cn> created
+ * 2024-03-10 Li XianJing <lixianjing@zlg.cn> created
  *
  */
+
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "modbus_memory_default.h"
 
-typedef struct _bits_memory_t {
-  uint32_t start;
-  uint32_t count;
-  uint8_t* data;
-} bits_memory_t;
-
-static ret_t modbus_memory_read_bits_impl(bits_memory_t* memory, uint16_t addr, uint16_t count,
-                                          uint8_t* buff) {
-  uint32_t i = 0;
-  uint8_t* p = NULL;
-  uint16_t offset = 0;
-  uint16_t bytes = modbus_bits_to_bytes(count);
-
-  if (count < 1 || count > MODBUS_MAX_READ_BITS) {
-    return RET_EXCEED_RANGE;
-  }
-
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    bits_stream_set(buff, bytes, i, p[i]);
-  }
-
-  return RET_OK;
-}
-
 static ret_t modbus_memory_default_read_bits(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                              uint8_t* buff) {
-  bits_memory_t bits_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  bits_memory.start = memory_default->bits_start;
-  bits_memory.count = memory_default->bits_count;
-  bits_memory.data = memory_default->bits_data;
-
-  return modbus_memory_read_bits_impl(&bits_memory, addr, count, buff);
+  return modbus_server_channel_read_bits(m->bits, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_read_input_bits(modbus_memory_t* memory, uint16_t addr,
                                                    uint16_t count, uint8_t* buff) {
-  bits_memory_t bits_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  bits_memory.start = memory_default->input_bits_start;
-  bits_memory.count = memory_default->input_bits_count;
-  bits_memory.data = memory_default->input_bits_data;
-
-  return modbus_memory_read_bits_impl(&bits_memory, addr, count, buff);
-}
-
-typedef struct _register_memory_t {
-  uint32_t start;
-  uint32_t count;
-  uint16_t* data;
-} register_memory_t;
-
-static ret_t modbus_memory_read_registers_impl(register_memory_t* memory, uint16_t addr,
-                                               uint16_t count, uint16_t* buff) {
-  uint32_t i = 0;
-  uint16_t* p = NULL;
-  uint16_t offset = 0;
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-
-  if (count < 1 || count > MODBUS_MAX_READ_REGISTERS) {
-    return RET_EXCEED_RANGE;
-  }
-
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    buff[i] = TK_HTONS(p[i]);
-  }
-
-  return RET_OK;
+  return modbus_server_channel_read_bits(m->input_bits, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_read_registers(modbus_memory_t* memory, uint16_t addr,
                                                   uint16_t count, uint16_t* buff) {
-  register_memory_t register_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  register_memory.start = memory_default->registers_start;
-  register_memory.count = memory_default->registers_count;
-  register_memory.data = memory_default->registers_data;
-
-  return modbus_memory_read_registers_impl(&register_memory, addr, count, buff);
+  return modbus_server_channel_read_registers(m->registers, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_read_input_registers(modbus_memory_t* memory, uint16_t addr,
                                                         uint16_t count, uint16_t* buff) {
-  register_memory_t register_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  register_memory.start = memory_default->input_registers_start;
-  register_memory.count = memory_default->input_registers_count;
-  register_memory.data = memory_default->input_registers_data;
-
-  return modbus_memory_read_registers_impl(&register_memory, addr, count, buff);
-}
-
-static ret_t modbus_memory_write_bits_impl(bits_memory_t* memory, uint16_t addr, uint16_t count,
-                                           const uint8_t* buff) {
-  uint32_t i = 0;
-  uint8_t* p = NULL;
-  uint16_t offset = 0;
-  uint16_t bytes = modbus_bits_to_bytes(count);
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-
-  if (count < 1 || count > MODBUS_MAX_WRITE_BITS) {
-    return RET_EXCEED_RANGE;
-  }
-
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    bool_t v = FALSE;
-    bits_stream_get(buff, bytes, i, &v);
-    p[i] = v;
-  }
-
-  return RET_OK;
+  return modbus_server_channel_read_registers(m->input_registers, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_write_bit(modbus_memory_t* memory, uint16_t addr,
                                              uint8_t value) {
-  return modbus_memory_write_bits(memory, addr, 1, &value);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
+
+  return modbus_server_channel_write_bit(m->bits, addr, value);
 }
 
 static ret_t modbus_memory_default_write_bits(modbus_memory_t* memory, uint16_t addr,
                                               uint16_t count, const uint8_t* buff) {
-  bits_memory_t bits_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  bits_memory.start = memory_default->bits_start;
-  bits_memory.count = memory_default->bits_count;
-  bits_memory.data = memory_default->bits_data;
-
-  return modbus_memory_write_bits_impl(&bits_memory, addr, count, buff);
+  return modbus_server_channel_write_bits(m->bits, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_write_register(modbus_memory_t* memory, uint16_t addr,
                                                   uint16_t value) {
-  return modbus_memory_write_registers(memory, addr, 1, &value);
-}
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-static ret_t modbus_memory_write_registers_impl(register_memory_t* memory, uint16_t addr,
-                                                uint16_t count, const uint16_t* buff) {
-  uint32_t i = 0;
-  uint16_t* p = NULL;
-  uint16_t offset = 0;
-  return_value_if_fail(memory != NULL && buff != NULL, RET_BAD_PARAMS);
-
-  if (count < 1 || count > MODBUS_MAX_WRITE_REGISTERS) {
-    return RET_EXCEED_RANGE;
-  }
-
-  if (addr < memory->start || (addr + count) > (memory->start + memory->count)) {
-    return RET_INVALID_ADDR;
-  }
-
-  offset = addr - memory->start;
-  p = memory->data + offset;
-
-  for (i = 0; i < count; i++) {
-    p[i] = TK_NTOHS(buff[i]);
-  }
-
-  return RET_OK;
+  return modbus_server_channel_write_register(m->registers, addr, value);
 }
 
 static ret_t modbus_memory_default_write_registers(modbus_memory_t* memory, uint16_t addr,
                                                    uint16_t count, const uint16_t* buff) {
-  register_memory_t register_memory;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-  return_value_if_fail(memory_default != NULL && buff != NULL, RET_BAD_PARAMS);
+  modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  register_memory.start = memory_default->registers_start;
-  register_memory.count = memory_default->registers_count;
-  register_memory.data = memory_default->registers_data;
-
-  return modbus_memory_write_registers_impl(&register_memory, addr, count, buff);
+  return modbus_server_channel_write_registers(m->registers, addr, count, buff);
 }
 
 static ret_t modbus_memory_default_destroy(modbus_memory_t* memory) {
   modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(memory_default != NULL, RET_BAD_PARAMS);
 
-  if (memory_default->bits_data != NULL) {
-    TKMEM_FREE(memory_default->bits_data);
-  }
-  if (memory_default->input_bits_data != NULL) {
-    TKMEM_FREE(memory_default->input_bits_data);
-  }
-  if (memory_default->registers_data != NULL) {
-    TKMEM_FREE(memory_default->registers_data);
-  }
-  if (memory_default->input_registers_data != NULL) {
-    TKMEM_FREE(memory_default->input_registers_data);
-  }
+  modbus_server_channel_destroy(memory_default->bits);
+  modbus_server_channel_destroy(memory_default->input_bits);
+  modbus_server_channel_destroy(memory_default->registers);
+  modbus_server_channel_destroy(memory_default->input_registers);
+
   TKMEM_FREE(memory_default);
 
   return RET_OK;
 }
 
-modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits_count,
-                                              uint32_t input_bits_start, uint32_t input_bits_count,
-                                              uint32_t registers_start, uint32_t registers_count,
-                                              uint32_t input_registers_start,
-                                              uint32_t input_registers_count) {
+modbus_memory_t* modbus_memory_default_create_test(void) {
+  modbus_server_channel_t* bits = modbus_server_channel_create(
+      MODBUS_SERVER_CHANNEL_BITS, MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, TRUE);
+  modbus_server_channel_t* input_bits =
+      modbus_server_channel_create(MODBUS_SERVER_CHANNEL_INPUT_BITS, MODBUS_DEMO_INPUT_BITS_ADDRESS,
+                                   MODBUS_DEMO_INPUT_BITS_NB, FALSE);
+  modbus_server_channel_t* registers =
+      modbus_server_channel_create(MODBUS_SERVER_CHANNEL_REGISTERS, MODBUS_DEMO_REGISTERS_ADDRESS,
+                                   MODBUS_DEMO_REGISTERS_NB, TRUE);
+  modbus_server_channel_t* input_registers = modbus_server_channel_create(
+      MODBUS_SERVER_CHANNEL_INPUT_REGISTERS, MODBUS_DEMO_INPUT_REGISTERS_ADDRESS,
+      MODBUS_DEMO_INPUT_REGISTERS_NB, FALSE);
+
+  return modbus_memory_default_create(bits, input_bits, registers, input_registers);
+}
+
+modbus_memory_t* modbus_memory_default_create(modbus_server_channel_t* bits,
+                                              modbus_server_channel_t* input_bits,
+                                              modbus_server_channel_t* registers,
+                                              modbus_server_channel_t* input_registers) {
   modbus_memory_default_t* memory = TKMEM_ZALLOC(modbus_memory_default_t);
   return_value_if_fail(memory != NULL, NULL);
-
-  memory->bits_start = bits_start;
-  memory->bits_count = bits_count;
-  memory->input_bits_start = input_bits_start;
-  memory->input_bits_count = input_bits_count;
-  memory->registers_start = registers_start;
-  memory->registers_count = registers_count;
-  memory->input_registers_start = input_registers_start;
-  memory->input_registers_count = input_registers_count;
-
-  memory->bits_data = TKMEM_ZALLOCN(uint8_t, bits_count);
-  goto_error_if_fail(memory->bits_data != NULL);
-
-  memory->input_bits_data = TKMEM_ZALLOCN(uint8_t, input_bits_count);
-  goto_error_if_fail(memory->input_bits_data != NULL);
-
-  memory->registers_data = TKMEM_ZALLOCN(uint16_t, registers_count);
-  goto_error_if_fail(memory->registers_data != NULL);
-
-  memory->input_registers_data = TKMEM_ZALLOCN(uint16_t, input_registers_count);
-  goto_error_if_fail(memory->input_registers_data != NULL);
 
   memory->memory.read_bits = modbus_memory_default_read_bits;
   memory->memory.read_input_bits = modbus_memory_default_read_input_bits;
@@ -286,11 +134,67 @@ modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits
   memory->memory.write_registers = modbus_memory_default_write_registers;
   memory->memory.destroy = modbus_memory_default_destroy;
 
-  return (modbus_memory_t*)memory;
+  memory->bits = bits;
+  memory->input_bits = input_bits;
+  memory->registers = registers;
+  memory->input_registers = input_registers;
 
-error:
-  modbus_memory_destroy((modbus_memory_t*)memory);
-  return NULL;
+  log_debug("-------------------------------------------------\n");
+  if (bits != NULL) {
+    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", bits->name, bits->start,
+              bits->length, bits->bytes, bits->writable);
+  }
+
+  if (input_bits != NULL) {
+    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", input_bits->name, input_bits->start,
+              input_bits->length, input_bits->bytes, input_bits->writable);
+  }
+
+  if (registers != NULL) {
+    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", registers->name, registers->start,
+              registers->length, registers->bytes, registers->writable);
+  }
+
+  if (input_registers != NULL) {
+    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", input_registers->name,
+              input_registers->start, input_registers->length, input_registers->bytes,
+              input_registers->writable);
+  }
+  log_debug("-------------------------------------------------\n");
+
+  return (modbus_memory_t*)memory;
+}
+
+modbus_memory_t* modbus_memory_default_create_with_conf(conf_node_t* node) {
+  modbus_server_channel_t* bits = NULL;
+  modbus_server_channel_t* input_bits = NULL;
+  modbus_server_channel_t* registers = NULL;
+  modbus_server_channel_t* input_registers = NULL;
+  conf_node_t* iter = conf_node_get_first_child(node);
+  return_value_if_fail(iter != NULL, NULL);
+
+  while (iter != NULL) {
+    modbus_server_channel_t* channel = modbus_server_channel_create_with_conf(iter);
+
+    if (channel != NULL) {
+      if (tk_str_eq(channel->name, MODBUS_SERVER_CHANNEL_BITS)) {
+        bits = channel;
+      } else if (tk_str_eq(channel->name, MODBUS_SERVER_CHANNEL_INPUT_BITS)) {
+        input_bits = channel;
+      } else if (tk_str_eq(channel->name, MODBUS_SERVER_CHANNEL_REGISTERS)) {
+        registers = channel;
+      } else if (tk_str_eq(channel->name, MODBUS_SERVER_CHANNEL_INPUT_REGISTERS)) {
+        input_registers = channel;
+      } else {
+        modbus_server_channel_destroy(channel);
+        log_debug("invalid channel name: %s\n", channel->name);
+      }
+    }
+
+    iter = iter->next;
+  }
+
+  return modbus_memory_default_create(bits, input_bits, registers, input_registers);
 }
 
 modbus_memory_default_t* modbus_memory_default_cast(modbus_memory_t* memory) {

@@ -11,7 +11,7 @@ Modbus 协议简单、易于实现和使用，因此在工业自动化领域得�
 * 支持 TCP 和 RTU 两种通信方式。
 * 支持客户端 (Master) 和 服务器 (Slave)。
 * 与  [AWTK](https://github.com/zlgopen/awtk.git) 无缝集成。服务端 (Slave) 可以集成到 AWTK 的主循环。
-* 服务器 (Slave) 支持自定义的memory，在处理请求的前后被调用，方便对数据进行预读和刷新。
+* 服务器 (Slave) 支持自定义的 memory，在处理请求的前后被调用，方便对数据进行预读和刷新。
 * 支持设置自动重试的次数。
 
 ## 准备
@@ -50,35 +50,22 @@ scons LINUX_FB=true
 ./bin/modbus_server tcp://localhost:502
 ```
 
-* 服务端 (集成到AWTK主循环)
+* 服务端 （集成到 AWTK 主循环）
 
 ```
 ./bin/modbus_server_awtk tcp://localhost:502
 ```
 
-* 服务端 (支持从配置文件加载参数，方便测试)
+* 服务端 （支持从配置文件加载参数，方便测试）
 
 ```
-bin/modbus_server_ex [url] [config]
-```
-
-示例：
-
-```
-./bin/modbus_server_ex tcp://localhost:502 config/default.ini
-```
-
-> RTU 可以指定 unit id。
-
-```
-bin/modbus_server_ex [url] [config] [unit_id]
+bin/modbus_server_ex [config]
 ```
 
 示例：
 
 ```
-./bin/modbus_server_ex serial:///dev/ttys017 config/default.ini 1
-./bin/modbus_server_ex serial:///dev/ttys017 config/default.ini 2
+./bin/modbus_server_ex config/default.json
 ```
 
 * 客户端
@@ -97,7 +84,7 @@ bin/modbus_server_ex [url] [config] [unit_id]
 ./bin/modbus_server serial:///dev/ttys124
 ```
 
-* 服务端 (集成到AWTK主循环)
+* 服务端 （集成到 AWTK 主循环）
 
 ```
 ./bin/modbus_server_awtk serial:///dev/ttys124
@@ -117,7 +104,7 @@ bin/modbus_server_ex [url] [config] [unit_id]
 ./bin/modbus_server rtu+tcp://localhost:502
 ```
 
-* 服务端 (集成到AWTK主循环)
+* 服务端 （集成到 AWTK 主循环）
 
 ```
 ./bin/modbus_server_awtk rtu+tcp://localhost:502
@@ -140,5 +127,3 @@ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 ### 致谢
 
  * 感谢 QY 同学提供大量建设性意见和使用反馈。
-
-

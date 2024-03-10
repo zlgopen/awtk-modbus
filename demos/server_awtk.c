@@ -62,10 +62,7 @@ ret_t application_init(void) {
     memory = modbus_memory_custom_create();
   } else {
     log_debug("use default memory.\n");
-    memory = modbus_memory_default_create(
-        MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, MODBUS_DEMO_INPUT_BITS_ADDRESS,
-        MODBUS_DEMO_INPUT_BITS_NB, MODBUS_DEMO_REGISTERS_ADDRESS, MODBUS_DEMO_REGISTERS_NB,
-        MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, MODBUS_DEMO_INPUT_REGISTERS_NB);
+    memory = modbus_memory_default_create_test();
   }
 
   socket_init();
