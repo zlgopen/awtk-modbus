@@ -103,6 +103,7 @@ TEST(modbus, memory) {
   ASSERT_EQ(modbus_memory_write_register(memory, REGISTERS_START + REGISTERS_COUNT, 2),
             RET_INVALID_ADDR);
 
+  memset(bits_data, 0, sizeof(bits_data));
   bits_data[0] = 0b01010101;
   bits_data[1] = 0b01010101;
 

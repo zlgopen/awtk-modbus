@@ -161,7 +161,7 @@ static void check_read_register_ex(uint16_t func_code, uint16_t* data, uint16_t 
   }
 
   modbus_client_destroy(client);
-  modbus_service_destroy(service);
+  tk_service_destroy((tk_service_t*)service);
 }
 
 TEST(modbus, read_registers_1) {

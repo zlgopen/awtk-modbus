@@ -38,9 +38,8 @@ GTEST_API_ int main(int argc, char** argv) {
   system_info_init(APP_SIMULATOR, NULL, NULL);
   tk_init_internal();
 
-  tk_init_internal();
-
   RUN_ALL_TESTS();
+  tk_deinit_internal();
 
   return 0;
 }
