@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  modbus memory default
  *
- * Copyright (c) 2023 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2023 - 2024  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,109 +15,67 @@
 /**
  * History:
  * ================================================================
- * 2023-10-02 Li XianJing <lixianjing@zlg.cn> created
+ * 2024-03-10 Li XianJing <lixianjing@zlg.cn> created
  *
  */
 
 #ifndef TK_MODBUS_MEMORY_DEFAULT_H
 #define TK_MODBUS_MEMORY_DEFAULT_H
 
+#include "conf_io/conf_node.h"
 #include "modbus_types_def.h"
 #include "modbus_memory.h"
+#include "modbus_server_channel.h"
 
 BEGIN_C_DECLS
 
 /**
  * @class modbus_memory_default_t
  * 
- * modbus的默认实现。
+ * 自定义的memory。
  */
 typedef struct _modbus_memory_default_t {
   modbus_memory_t memory;
 
-  /**
-   * @property {uint32_t} bits_start
-   * 位起始地址。
-   */
-  uint32_t bits_start;
-  /**
-   * @property {uint32_t} bits_count
-   * 位数量。
-   */
-  uint32_t bits_count;
-  /**
-   * @property {uint8_t*} bits_data
-   * 位数据。
-   */
-  uint8_t* bits_data;
-
-  /**
-   * @property {uint32_t} input_bits_start
-   * 输入位起始地址。
-   */
-  uint32_t input_bits_start;
-  /**
-   * @property {uint32_t} input_bits_count
-   * 输入位数量。
-   */
-  uint32_t input_bits_count;
-  /**
-   * @property {uint8_t*} input_bits_data
-   * 输入位数据。
-   */
-  uint8_t* input_bits_data;
-  /**
-   * @property {uint32_t} registers_start
-   * 寄存器起始地址。
-   */
-  uint32_t registers_start;
-  /**
-   * @property {uint32_t} registers_count
-   * 寄存器数量。
-   */
-  uint32_t registers_count;
-  /**
-   * @property {uint16_t*} registers_data
-   * 寄存器数据。
-   */
-  uint16_t* registers_data;
-
-  /**
-   * @property {uint32_t} input_registers_start
-   * 输入寄存器起始地址。
-   */
-  uint32_t input_registers_start;
-  /**
-   * @property {uint32_t} input_registers_count
-   * 输入寄存器数量。
-   */
-  uint32_t input_registers_count;
-  /**
-   * @property {uint16_t*} input_registers_data
-   * 输入寄存器数据。
-   */
-  uint16_t* input_registers_data;
+  /*private*/
+  modbus_server_channel_t* bits;
+  modbus_server_channel_t* input_bits;
+  modbus_server_channel_t* registers;
+  modbus_server_channel_t* input_registers;
 } modbus_memory_default_t;
 
 /**
  * @method modbus_memory_default_create
- * 创建默认memory。
- * @param {uint32_t} bits_start 位起始地址。
- * @param {uint32_t} bits_count 位数量。
- * @param {uint32_t} input_bits_start 输入位起始地址。
- * @param {uint32_t} input_bits_count 输入位数量。
- * @param {uint32_t} registers_start 寄存器起始地址。
- * @param {uint32_t} registers_count 寄存器数量。
- * @param {uint32_t} input_registers_start 输入寄存器起始地址。
- * @param {uint32_t} input_registers_count 输入寄存器数量。
+ * 创建modbus_memory_default_t对象。
+ * @param {modbus_server_channel_t*} bits bits channel。
+ * @param {modbus_server_channel_t*} input_bits input bits channel。
+ * @param {modbus_server_channel_t*} registers registers channel。
+ * @param {modbus_server_channel_t*} input_registers input registers channel。
  * 
- * @return {modbus_memory_t*} 返回modbus memory对象。
+ * @return {modbus_memory_t*} 返回modbus_memory_t对象。
  */
-modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits_count,
-                                              uint32_t input_bits_start, uint32_t input_bits_count,
-                                              uint32_t registers_start, uint32_t registers_count,
-                                              uint32_t input_registers_start,
-                                              uint32_t input_registers_count);
+modbus_memory_t* modbus_memory_default_create(
+  modbus_server_channel_t* bits,
+  modbus_server_channel_t* input_bits,
+  modbus_server_channel_t* registers,
+  modbus_server_channel_t* input_registers);
+
+/**
+ * @method modbus_memory_default_create_test
+ * 创建modbus_memory_default_t对象。
+ * 
+ * @return {modbus_memory_t*} 返回modbus_memory_t对象。
+ */
+modbus_memory_t* modbus_memory_default_create_test(void);
+
+/**
+ * @method modbus_memory_default_create_with_conf
+ * 从配置文件创建modbus_memory_default_t对象。
+ * @param {conf_node_t*} node 配置文件节点。
+ * 
+ * @return {modbus_memory_t*} 返回modbus_memory_t对象。
+ */
+modbus_memory_t* modbus_memory_default_create_with_conf(conf_node_t* node);
 
 /**
  * @method modbus_memory_default_cast
@@ -129,6 +87,7 @@ modbus_memory_t* modbus_memory_default_create(uint32_t bits_start, uint32_t bits
 modbus_memory_default_t* modbus_memory_default_cast(modbus_memory_t* memory);
 
 #define MODBUS_MEMORY_DEFAULT(memory) modbus_memory_default_cast((modbus_memory_t*)memory)
+
 END_C_DECLS
 
 #endif /*TK_MODBUS_MEMORY_DEFAULT_H*/

@@ -40,26 +40,6 @@ static ret_t start_tcp(event_source_manager_t* esm, const char* url, modbus_memo
   return modbus_service_tcp_start(esm, memory, port, proto, MODBUS_DEMO_SLAVE_ID);
 }
 
-/*生成测试数据*/
-static void modbus_memory_init_demo_data(modbus_memory_t* memory) {
-  uint32_t i = 0;
-  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
-
-  if (memory_default == NULL) {
-    return;
-  }
-
-  for (i = 0; i < memory_default->input_bits_count; i++) {
-    memory_default->input_bits_data[i] = i % 2;
-  }
-
-  for (i = 0; i < memory_default->input_registers_count; i++) {
-    memory_default->input_registers_data[i] = (uint16_t)i;
-  }
-
-  return;
-}
-
 int main(int argc, char* argv[]) {
   modbus_memory_t* memory = NULL;
   const char* url = argc > 1 ? argv[1] : "tcp://localhost:502";
@@ -74,13 +54,9 @@ int main(int argc, char* argv[]) {
     memory = modbus_memory_custom_create();
   } else {
     log_debug("use default memory.\n");
-    memory = modbus_memory_default_create(
-        MODBUS_DEMO_BITS_ADDRESS, MODBUS_DEMO_BITS_NB, MODBUS_DEMO_INPUT_BITS_ADDRESS,
-        MODBUS_DEMO_INPUT_BITS_NB, MODBUS_DEMO_REGISTERS_ADDRESS, MODBUS_DEMO_REGISTERS_NB,
-        MODBUS_DEMO_INPUT_REGISTERS_ADDRESS, MODBUS_DEMO_INPUT_REGISTERS_NB);
+    memory = modbus_memory_default_create_test(); 
   }
 
-  modbus_memory_init_demo_data(memory);
   esm = event_source_manager_default_create();
 
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {

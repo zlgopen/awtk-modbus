@@ -48,6 +48,8 @@ EXPORTS
     modbus_init_req_request
     modbus_init_req_destroy
     modbus_memory_default_create
+    modbus_memory_default_create_test
+    modbus_memory_default_create_with_conf
     modbus_memory_default_cast
     modbus_memory_read_bits
     modbus_memory_read_input_bits
@@ -68,3 +70,6 @@ EXPORTS
     modbus_service_destroy
     modbus_service_attach_to_event_source_manager
     modbus_service_run
+    modbus_server_channel_create_with_conf
+    modbus_server_channel_create
+    modbus_server_channel_destroy
