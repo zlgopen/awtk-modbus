@@ -29,8 +29,8 @@ TEST(modbus, memory) {
   ASSERT_EQ(memory_default->registers->data != NULL, TRUE);
   ASSERT_EQ(memory_default->input_registers->data != NULL, TRUE);
 
-  uint8_t bits_data[100];
-  uint8_t input_bits_data[100];
+  uint8_t bits_data[MODBUS_DEMO_BITS_NB+1];
+  uint8_t input_bits_data[MODBUS_DEMO_INPUT_BITS_NB+1];
   uint16_t registers_data[100];
   uint16_t input_registers_data[100];
 

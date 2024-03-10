@@ -16,7 +16,7 @@ TEST(modbus_init_req, init5) {
   ASSERT_EQ(init->value, 1);
 
   modbus_init_req_destroy(init);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 TEST(modbus_init_req, init15) {
@@ -32,7 +32,7 @@ TEST(modbus_init_req, init15) {
   ASSERT_EQ(init->value, 1);
 
   modbus_init_req_destroy(init);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 TEST(modbus_init_req, init6) {
@@ -48,7 +48,7 @@ TEST(modbus_init_req, init6) {
   ASSERT_EQ(init->value, 100);
 
   modbus_init_req_destroy(init);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 
@@ -65,6 +65,6 @@ TEST(modbus_init_req, init16) {
   ASSERT_EQ(init->value, 500);
 
   modbus_init_req_destroy(init);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 

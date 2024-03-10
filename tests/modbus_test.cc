@@ -57,7 +57,7 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
     ASSERT_EQ(buff[i], v);
   }
   modbus_client_destroy(client);
-  modbus_service_destroy(service);
+  tk_service_destroy((tk_service_t*)service);
 }
 
 static void check_read_bits(uint8_t value1, uint8_t value2, uint16_t num_bits) {

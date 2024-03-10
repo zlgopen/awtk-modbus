@@ -47,6 +47,7 @@ ret_t modbus_server_channel_destroy(modbus_server_channel_t* channel) {
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
 
   TKMEM_FREE(channel->data);
+  TKMEM_FREE(channel->name);
   TKMEM_FREE(channel);
 
   return RET_OK;

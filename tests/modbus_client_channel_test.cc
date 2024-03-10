@@ -24,7 +24,7 @@ TEST(modbus_client_channel, read_bits) {
   ASSERT_EQ(channel->keep_last_value_if_read_failed, TRUE);
   
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 TEST(modbus_client_channel, read_input_bits) {
@@ -47,7 +47,7 @@ TEST(modbus_client_channel, read_input_bits) {
   ASSERT_EQ(channel->keep_last_value_if_read_failed, TRUE);
 
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 TEST(modbus_client_channel, read_registers) {
@@ -70,7 +70,7 @@ TEST(modbus_client_channel, read_registers) {
   ASSERT_EQ(channel->keep_last_value_if_read_failed, FALSE);
 
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 TEST(modbus_client_channel, read_input_registers) {
@@ -93,7 +93,7 @@ TEST(modbus_client_channel, read_input_registers) {
   ASSERT_EQ(channel->keep_last_value_if_read_failed, FALSE);
 
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
 }
 
 
@@ -115,8 +115,8 @@ TEST(modbus_client_channel, write_1_bit) {
   ASSERT_EQ(channel->write_buffer != NULL, true);
   ASSERT_EQ(channel->read_buffer == NULL, true);
 
+  TK_OBJECT_UNREF(obj);
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
 }
 
 TEST(modbus_client_channel, write_bits) {
@@ -137,8 +137,8 @@ TEST(modbus_client_channel, write_bits) {
   ASSERT_EQ(channel->write_buffer != NULL, true);
   ASSERT_EQ(channel->read_buffer == NULL, true);
 
+  TK_OBJECT_UNREF(obj);
   modbus_client_channel_destroy(channel);
-  conf_doc_destroy(conf);
 }
 
 
@@ -160,7 +160,8 @@ TEST(modbus_client_channel, write_1_register) {
   ASSERT_EQ(channel->write_buffer != NULL, true);
   ASSERT_EQ(channel->read_buffer == NULL, true);
 
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
+  modbus_client_channel_destroy(channel);
 }
 
 
@@ -181,5 +182,6 @@ TEST(modbus_client_channel, write_registers) {
   ASSERT_EQ(channel->write_buffer != NULL, true);
   ASSERT_EQ(channel->read_buffer == NULL, true);
 
-  conf_doc_destroy(conf);
+  TK_OBJECT_UNREF(obj);
+  modbus_client_channel_destroy(channel);
 }

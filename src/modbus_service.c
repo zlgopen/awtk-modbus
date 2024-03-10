@@ -24,6 +24,9 @@
 
 BEGIN_C_DECLS
 
+ret_t modbus_service_destroy(modbus_service_t* service);
+ret_t modbus_service_dispatch(modbus_service_t* service);
+
 modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_t proto,
                                                 modbus_memory_t* memory) {
   modbus_service_t* service = NULL;
@@ -40,6 +43,11 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
   if (MODBUS_PROTO_TCP == proto) {
     modbus_service_set_slave(service, 0xff);
   }
+  
+  service->service.dispatch = (tk_service_dispatch_t)modbus_service_dispatch;
+  service->service.destroy = (tk_service_destroy_t)modbus_service_destroy;
+  service->service.io = io;
+
 
   return service;
 }
@@ -225,10 +233,6 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
 
   service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
   return_value_if_fail(service != NULL, NULL);
-
-  service->service.dispatch = (tk_service_dispatch_t)modbus_service_dispatch;
-  service->service.destroy = (tk_service_destroy_t)modbus_service_destroy;
-  service->service.io = io;
 
   if (service_args->proto == MODBUS_PROTO_RTU) {
     modbus_service_set_slave(service, service_args->slave);
