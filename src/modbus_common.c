@@ -175,7 +175,7 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
 
   if (func_code == expected_func_code) {
     bytes = modbus_common_get_resp_playload_length(common, expected_func_code);
-    return_value_if_fail(bytes < MODBUS_MAX_PAYLOAD, RET_IO);
+    return_value_if_fail((bytes + wb->cursor + 1) < MODBUS_MAX_PAYLOAD, RET_IO);
 
     wbuffer_extend_capacity(wb, bytes + wb->cursor + 1);
     buff = wb->data + wb->cursor;
