@@ -1,0 +1,63 @@
+[connect]
+ url = tcp://localhost:502
+
+[write_bit]
+ addr = 0
+ count = 1
+ data = 1
+  
+[read_bits]
+ addr = 0
+ count = 1
+ data = 1
+
+[write_bits]
+ addr = 0
+ count = 1
+ data = 0
+  
+[read_bits]
+ addr = 0
+ count = 1
+ data = 0
+
+[write_bits]
+ addr = 0
+ count = 10
+ data = 1,0,1,1,0,0,1,1,1,1
+
+[read_bits]
+ addr = 0
+ count = 10
+ data = 1,0,1,1,0,0,1,1,1,1
+
+[write_register]
+ addr = 0
+ count = 1
+ data = 1
+  
+[read_registers]
+ addr = 0
+ count = 1
+ data = 1
+
+[write_registers]
+ addr = 0
+ count = 1
+ data = 0
+  
+[read_registers]
+ addr = 0
+ count = 1
+ data = 0
+
+[write_registers]
+ addr = 0
+ count = 10
+ data = 1,0,1,1,0,0,1,1,1,1
+
+[read_registers]
+ addr = 0
+ count = 10
+ data = 1,0,1,1,0,0,1,1,1,1
+
