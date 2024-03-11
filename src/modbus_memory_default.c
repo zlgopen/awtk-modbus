@@ -57,34 +57,58 @@ static ret_t modbus_memory_default_read_input_registers(modbus_memory_t* memory,
 
 static ret_t modbus_memory_default_write_bit(modbus_memory_t* memory, uint16_t addr,
                                              uint8_t value) {
+  ret_t ret = RET_OK;
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  return modbus_server_channel_write_bit(m->bits, addr, value);
+  ret = modbus_server_channel_write_bit(m->bits, addr, value);
+  if (ret == RET_OK) {
+    emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
+  }
+
+  return ret;
 }
 
 static ret_t modbus_memory_default_write_bits(modbus_memory_t* memory, uint16_t addr,
                                               uint16_t count, const uint8_t* buff) {
+  ret_t ret = RET_OK;                                                
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  return modbus_server_channel_write_bits(m->bits, addr, count, buff);
+  ret = modbus_server_channel_write_bits(m->bits, addr, count, buff);
+  if (ret == RET_OK) {
+    emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
+  }
+
+  return ret;
 }
 
 static ret_t modbus_memory_default_write_register(modbus_memory_t* memory, uint16_t addr,
                                                   uint16_t value) {
+  ret_t ret = RET_OK;                                                    
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  return modbus_server_channel_write_register(m->registers, addr, value);
+  ret = modbus_server_channel_write_register(m->registers, addr, value);
+  if (ret == RET_OK) {
+    emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
+  }
+
+  return ret;
 }
 
 static ret_t modbus_memory_default_write_registers(modbus_memory_t* memory, uint16_t addr,
                                                    uint16_t count, const uint16_t* buff) {
+  ret_t ret = RET_OK;                                                    
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
 
-  return modbus_server_channel_write_registers(m->registers, addr, count, buff);
+  ret = modbus_server_channel_write_registers(m->registers, addr, count, buff);
+  if (ret == RET_OK) {
+    emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
+  }
+
+  return ret;
 }
 
 static ret_t modbus_memory_default_destroy(modbus_memory_t* memory) {
@@ -96,6 +120,7 @@ static ret_t modbus_memory_default_destroy(modbus_memory_t* memory) {
   modbus_server_channel_destroy(memory_default->registers);
   modbus_server_channel_destroy(memory_default->input_registers);
 
+  emitter_destroy(memory_default->emitter);
   TKMEM_FREE(memory_default);
 
   return RET_OK;
@@ -161,6 +186,8 @@ modbus_memory_t* modbus_memory_default_create(modbus_server_channel_t* bits,
               input_registers->writable);
   }
   log_debug("-------------------------------------------------\n");
+
+  memory->emitter = emitter_create();
 
   return (modbus_memory_t*)memory;
 }

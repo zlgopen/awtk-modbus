@@ -1398,7 +1398,13 @@
       }
     ],
     "events": [],
-    "properties": [],
+    "properties": [
+      {
+        "name": "emitter",
+        "desc": "事件发射器。",
+        "type": "emitter_t*"
+      }
+    ],
     "header": "src/modbus_memory_default.h",
     "desc": "自定义的memory。",
     "name": "modbus_memory_default_t",

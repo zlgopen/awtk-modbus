@@ -1,3 +1,6 @@
+2024-03-11
+  * 完善 modbus\_memory\_default，支持触发事件。
+
 2024-03-10
   * 重构 modbus\_memory\_default。
 

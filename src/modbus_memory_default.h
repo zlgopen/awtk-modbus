@@ -37,6 +37,12 @@ BEGIN_C_DECLS
 typedef struct _modbus_memory_default_t {
   modbus_memory_t memory;
 
+  /**
+   * @property {emitter_t*} emitter
+   * 事件发射器。
+  */
+  emitter_t* emitter;
+
   /*private*/
   modbus_server_channel_t* bits;
   modbus_server_channel_t* input_bits;
