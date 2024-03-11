@@ -24,3 +24,5 @@ release
 *.log
 res
 t*.ini
+idl/idl.json
+src/modbus.def
