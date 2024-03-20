@@ -1,3 +1,6 @@
+2024-03-20
+  * modbus client channel 启用keep\_last_value_if_read_failed参数。
+
 2024-03-11
   * 完善 modbus\_memory\_default，支持触发事件。
 

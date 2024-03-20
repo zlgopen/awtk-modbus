@@ -25,6 +25,17 @@
 static ret_t modbus_client_channel_init(modbus_client_channel_t* channel);
 static ret_t modbus_client_channel_load(modbus_client_channel_t* channel, conf_node_t* node);
 
+static ret_t modbus_client_clear_buffer_if_fail(modbus_client_channel_t* channel) {
+  return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
+  if (!channel->keep_last_value_if_read_failed) {
+    if (channel->read_buffer != NULL) {
+      memset(channel->read_buffer, 0, channel->read_buffer_length);
+    }
+  }
+
+  return RET_OK;
+}
+
 modbus_client_channel_t* modbus_client_channel_create(conf_node_t* node) {
   modbus_client_channel_t* channel = TKMEM_ZALLOC(modbus_client_channel_t);
   return_value_if_fail(channel != NULL, NULL);
@@ -46,6 +57,9 @@ ret_t modbus_client_channel_read(modbus_client_channel_t* channel) {
   ret_t ret = RET_FAIL;
   modbus_client_t* client = NULL;
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
+  if (channel->client == NULL) {
+    modbus_client_clear_buffer_if_fail(channel);
+  }
   client = channel->client;
   return_value_if_fail(client != NULL, RET_BAD_PARAMS);
 
@@ -89,6 +103,7 @@ ret_t modbus_client_channel_read(modbus_client_channel_t* channel) {
     channel->read_ok_count++;
   } else {
     channel->read_fail_count++;
+    modbus_client_clear_buffer_if_fail(channel);
   }
 
   return ret;
@@ -215,7 +230,8 @@ ret_t modbus_client_channel_set_client(modbus_client_channel_t* channel, modbus_
   return RET_OK;
 }
 
-bool_t modbus_client_channel_need_update(modbus_client_channel_t* modbus_channel, uint64_t current_time) {
+bool_t modbus_client_channel_need_update(modbus_client_channel_t* modbus_channel,
+                                         uint64_t current_time) {
   return_value_if_fail(modbus_channel != NULL, FALSE);
 
   return modbus_channel->next_update_time <= current_time;
@@ -224,6 +240,11 @@ bool_t modbus_client_channel_need_update(modbus_client_channel_t* modbus_channel
 ret_t modbus_client_channel_update(modbus_client_channel_t* channel, uint64_t current_time) {
   ret_t ret = RET_OK;
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
+
+  if (channel->client == NULL) {
+    modbus_client_clear_buffer_if_fail(channel);
+  }
+
   return_value_if_fail(channel->client != NULL, RET_BAD_PARAMS);
 
   if (channel->next_update_time > current_time) {
