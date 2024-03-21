@@ -34,7 +34,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
   modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(m);
   return_value_if_fail(memory_default != NULL, NULL);
 
-  init = conf_doc_get_str(doc, "bits.init", NULL);
+  init = conf_doc_get_str(doc, "init.bits", NULL);
   if (init != NULL) {
     i = 0;
     log_debug("bits.init:\t\t%s\n", init);
@@ -47,7 +47,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     tokenizer_deinit(&t);
   }
 
-  init = conf_doc_get_str(doc, "input_bits.init", NULL);
+  init = conf_doc_get_str(doc, "init.input_bits", NULL);
   if (init != NULL) {
     i = 0;
     log_debug("input_bits.init:\t%s\n", init);
@@ -60,7 +60,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     tokenizer_deinit(&t);
   }
 
-  init = conf_doc_get_str(doc, "registers.init", NULL);
+  init = conf_doc_get_str(doc, "init.registers", NULL);
   if (init != NULL) {
     i = 0;
     log_debug("registers.init:\t\t%s\n", init);
@@ -73,7 +73,7 @@ static modbus_memory_t* modbus_memory_init_data(modbus_memory_t* m, conf_doc_t* 
     tokenizer_deinit(&t);
   }
 
-  init = conf_doc_get_str(doc, "input_registers.init", NULL);
+  init = conf_doc_get_str(doc, "init.input_registers", NULL);
   if (init != NULL) {
     i = 0;
     log_debug("input_registers.init:\t%s\n", init);
