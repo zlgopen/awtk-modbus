@@ -1,3 +1,6 @@
+2024-03-21
+  * 增加文档 server_conf.md。
+  
 2024-03-20
   * modbus client channel 启用keep\_last_value_if_read_failed参数。
 
