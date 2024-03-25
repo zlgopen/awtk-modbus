@@ -137,6 +137,7 @@ typedef struct modbus_client_channel_t {
   uint32_t write_fail_count;
 
   /*private*/
+  /*对于bits操作，在bits_buffer中，每个bit占一个字节*/
   uint8_t* bits_buffer;
   uint32_t bits_length;
   tk_mutex_t* mutex;

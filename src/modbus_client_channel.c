@@ -65,33 +65,76 @@ ret_t modbus_client_channel_read(modbus_client_channel_t* channel) {
 
   switch (channel->access_type) {
     case MODBUS_FC_READ_COILS: {
-      ret = modbus_client_read_bits(client, channel->read_offset, channel->bits_length,
-                                    channel->bits_buffer);
-      if (ret == RET_OK) {
-        tk_bits_data_from_bytes_data(channel->read_buffer, channel->read_buffer_length,
-                                     channel->bits_buffer, channel->bits_length);
+      /*如果长度超过了最大长度(MODBUS_MAX_READ_BITS)，需要分包读取*/
+      uint32_t offset = 0;
+      uint32_t length = channel->bits_length;
+
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_READ_BITS ? MODBUS_MAX_READ_BITS : length;
+        ret = modbus_client_read_bits(client, channel->read_offset + offset, len,
+                                      channel->bits_buffer);
+        if (ret != RET_OK) {
+          break;
+        }
+        tk_bits_data_from_bytes_data(channel->read_buffer + offset / 8, tk_bits_to_bytes(len),
+                                     channel->bits_buffer, len);
+        offset += len;
+        length -= len;
       }
       break;
     }
     case MODBUS_FC_READ_DISCRETE_INPUTS: {
-      ret = modbus_client_read_input_bits(client, channel->read_offset, channel->bits_length,
-                                          channel->bits_buffer);
-      if (ret == RET_OK) {
-        tk_bits_data_from_bytes_data(channel->read_buffer, channel->read_buffer_length,
-                                     channel->bits_buffer, channel->bits_length);
+      /*如果长度超过了最大长度(MODBUS_MAX_READ_BITS)，需要分包读取*/
+      uint32_t offset = 0;
+      uint32_t length = channel->bits_length;
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_READ_BITS ? MODBUS_MAX_READ_BITS : length;
+        ret = modbus_client_read_input_bits(client, channel->read_offset + offset, len,
+                                            channel->bits_buffer);
+        if (ret != RET_OK) {
+          break;
+        }
+        tk_bits_data_from_bytes_data(channel->read_buffer + offset / 8, tk_bits_to_bytes(len),
+                                     channel->bits_buffer, len);
+        offset += len;
+        length -= len;
       }
       break;
     }
     case MODBUS_FC_READ_HOLDING_REGISTERS: {
-      ret = modbus_client_read_registers(client, channel->read_offset,
-                                         channel->read_buffer_length / sizeof(uint16_t),
-                                         (uint16_t*)(channel->read_buffer));
+      /*如果长度超过了最大长度(MODBUS_MAX_READ_REGISTERS)，需要分包读取*/
+      uint32_t offset = 0;
+      uint32_t length = channel->read_buffer_length / sizeof(uint16_t);
+
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_READ_REGISTERS ? MODBUS_MAX_READ_REGISTERS : length;
+        ret = modbus_client_read_registers(
+            client, channel->read_offset + offset, len,
+            (uint16_t*)(channel->read_buffer + offset * sizeof(uint16_t)));
+        if (ret != RET_OK) {
+          break;
+        }
+        offset += len;
+        length -= len;
+      }
       break;
     }
     case MODBUS_FC_READ_INPUT_REGISTERS: {
-      ret = modbus_client_read_input_registers(client, channel->read_offset,
-                                               channel->read_buffer_length / sizeof(uint16_t),
-                                               (uint16_t*)(channel->read_buffer));
+      /*如果长度超过了最大长度(MODBUS_MAX_READ_REGISTERS)，需要分包读取*/
+      uint32_t offset = 0;
+      uint32_t length = channel->read_buffer_length / sizeof(uint16_t);
+
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_READ_REGISTERS ? MODBUS_MAX_READ_REGISTERS : length;
+        ret = modbus_client_read_input_registers(
+            client, channel->read_offset + offset, len,
+            (uint16_t*)(channel->read_buffer + offset * sizeof(uint16_t)));
+        if (ret != RET_OK) {
+          break;
+        }
+        offset += len;
+        length -= len;
+      }
       break;
     }
     default: {
@@ -127,16 +170,40 @@ ret_t modbus_client_channel_write(modbus_client_channel_t* channel) {
       break;
     }
     case MODBUS_FC_WRITE_MULTIPLE_COILS: {
-      tk_bits_data_to_bytes_data(channel->write_buffer, channel->write_buffer_length,
-                                 channel->bits_buffer, channel->bits_length);
-      ret = modbus_client_write_bits(client, channel->write_offset, channel->bits_length,
-                                     channel->bits_buffer);
+      /*如果长度超过了最大长度(MODBUS_MAX_WRITE_BITS)，需要分包发送*/
+      uint32_t offset = 0;
+      uint32_t length = channel->bits_length;
+
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_WRITE_BITS ? MODBUS_MAX_WRITE_BITS : length;
+        tk_bits_data_to_bytes_data(channel->write_buffer + offset / 8, tk_bits_to_bytes(len),
+                                   channel->bits_buffer, len);
+        ret = modbus_client_write_bits(client, channel->write_offset + offset, len,
+                                       channel->bits_buffer);
+        if (ret != RET_OK) {
+          break;
+        }
+        offset += len;
+        length -= len;
+      }
       break;
     }
     case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS: {
-      ret = modbus_client_write_registers(client, channel->write_offset,
-                                          channel->write_buffer_length / sizeof(uint16_t),
-                                          (uint16_t*)(channel->write_buffer));
+      /*如果长度超过了最大长度(MODBUS_MAX_WRITE_REGISTERS)，需要分包发送*/
+      uint32_t offset = 0;
+      uint32_t length = channel->write_buffer_length / sizeof(uint16_t);
+      
+      while (length > 0) {
+        uint32_t len = length > MODBUS_MAX_WRITE_REGISTERS ? MODBUS_MAX_WRITE_REGISTERS : length;
+        ret = modbus_client_write_registers(
+            client, channel->write_offset + offset, len,
+            (uint16_t*)(channel->write_buffer + offset * sizeof(uint16_t)));
+        if (ret != RET_OK) {
+          break;
+        }
+        offset += len;
+        length -= len;
+      }
       break;
     }
     default: {

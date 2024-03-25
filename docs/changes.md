@@ -1,3 +1,6 @@
+2024-03-25
+  * 完善modbus client channel，对于长数据分多次读写数据。
+
 2024-03-21
   * 增加文档 server_conf.md。
   

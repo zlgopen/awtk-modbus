@@ -1,0 +1,9 @@
+{   
+    "name" : "read_registers",
+    "access_type" : 3,
+    "read" : { 
+      "cycle_time" : 100,
+      "offset" : 0,
+      "length" : 1000
+    }   
+  }

@@ -1,0 +1,8 @@
+{   
+    "name" : "write_bits",
+    "access_type" : 15,
+    "write" : { 
+      "offset" : 0,
+      "length" : 6000
+    }   
+  }

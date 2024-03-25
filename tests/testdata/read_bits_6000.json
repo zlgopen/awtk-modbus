@@ -1,0 +1,8 @@
+{   
+    "name" : "read_bits",
+    "access_type" : 1,
+    "read" : { 
+      "offset" : 0,
+      "length" : 6000
+    }   
+  }

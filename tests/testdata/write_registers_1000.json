@@ -1,0 +1,9 @@
+{   
+    "name" : "write_registers",
+    "unit_id" : 1,
+    "access_type" : 16,
+    "write" : { 
+      "offset" : 0,
+      "length" : 1000
+    }   
+  }
