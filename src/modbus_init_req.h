@@ -31,7 +31,7 @@ BEGIN_C_DECLS
  * @class modbus_init_req_t
  * 初始化数据。
  */
-typedef struct modbus_init_req_t {
+typedef struct _modbus_init_req_t {
   /**
    * @property {uint8_t} access_type
    * @annotation ["readable"]

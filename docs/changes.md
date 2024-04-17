@@ -1,11 +1,15 @@
+2024-04-17
+  * 修复 api doc错误。
+  * 修复modbus\_client\_channel\_update重复定义的问题(感谢俊杰提供补丁)
+
 2024-03-25
   * 完善modbus client channel，对于长数据分多次读写数据。
 
 2024-03-21
-  * 增加文档 server_conf.md。
+  * 增加文档 server\_conf.md。
   
 2024-03-20
-  * modbus client channel 启用keep\_last_value_if_read_failed参数。
+  * modbus client channel 启用keep\_last\_value\_if\_read\_failed参数。
 
 2024-03-11
   * 完善 modbus\_memory\_default，支持触发事件。

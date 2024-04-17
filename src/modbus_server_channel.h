@@ -30,10 +30,9 @@ BEGIN_C_DECLS
 
 /**
  * @class modbus_server_channel_t
- * @parent modbus_server_channel_t
  * modbus_server_channel
  */
-typedef struct modbus_server_channel_t {
+typedef struct _modbus_server_channel_t {
   /**
    * @property {char*} name
    * @annotation ["readable"]

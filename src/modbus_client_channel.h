@@ -32,7 +32,7 @@ BEGIN_C_DECLS
  * @class modbus_client_channel_t
  * modbus_client_channel
  */
-typedef struct modbus_client_channel_t {
+typedef struct _modbus_client_channel_t {
   /**
    * @property {char*} name
    * @annotation ["readable"]
@@ -150,16 +150,6 @@ typedef struct modbus_client_channel_t {
  * @return {modbus_client_channel_t*} 返回对象。
  */
 modbus_client_channel_t* modbus_client_channel_create(conf_node_t* node);
-
-/**
- * @method modbus_client_channel_update
- * 更新数据。
- * @param {modbus_client_channel_t*} modbus_channel 对象。
- * @param {uint64_t} current_time 当前时间。
- * 
- * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
- */
-ret_t modbus_client_channel_update(modbus_client_channel_t* modbus_channel, uint64_t current_time);
 
 /**
  * @method modbus_client_channel_need_update
