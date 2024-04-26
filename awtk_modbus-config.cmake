@@ -13,5 +13,6 @@ include_directories(${AWTK_MODBUS_INCLUDE_DIRS})
 
 if(WIN32)
   file(COPY  ${AWTK_MODBUS_ROOT_DIR}/bin/modbus.dll DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+  file(COPY  ${AWTK_MODBUS_ROOT_DIR}/bin/modbus.dll DESTINATION ${PROJECT_SOURCE_DIR}/bin)
 endif()
 
