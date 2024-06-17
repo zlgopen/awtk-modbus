@@ -1,3 +1,6 @@
+2024-06-17
+  * 如果modbus client channel指定了unit id，就用它，没有指定就用默认的。
+
 2024-04-17
   * 修复 api doc错误。
   * 修复modbus\_client\_channel\_update重复定义的问题(感谢俊杰提供补丁)

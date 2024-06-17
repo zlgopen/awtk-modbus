@@ -62,6 +62,10 @@ ret_t modbus_client_channel_read(modbus_client_channel_t* channel) {
   }
   client = channel->client;
   return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+  
+  if (channel->unit_id) {
+    modbus_client_set_slave(client, channel->unit_id);
+  }
 
   switch (channel->access_type) {
     case MODBUS_FC_READ_COILS: {
@@ -159,6 +163,9 @@ ret_t modbus_client_channel_write(modbus_client_channel_t* channel) {
   client = channel->client;
   return_value_if_fail(client != NULL, RET_BAD_PARAMS);
 
+  if (channel->unit_id) {
+    modbus_client_set_slave(client, channel->unit_id);
+  }
   switch (channel->access_type) {
     case MODBUS_FC_WRITE_SINGLE_COIL: {
       ret = modbus_client_write_bit(client, channel->write_offset, channel->write_buffer[0] & 0x01);
