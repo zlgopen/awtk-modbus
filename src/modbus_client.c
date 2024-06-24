@@ -47,7 +47,7 @@ static uint32_t modbus_client_calculate_frame_gap_time(tk_iostream_t* io) {
     frame_bits += 2.0f;
     break;
   }
-  return tk_roundi((3.5f * frame_bits * 1000 * 1000 / baudrate));
+  return ceil(3.5f * frame_bits * 1000 * 1000 / baudrate);
 }
 
 modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t proto) {
