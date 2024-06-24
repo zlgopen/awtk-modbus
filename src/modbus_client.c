@@ -20,11 +20,35 @@
  */
 
 #include "tkc/url.h"
+#include "tkc/time_now.h"
 //#include "streams/inet/iostream_tcp.h"
 #include "streams/serial/iostream_serial.h"
 #include "streams/stream_factory.h"
 
 #include "modbus_client.h"
+
+static uint32_t modbus_client_calculate_frame_gap_time(tk_iostream_t* io) {
+  float_t frame_bits = 1;
+  int32_t baudrate = tk_object_get_prop_uint32(TK_OBJECT(io), TK_IOSTREAM_SERIAL_PROP_BAUDRATE, 115200);
+  uint8_t bytesize = tk_object_get_prop_uint32(TK_OBJECT(io), TK_IOSTREAM_SERIAL_PROP_BYTESIZE, (uint8_t)eightbits); 
+  stopbits_t stopbits = (stopbits_t)tk_object_get_prop_uint32(TK_OBJECT(io), TK_IOSTREAM_SERIAL_PROP_STOPBITS, (uint8_t)stopbits_one); 
+  frame_bits += bytesize;
+  switch (stopbits) {
+  case stopbits_one:
+    frame_bits += 1.0f;
+    break;
+  case stopbits_two:
+    frame_bits += 2.0f;
+    break;
+  case stopbits_one_point_five:
+    frame_bits += 1.5f;
+    break;
+  default:
+    frame_bits += 2.0f;
+    break;
+  }
+  return tk_roundi((3.5f * frame_bits * 1000 * 1000 / baudrate));
+}
 
 modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t proto) {
   modbus_client_t* client = NULL;
@@ -65,11 +89,32 @@ modbus_client_t* modbus_client_create(const char* url) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else if (tk_str_start_with(url, STR_SCHEMA_SERIAL)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+    if (client != NULL) {
+      modbus_client_set_frame_gap_time(client, modbus_client_calculate_frame_gap_time(io));
+    }
   } else {
     log_debug("not support:%s\n", url);
   }
 
   return client;
+}
+
+ret_t modbus_client_set_response_timeout(modbus_client_t* client, uint32_t response_timeout) {
+  modbus_common_t* common = MODBUS_COMMON(client);
+  return_value_if_fail(client != NULL && common != NULL, RET_BAD_PARAMS);
+
+  client->response_timeout = response_timeout;
+  common->write_timeout = response_timeout;
+
+  return RET_OK;
+}
+
+ret_t modbus_client_set_frame_gap_time(modbus_client_t* client, uint32_t frame_gap_time) {
+  return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+
+  client->frame_gap_time = tk_max(frame_gap_time, client->frame_gap_time);
+
+  return RET_OK;
 }
 
 ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_times) {
@@ -80,16 +125,44 @@ ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_time
   return RET_OK;
 }
 
+static ret_t modbus_client_wait_for_frame_gap_time(modbus_client_t* client, uint64_t start_time) {
+  uint64_t diff = time_now_us() - start_time;
+  if (diff < client->frame_gap_time) {
+    sleep_us(client->frame_gap_time - diff);
+  }
+  return RET_OK;
+}
+
+static ret_t modbus_client_check_and_set_recv_timeout(modbus_client_t* client, uint64_t start_time) {
+  uint64_t diff = time_now_ms() - start_time;
+  modbus_common_t* common = MODBUS_COMMON(client);
+  if (client->response_timeout != 0) {
+    if (diff >= client->response_timeout) {
+      return RET_TIMEOUT;
+    }
+    common->read_timeout = client->response_timeout - diff;
+  }
+  return RET_OK;
+}
+
 static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_code, uint16_t addr,
                                         uint16_t count, uint8_t* buff) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_read_bits_req(common, func_code, addr, count);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_read_bits_resp(common, func_code, buff, &count);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+  t = time_now_us();
+  ret = modbus_common_recv_read_bits_resp(common, func_code, buff, &count);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 static ret_t modbus_client_flush_read_buffer(modbus_client_t* client) {
@@ -144,14 +217,22 @@ ret_t modbus_client_read_input_bits(modbus_client_t* client, uint16_t addr, uint
 
 static ret_t modbus_client_read_registers_ex(modbus_client_t* client, uint16_t func_code,
                                              uint16_t addr, uint16_t count, uint16_t* buff) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_read_registers_req(common, func_code, addr, count);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_read_registers_resp(common, func_code, buff, &count);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+  t = time_now_us();
+  ret = modbus_common_recv_read_registers_resp(common, func_code, buff, &count);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 ret_t modbus_client_read_registers(modbus_client_t* client, uint16_t addr, uint16_t count,
@@ -197,50 +278,85 @@ ret_t modbus_client_read_input_registers(modbus_client_t* client, uint16_t addr,
 }
 
 static ret_t modbus_client_write_bit_impl(modbus_client_t* client, uint16_t addr, uint8_t value) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_write_bit_req(common, addr, value);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_write_bit_resp(common);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+  t = time_now_us();
+  ret = modbus_common_recv_write_bit_resp(common);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 static ret_t modbus_client_write_register_impl(modbus_client_t* client, uint16_t addr,
                                                uint16_t value) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_write_register_req(common, addr, value);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_write_register_resp(common);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+
+  t = time_now_us();
+  ret = modbus_common_recv_write_register_resp(common);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 static ret_t modbus_client_write_bits_impl(modbus_client_t* client, uint16_t addr, uint16_t count,
                                            const uint8_t* buff) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_write_bits_req(common, addr, count, buff);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_write_bits_resp(common);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+
+  t = time_now_us();
+  ret = modbus_common_recv_write_bits_resp(common);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 static ret_t modbus_client_write_registers_impl(modbus_client_t* client, uint16_t addr,
                                                 uint16_t count, const uint16_t* buff) {
+  uint64_t t = 0;
   ret_t ret = RET_OK;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && buff != NULL, RET_BAD_PARAMS);
 
+  t = time_now_ms();
   ret = modbus_common_send_write_registers_req(common, addr, count, buff);
   return_value_if_fail(ret == RET_OK, ret);
 
-  return modbus_common_recv_write_registers_resp(common);
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+
+  t = time_now_us();
+  ret = modbus_common_recv_write_registers_resp(common);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret;
 }
 
 ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t value) {

@@ -75,6 +75,19 @@ typedef struct _modbus_client_t {
   modbus_common_t common;
 
   /**
+   * @property {uint32_t} response_timeout
+   * @annotation ["readable"]
+   * 数据帧应答超时时间
+  */
+  uint32_t response_timeout;
+
+  /**
+   * @property {uint32_t} frame_gap_time
+   * 帧间间隔时间。(单位：us)
+   */
+  uint32_t frame_gap_time;
+
+  /**
    * @property {uint32_t} retry_times
    * 重试次数。
    */
@@ -141,6 +154,24 @@ modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t 
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_times);
+
+/**
+ * @method modbus_client_set_response_timeout
+ * 设置数据帧应答超时时间。
+ * @param {modbus_client_t*} client modbus client对象。
+ * @param {uint32_t} response_timeout 数据帧应答超时时间。(单位：us)
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_set_response_timeout(modbus_client_t* client, uint32_t response_timeout);
+
+/**
+ * @method modbus_client_set_frame_gap_time
+ * 设置数据帧帧间隔时间。
+ * @param {modbus_client_t*} client modbus client对象。
+ * @param {uint32_t} response_timeout 数据帧应答超时时间。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_set_frame_gap_time(modbus_client_t* client, uint32_t frame_gap_time);
 
 /**
  * @method modbus_client_read_bits
