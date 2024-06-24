@@ -182,6 +182,16 @@ ret_t modbus_client_channel_set_client(modbus_client_channel_t* channel, modbus_
 ret_t modbus_client_channel_set_name(modbus_client_channel_t* channel, const char* name);
 
 /**
+ * @method modbus_client_channel_set_unit_id
+ * 设置 unit_id。
+ * @param {modbus_client_channel_t*} channel 对象。
+ * @param {uint8_t} unit_id unit_id。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_channel_set_unit_id(modbus_client_channel_t* channel, uint8_t unit_id);
+
+/**
  * @method modbus_client_channel_read
  * 读取数据。
  * @param {modbus_client_channel_t*} modbus_channel 对象。

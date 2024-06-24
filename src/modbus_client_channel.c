@@ -367,6 +367,14 @@ ret_t modbus_client_channel_set_name(modbus_client_channel_t* channel, const cha
   return RET_OK;
 }
 
+ret_t modbus_client_channel_set_unit_id(modbus_client_channel_t* channel, uint8_t unit_id) {
+  return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
+
+  channel->unit_id = unit_id;
+
+  return RET_OK;
+}
+
 static ret_t modbus_client_channel_load(modbus_client_channel_t* channel, conf_node_t* node) {
   return_value_if_fail(channel != NULL && node != NULL, RET_BAD_PARAMS);
 

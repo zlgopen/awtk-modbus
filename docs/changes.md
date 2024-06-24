@@ -1,3 +1,6 @@
+2024-06-24
+  * 增加配置channel的unit_id函数(感谢智明提供补丁) 
+
 2024-06-17
   * 如果modbus client channel指定了unit id，就用它，没有指定就用默认的。
 
