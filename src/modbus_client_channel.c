@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   modbus_client_channel.c
  * Author: AWTK Develop Team
  * Brief:  modbus_client_channel

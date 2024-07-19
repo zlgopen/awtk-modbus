@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   modbus_server_channel.h
  * Author: AWTK Develop Team
  * Brief:  modbus_server_channel

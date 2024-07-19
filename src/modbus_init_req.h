@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   modbus_init_req.h
  * Author: AWTK Develop Team
  * Brief:  modbus init req

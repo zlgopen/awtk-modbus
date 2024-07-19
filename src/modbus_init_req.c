@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   modbus_init_req.c
  * Author: AWTK Develop Team
  * Brief:  modbus_init_req
