@@ -118,6 +118,7 @@ static uint32_t modbus_common_get_resp_playload_length(modbus_common_t* common, 
     case MODBUS_FC_READ_COILS:
     case MODBUS_FC_READ_DISCRETE_INPUTS:
     case MODBUS_FC_READ_HOLDING_REGISTERS:
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS:  
     case MODBUS_FC_READ_INPUT_REGISTERS: {
       return 1;
     }
@@ -419,6 +420,21 @@ ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common) {
   return modbus_common_recv_resp(common, MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS, NULL);
 }
 
+ret_t modbus_common_send_write_and_read_registers_req(modbus_common_t* common, uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+                                                      uint16_t read_addr, uint16_t read_nb) {
+  uint16_t i = 0; 
+  common->transaction_id++;
+  modbus_common_pack_header(common, MODBUS_FC_WRITE_AND_READ_REGISTERS, 8 + write_nb * 2 + 1);
+  modbus_common_pack_uint16(common, read_addr);
+  modbus_common_pack_uint16(common, read_nb);
+  modbus_common_pack_uint16(common, write_addr);
+  modbus_common_pack_uint16(common, write_nb);
+  modbus_common_encode_registers(common->wbuffer, (uint16_t*)src, write_nb);
+
+  modbus_common_pack_tail(common);
+  return modbus_common_send_wbuffer(common);
+}
+
 ret_t modbus_common_deinit(modbus_common_t* common) {
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
@@ -509,6 +525,30 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
   buff = wb->data + wb->cursor;
 
   switch (func_code) {
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
+      ret = modbus_common_read_len(common, buff, 9);
+      return_value_if_fail(ret == 9, RET_IO);
+      wbuffer_skip(wb, 4);
+      addr = buff[0] << 8 | buff[1];
+      count = buff[2] << 8 | buff[3];
+      req_data->addr = addr;
+      req_data->count = count;
+      req_data->data = NULL;
+      req_data->bytes = 0;
+      addr = buff[4] << 8 | buff[5];
+      count = buff[6] << 8 | buff[7];
+      req_data->addr_ex = addr;
+      req_data->count_ex = count;
+      req_data->bytes_ex = buff[8];
+
+      buff = wb->data + wb->cursor;
+      req_data->data_ex = buff;
+
+      ret = modbus_common_read_len(common, buff, req_data->bytes_ex);
+      return_value_if_fail(ret == req_data->bytes_ex, RET_IO);
+      wbuffer_skip(wb, req_data->bytes_ex);
+      break;
+    }
     case MODBUS_FC_READ_COILS:
     case MODBUS_FC_READ_DISCRETE_INPUTS:
     case MODBUS_FC_READ_HOLDING_REGISTERS:
@@ -586,6 +626,7 @@ ret_t modbus_common_send_resp(modbus_common_t* common, modbus_resp_data_t* resp_
       wbuffer_write_binary(wb, resp_data->data, bytes);
       break;
     }
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS:
     case MODBUS_FC_READ_HOLDING_REGISTERS:
     case MODBUS_FC_READ_INPUT_REGISTERS: {
       uint8_t bytes = resp_data->count * 2;

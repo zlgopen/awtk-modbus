@@ -127,6 +127,12 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
                                             (uint16_t*)req_data.data);
         break;
       }
+      case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
+        resp_data.bytes = req_data.count * 2;
+        modbus_memory_write_registers(memory, req_data.addr_ex, req_data.count_ex, (uint16_t*)req_data.data_ex);
+        ret = modbus_memory_read_registers(memory, req_data.addr, req_data.count, buff);
+        break;
+      }
       default: {
         ret = RET_NOT_IMPL;
         break;

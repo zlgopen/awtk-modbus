@@ -46,6 +46,44 @@ static ret_t conf_get_params(conf_node_t* iter, uint16_t* addr, uint16_t* count,
   return RET_OK;
 }
 
+static ret_t conf_get_params_ex(conf_node_t* iter, uint16_t* w_addr, uint16_t* w_count,
+                             const char** w_data, uint16_t* r_addr, uint16_t* r_count,
+                             const char** r_data) {
+  value_t v;
+  if (conf_node_get_child_value(iter, "w_addr", &v) != RET_OK) {
+    log_debug("get addr failed\n");
+    return RET_FAIL;
+  }
+  *w_addr = value_uint16(&v);
+
+  if (conf_node_get_child_value(iter, "w_count", &v) != RET_OK) {
+    *w_count = 1;
+  } else {
+    *w_count = value_uint16(&v);
+  }
+
+  if (conf_node_get_child_value(iter, "w_data", &v) == RET_OK) {
+    *w_data = value_str(&v);
+  }
+  if (conf_node_get_child_value(iter, "r_addr", &v) != RET_OK) {
+    log_debug("get addr failed\n");
+    return RET_FAIL;
+  }
+  *r_addr = value_uint16(&v);
+
+  if (conf_node_get_child_value(iter, "r_count", &v) != RET_OK) {
+    *r_count = 1;
+  } else {
+    *r_count = value_uint16(&v);
+  }
+
+  if (conf_node_get_child_value(iter, "r_data", &v) == RET_OK) {
+    *r_data = value_str(&v);
+  }
+  
+  return RET_OK;
+}
+
 static ret_t run_read_bits(const char* name, modbus_client_t* client, conf_node_t* iter) {
   ret_t ret = RET_OK;
   uint16_t addr = 0;
@@ -255,6 +293,70 @@ static ret_t run_write_registers(const char* name, modbus_client_t* client, conf
   return ret;
 }
 
+static ret_t run_write_and_read_registers(const char* name, modbus_client_t* client, conf_node_t* iter) {
+  ret_t ret = RET_OK;
+  uint16_t r_addr = 0, w_addr = 0;
+  uint16_t r_count = 0, w_count = 0;
+  const char* r_data = NULL;
+  const char* w_data = NULL;
+  uint16_t r_registers[1024] = {0};
+  uint16_t w_registers[1024] = {0};
+  tokenizer_t t;
+
+  if (conf_get_params_ex(iter, &w_addr, &w_count, &w_data, &r_addr, &r_count, &r_data) != RET_OK) {
+    return RET_OK;
+  }
+
+  if (r_data != NULL) {
+    uint32_t i = 0;
+    tokenizer_init(&t, r_data, tk_strlen(r_data), ", ");
+    while (tokenizer_has_more(&t)) {
+      const char* value = tokenizer_next_str(&t);
+      r_registers[i] = parse_register_value(value);
+      i++;
+    }
+    tokenizer_deinit(&t);
+    if (r_count > i) {
+      r_count = i;
+    }
+  }
+
+  if (w_data != NULL) {
+    uint32_t i = 0;
+    tokenizer_init(&t, w_data, tk_strlen(w_data), ", ");
+    while (tokenizer_has_more(&t)) {
+      const char* value = tokenizer_next_str(&t);
+      w_registers[i] = parse_register_value(value);
+      i++;
+    }
+    tokenizer_deinit(&t);
+    if (w_count > i) {
+      w_count = i;
+    }
+  }
+
+  ret = modbus_client_write_and_read_registers(client, w_addr, w_count, w_registers, r_addr, r_count, r_registers);
+
+  if (ret == RET_OK) {
+    int32_t i = 0;
+    for (i = 0; i < r_count; i++) {
+      if (w_registers[i] != r_registers[i]) {
+        break;
+      }
+    }
+    if (i == r_count) {
+      log_debug("%s ok\n", name);
+    } else {
+      log_debug("%s failed: read data not right! \n", name);
+    }
+  } else {
+    log_debug("%s failed:%s\n", name, modbus_common_get_last_exception_str(&client->common));
+  }
+
+  return ret;
+}
+
+
 static void demo_tcp(void) {
   uint8_t read_bits_result[4];
   uint8_t write_bits[] = {TRUE, FALSE, TRUE, FALSE};
@@ -351,6 +453,8 @@ static void run_script(conf_doc_t* doc, uint32_t times) {
       run_write_bits(name, client, iter);
     } else if (tk_str_eq(name, "write_register") || tk_str_eq(name, "write_registers")) {
       run_write_registers(name, client, iter);
+    } else if (tk_str_eq(name, "write_and_read_registers")) {
+      run_write_and_read_registers(name, client, iter);
     } else if (tk_str_eq(name, "sleep")) {
       uint32_t ms = conf_node_get_child_value_int32(iter, "time", 0);
       log_debug("sleep %d\n", ms);
@@ -412,7 +516,7 @@ int main(int argc, char* argv[]) {
   }
 
   tk_socket_init();
-
+  sleep_ms(1000);
   data = (char*)file_read(input, NULL);
   if (data != NULL) {
     doc = conf_doc_load_ini(data);

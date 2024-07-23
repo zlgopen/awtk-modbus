@@ -265,6 +265,22 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
                                     const uint16_t* buff);
 
 /**
+ * @method modbus_client_write_and_read_registers
+ * 写入和读取 holding registers。
+ * @param {modbus_client_t*} client modbus client对象。
+ * @param {uint16_t} write_addr 写入地址。
+ * @param {uint16_t} write_nb 写入个数。
+ * @param {const uint16_t*} src 写入的数据。
+ * @param {uint16_t} read_addr 读取地址。
+ * @param {uint16_t} read_nb 读取个数。
+ * @param {const uint16_t*} dest 读取的数据。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_write_and_read_registers(modbus_client_t* client, 
+                                             uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+                                             uint16_t read_addr, uint16_t read_nb, uint16_t *dest);
+
+/**
  * @method modbus_client_set_slave
  * 设置slave。
  * @param {modbus_client_t*} client modbus client对象。

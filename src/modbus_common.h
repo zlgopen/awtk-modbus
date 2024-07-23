@@ -215,6 +215,20 @@ ret_t modbus_common_send_write_registers_req(modbus_common_t* common, uint16_t a
 ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common);
 
 /**
+ * @method modbus_common_send_write_registers_req
+ * 发送写入和读取 holding registers请求。
+ * @param {modbus_common_t*} common modbus_common_t对象。
+ * @param {uint16_t} write_addr 写入地址。
+ * @param {uint16_t} write_nb 写入个数。
+ * @param {const uint16_t*} src 写入值。
+ * @param {uint16_t} read_addr 读取地址。
+ * @param {uint16_t} read_nb 读取个数。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_common_send_write_and_read_registers_req(modbus_common_t* common, uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+                                                      uint16_t read_addr, uint16_t read_nb);
+
+/**
  * @method modbus_common_get_last_exception_code
  * 获取最后一次的错误码。
  * @param {modbus_common_t*} common modbus_common_t对象。

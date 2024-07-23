@@ -213,6 +213,24 @@ ret_t modbus_client_channel_write(modbus_client_channel_t* channel) {
       }
       break;
     }
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
+      uint16_t r_length = channel->read_buffer_length / sizeof(uint16_t);
+      uint16_t w_length = channel->write_buffer_length / sizeof(uint16_t);
+      if (w_length > MODBUS_MAX_WR_WRITE_REGISTERS) {
+        ret = RET_FAIL;
+        break;
+      }
+      if (r_length > MODBUS_MAX_WR_READ_REGISTERS) {
+        ret = RET_FAIL;
+        break;
+      }
+      
+      ret = modbus_client_write_and_read_registers(
+          client, 
+          channel->write_offset, w_length, (uint16_t*)channel->write_buffer,
+          channel->read_offset, r_length, (uint16_t*)channel->read_buffer);
+      break;
+    }
     default: {
       ret = RET_NOT_IMPL;
     }
@@ -336,6 +354,7 @@ ret_t modbus_client_channel_update(modbus_client_channel_t* channel, uint64_t cu
     case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
     case MODBUS_FC_WRITE_MULTIPLE_COILS:
     case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS:
       ret = modbus_client_channel_write(channel);
       break;
     default:

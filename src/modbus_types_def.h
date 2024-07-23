@@ -75,7 +75,12 @@ typedef enum _modbus_function_code_t {
    * @const MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS
    * 写入多个HOLDING_REGISTERS。
    */
-  MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS = 16
+  MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS = 16,
+  /**
+   * @const MODBUS_FC_WRITE_AND_READ_REGISTERS
+   * 读写多个HOLDING_REGISTERS。
+   */
+  MODBUS_FC_WRITE_AND_READ_REGISTERS = 23
 } modbus_function_code_t;
 
 /**
@@ -213,6 +218,28 @@ typedef struct _modbus_req_data_t {
    * 数据。
    */
   uint8_t* data;
+  
+  /**
+   * @property {uint16_t} addr_ex
+    * 地址。
+    */
+  uint16_t addr_ex;
+  /**
+    * @property {uint16_t} count_ex
+    * 个数。
+    */
+  uint16_t count_ex;
+  /**
+   * @property {uint8_t} bytes_ex
+   * 数据长度。
+   */
+  uint8_t bytes_ex;
+  
+  /**
+   * @property {uint8_t*} data_ex
+   * 数据。
+   */
+  uint8_t* data_ex;
 } modbus_req_data_t, modbus_resp_data_t;
 
 #pragma pack(push, 1)
@@ -271,6 +298,8 @@ typedef struct _modbus_rtu_header_t {
 #define MODBUS_MAX_WRITE_BITS 1968
 #define MODBUS_MAX_READ_REGISTERS 125
 #define MODBUS_MAX_WRITE_REGISTERS 123
+#define MODBUS_MAX_WR_READ_REGISTERS 125
+#define MODBUS_MAX_WR_WRITE_REGISTERS 121
 
 #ifndef MODBUS_WRITE_TIMEOUT
 #define MODBUS_WRITE_TIMEOUT 500 /*0.5s*/

@@ -359,6 +359,29 @@ static ret_t modbus_client_write_registers_impl(modbus_client_t* client, uint16_
   return ret;
 }
 
+static ret_t modbus_client_write_and_read_registers_impl(modbus_client_t* client,
+                                                         uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+                                                         uint16_t read_addr, uint16_t read_nb, uint16_t *dest) {
+  uint64_t t = 0;
+  ret_t ret = RET_OK;
+  uint16_t dest_count = read_nb;
+  modbus_common_t* common = MODBUS_COMMON(client);
+  return_value_if_fail(common != NULL && src != NULL && dest != NULL, RET_BAD_PARAMS);
+  memset(dest, 0x0, read_nb);
+  t = time_now_ms();
+  ret = modbus_common_send_write_and_read_registers_req(common, write_addr, write_nb, src, read_addr, read_nb);
+  return_value_if_fail(ret == RET_OK, ret);
+
+  if (modbus_client_check_and_set_recv_timeout(client, t) != RET_OK) {
+    return RET_TIMEOUT;
+  }
+
+  t = time_now_us();
+  ret = modbus_common_recv_read_registers_resp(common, MODBUS_FC_WRITE_AND_READ_REGISTERS, dest, &dest_count);
+  modbus_client_wait_for_frame_gap_time(client, t);
+  return ret == RET_OK && read_nb == dest_count ? RET_OK : RET_FAIL;
+}
+
 ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t value) {
   uint32_t i = 0;
   ret_t ret = RET_OK;
@@ -425,6 +448,27 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_registers_impl(client, addr, count, buff);
+    if (!MODBUS_NEED_RETRY(ret)) {
+      return ret;
+    }
+
+    log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
+  }
+
+  // clear the old resp data when comm error, ensure the next req and resp tid sync
+  modbus_client_flush_read_buffer(client);
+  return ret;
+}
+
+ret_t modbus_client_write_and_read_registers(modbus_client_t* client, 
+                                             uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+                                             uint16_t read_addr, uint16_t read_nb, uint16_t *dest) {
+  uint32_t i = 0;
+  ret_t ret = RET_OK;
+  return_value_if_fail(client != NULL && src != NULL && dest != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < client->retry_times; i++) {
+    ret = modbus_client_write_and_read_registers_impl(client, write_addr, write_nb, src, read_addr, read_nb, dest);
     if (!MODBUS_NEED_RETRY(ret)) {
       return ret;
     }
