@@ -1204,11 +1204,6 @@
               <FilePath>..\..\src\modbus_memory.c</FilePath>
             </File>
             <File>
-              <FileName>modbus_memory_default.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\modbus_memory_default.c</FilePath>
-            </File>
-            <File>
               <FileName>modbus_service.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\modbus_service.c</FilePath>
