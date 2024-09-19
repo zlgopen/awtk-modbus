@@ -637,13 +637,20 @@ ret_t modbus_common_send_resp(modbus_common_t* common, modbus_resp_data_t* resp_
       break;
     }
     case MODBUS_FC_WRITE_SINGLE_COIL:
-    case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
     case MODBUS_FC_WRITE_MULTIPLE_COILS:
     case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS: {
       uint16_t data_len = 4;
       modbus_common_pack_header(common, func_code, data_len);
       modbus_common_pack_uint16(common, resp_data->addr);
       modbus_common_pack_uint16(common, resp_data->count);
+      break;
+    }
+    case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER: {
+      uint16_t data_len = 4;
+      modbus_common_pack_header(common, func_code, data_len);
+      modbus_common_pack_uint16(common, resp_data->addr);
+      modbus_common_pack_uint8(common, resp_data->data[0]);
+      modbus_common_pack_uint8(common, resp_data->data[1]);
       break;
     }
     default:

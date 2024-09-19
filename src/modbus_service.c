@@ -115,6 +115,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         break;
       }
       case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER: {
+        memcpy(resp_data.data, req_data.data, sizeof(uint16_t));
         ret = modbus_memory_write_register(memory, req_data.addr, *(uint16_t*)(req_data.data));
         break;
       }
