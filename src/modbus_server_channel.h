@@ -74,6 +74,9 @@ typedef struct _modbus_server_channel_t {
    * Writable
   */
   bool_t writable;
+
+  /* private */
+  tk_mutex_t* lock;
 } modbus_server_channel_t;
 
 /**
@@ -181,6 +184,26 @@ ret_t modbus_server_channel_write_register(modbus_server_channel_t* channel, uin
  */
 ret_t modbus_server_channel_write_registers(modbus_server_channel_t* channel, uint16_t addr,
                                             uint16_t count, const uint16_t* buff);
+
+/**
+ * @method modbus_server_channel_lock
+ * 给 channel 对象数据上锁。
+ * 
+ * @param {modbus_server_channel_t*} channel 对象。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_server_channel_lock(modbus_server_channel_t* channel);
+
+/**
+ * @method modbus_server_channel_unlock
+ * 给 channel 对象数据解锁。
+ * 
+ * @param {modbus_server_channel_t*} channel 对象。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_server_channel_unlock(modbus_server_channel_t* channel);
 
 /**
  * @method modbus_server_channel_destroy
