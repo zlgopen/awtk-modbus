@@ -111,6 +111,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         break;
       }
       case MODBUS_FC_WRITE_SINGLE_COIL: {
+        resp_data.data[0] = req_data.data[0];
         ret = modbus_memory_write_bit(memory, req_data.addr, req_data.data[0]);
         break;
       }
