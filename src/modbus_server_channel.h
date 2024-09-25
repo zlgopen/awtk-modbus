@@ -76,7 +76,7 @@ typedef struct _modbus_server_channel_t {
   bool_t writable;
 
   /* private */
-  tk_mutex_t* lock;
+  tk_mutex_nest_t* lock;
 } modbus_server_channel_t;
 
 /**

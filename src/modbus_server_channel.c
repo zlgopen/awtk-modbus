@@ -34,7 +34,7 @@ static ret_t modbus_server_channel_init(modbus_server_channel_t* channel) {
   }
   return_value_if_fail(bytes > 0, RET_BAD_PARAMS);
 
-  channel->lock = tk_mutex_create();
+  channel->lock = tk_mutex_nest_create();
   return_value_if_fail(channel->lock != NULL, RET_OOM);
 
   channel->bytes = bytes;
@@ -49,7 +49,7 @@ static ret_t modbus_server_channel_init(modbus_server_channel_t* channel) {
 ret_t modbus_server_channel_destroy(modbus_server_channel_t* channel) {
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
   if (channel->lock != NULL) {
-    tk_mutex_destroy(channel->lock);
+    tk_mutex_nest_destroy(channel->lock);
     channel->lock = NULL;
   }
   TKMEM_FREE(channel->data);
@@ -108,12 +108,12 @@ static ret_t modbus_server_channel_read_bit(modbus_server_channel_t* channel, ui
 
 ret_t modbus_server_channel_lock(modbus_server_channel_t* channel) {
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
-  return tk_mutex_lock(channel->lock);
+  return tk_mutex_nest_lock(channel->lock);
 }
 
 ret_t modbus_server_channel_unlock(modbus_server_channel_t* channel) {
   return_value_if_fail(channel != NULL, RET_BAD_PARAMS);
-  return tk_mutex_unlock(channel->lock);
+  return tk_mutex_nest_unlock(channel->lock);
 }
 
 ret_t modbus_server_channel_read_bits(modbus_server_channel_t* channel, uint16_t addr,
