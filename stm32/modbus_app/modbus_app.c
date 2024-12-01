@@ -20,6 +20,7 @@ static void* modbus_service_func(void* args) {
   modbus_memory_t* memory = modbus_memory_custom_create();
   modbus_service_t* service = modbus_service_create_with_io(io, MODBUS_PROTO_RTU, memory);
 
+  s_modbus_running = TRUE;
   modbus_service_set_slave(service, MODBUS_DEMO_SLAVE_ID);
   while (s_modbus_running) {
     if (modbus_service_wait_for_data(service, 10) == RET_OK) {
@@ -46,7 +47,6 @@ ret_t modbus_service_start(const char* device) {
   tk_thread_set_stack_size(s_modbus_thread, 0x1000);
 
   tk_thread_start(s_modbus_thread);
-  s_modbus_running = TRUE;
 
   return RET_OK;
 }
