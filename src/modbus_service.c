@@ -91,21 +91,37 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 
     switch (req_data.func_code) {
       case MODBUS_FC_READ_COILS: {
+        if (req_data.count > MODBUS_MAX_READ_BITS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         resp_data.bytes = (req_data.count + 7) / 8;
         ret = modbus_memory_read_bits(memory, req_data.addr, req_data.count, (uint8_t*)buff);
         break;
       }
       case MODBUS_FC_READ_DISCRETE_INPUTS: {
+        if (req_data.count > MODBUS_MAX_READ_BITS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         resp_data.bytes = (req_data.count + 7) / 8;
         ret = modbus_memory_read_input_bits(memory, req_data.addr, req_data.count, (uint8_t*)buff);
         break;
       }
       case MODBUS_FC_READ_HOLDING_REGISTERS: {
+        if (req_data.count > MODBUS_MAX_READ_REGISTERS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         resp_data.bytes = req_data.count * 2;
         ret = modbus_memory_read_registers(memory, req_data.addr, req_data.count, buff);
         break;
       }
       case MODBUS_FC_READ_INPUT_REGISTERS: {
+        if (req_data.count > MODBUS_MAX_READ_REGISTERS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         resp_data.bytes = req_data.count * 2;
         ret = modbus_memory_read_input_registers(memory, req_data.addr, req_data.count, buff);
         break;
@@ -121,15 +137,27 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         break;
       }
       case MODBUS_FC_WRITE_MULTIPLE_COILS: {
+        if (req_data.count > MODBUS_MAX_WRITE_BITS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         ret = modbus_memory_write_bits(memory, req_data.addr, req_data.count, req_data.data);
         break;
       }
       case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS: {
+        if (req_data.count > MODBUS_MAX_WRITE_REGISTERS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         ret = modbus_memory_write_registers(memory, req_data.addr, req_data.count,
                                             (uint16_t*)req_data.data);
         break;
       }
       case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
+        if (req_data.count > MODBUS_MAX_WR_READ_REGISTERS || req_data.count_ex > MODBUS_MAX_WR_WRITE_REGISTERS) {
+          ret = RET_INVALID_ADDR;
+          break;
+        }
         resp_data.bytes = req_data.count * 2;
         modbus_memory_write_registers(memory, req_data.addr_ex, req_data.count_ex, (uint16_t*)req_data.data_ex);
         ret = modbus_memory_read_registers(memory, req_data.addr, req_data.count, buff);
