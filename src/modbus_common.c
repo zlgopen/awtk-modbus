@@ -20,6 +20,7 @@
  */
 
 #include "tkc/crc.h"
+#include "tkc/time_now.h"
 #include "modbus_common.h"
 #define MODBUS_MAX_PAYLOAD 1024
 
@@ -46,8 +47,8 @@ static ret_t modbus_common_write_crc16(modbus_common_t* common) {
   return wbuffer_write_uint16(common->wbuffer, crc);
 }
 
-static ret_t modbus_common_pack_header(modbus_common_t* common,
-                                       uint8_t function_code, uint16_t data_len) {
+static ret_t modbus_common_pack_header(modbus_common_t* common, uint8_t function_code,
+                                       uint16_t data_len) {
   wbuffer_t* wb = NULL;
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
 
@@ -82,7 +83,8 @@ static ret_t modbus_common_pack_tail(modbus_common_t* common) {
   return RET_OK;
 }
 
-ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto, wbuffer_t* wb) {
+ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_proto_t proto,
+                         wbuffer_t* wb) {
   return_value_if_fail(common != NULL && io != NULL && wb != NULL, RET_BAD_PARAMS);
 
   common->io = io;
@@ -118,7 +120,7 @@ static uint32_t modbus_common_get_resp_playload_length(modbus_common_t* common, 
     case MODBUS_FC_READ_COILS:
     case MODBUS_FC_READ_DISCRETE_INPUTS:
     case MODBUS_FC_READ_HOLDING_REGISTERS:
-    case MODBUS_FC_WRITE_AND_READ_REGISTERS:  
+    case MODBUS_FC_WRITE_AND_READ_REGISTERS:
     case MODBUS_FC_READ_INPUT_REGISTERS: {
       return 1;
     }
@@ -139,6 +141,76 @@ static ret_t modbus_common_check_crc(modbus_common_t* common, const uint8_t* dat
   }
 
   return RET_OK;
+}
+
+static ret_t modbus_common_read_rtu_header(modbus_common_t* common, modbus_rtu_header_t* header,
+                                      uint8_t expected_func_code) {
+  int32_t ret = 0;
+  uint8_t slave = 0;
+  uint8_t func_code = 0;
+  int32_t cost_time = 0;
+  uint64_t start_time = time_now_ms();
+  return_value_if_fail(common != NULL && header != NULL, RET_BAD_PARAMS);
+
+  do {
+    do {
+      ret = modbus_common_read_len(common, &slave, 1);
+      return_value_if_fail(ret == 1, RET_IO);
+
+      if (slave == common->slave) {
+        break;
+      } else {
+        log_debug("skip invalid slave %d\n", slave);
+      }
+      cost_time = time_now_ms() - start_time;
+      if (cost_time > common->read_timeout) {
+        log_debug("read data timeout\n");
+        return RET_FAIL;
+      }
+    } while (1);
+
+    do {
+      ret = modbus_common_read_len(common, &func_code, 1);
+      return_value_if_fail(ret == 1, RET_IO);
+
+      if (expected_func_code != 0) {
+        if (func_code == expected_func_code || (func_code == (expected_func_code | 0x80))) {
+          header->slave = slave;
+          header->func_code = func_code;
+          return RET_OK;
+        } else {
+          log_debug("skip invalid func_code %d\n", func_code);
+        }
+      } else {
+        switch (func_code) {
+          case MODBUS_FC_READ_COILS:
+          case MODBUS_FC_READ_DISCRETE_INPUTS:
+          case MODBUS_FC_READ_HOLDING_REGISTERS:
+          case MODBUS_FC_READ_INPUT_REGISTERS:
+          case MODBUS_FC_WRITE_SINGLE_COIL:
+          case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
+          case MODBUS_FC_WRITE_MULTIPLE_COILS:
+          case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
+          case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
+            header->slave = slave;
+            header->func_code = func_code;
+            return RET_OK;
+          }
+          default: {
+            log_debug("skip invalid func_code %d\n", func_code);
+            break;
+          }
+        }
+      }
+      cost_time = time_now_ms() - start_time;
+      if (cost_time > common->read_timeout) {
+        log_debug("read data timeout\n");
+        return RET_FAIL;
+      }
+    } while (1);
+  } while (1);
+
+  return RET_FAIL;
 }
 
 static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_func_code,
@@ -168,8 +240,9 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     return_value_if_fail(transaction_id == common->transaction_id, RET_IO);
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
-    int32_t ret = modbus_common_read_len(common, buff, sizeof(*header));
-    return_value_if_fail(ret == sizeof(*header), RET_IO);
+    ret_t ret = modbus_common_read_rtu_header(common, header, expected_func_code);
+    return_value_if_fail(ret == RET_OK, ret);
+
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
   }
@@ -420,9 +493,9 @@ ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common) {
   return modbus_common_recv_resp(common, MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS, NULL);
 }
 
-ret_t modbus_common_send_write_and_read_registers_req(modbus_common_t* common, uint16_t write_addr, uint16_t write_nb, const uint16_t *src,
+ret_t modbus_common_send_write_and_read_registers_req(modbus_common_t* common, uint16_t write_addr,
+                                                      uint16_t write_nb, const uint16_t* src,
                                                       uint16_t read_addr, uint16_t read_nb) {
-  uint16_t i = 0; 
   common->transaction_id++;
   modbus_common_pack_header(common, MODBUS_FC_WRITE_AND_READ_REGISTERS, 8 + write_nb * 2 + 1);
   modbus_common_pack_uint16(common, read_addr);
@@ -514,8 +587,9 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     req_data->slave = header->unit_id;
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
-    ret = modbus_common_read_len(common, buff, sizeof(*header));
-    return_value_if_fail(ret == sizeof(*header), RET_IO);
+    ret = modbus_common_read_rtu_header(common, header, 0);
+    return_value_if_fail(ret == RET_OK, ret);
+    
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
     req_data->slave = header->slave;

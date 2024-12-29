@@ -75,7 +75,13 @@ static ret_t start_modbus_server_with_conf(const char* filename) {
   goto_error_if_fail(doc != NULL);
   memory = server_conf_load_doc(doc);
   url = conf_doc_get_str(doc, "url", NULL);
-  unit_id = conf_doc_get_int(doc, "unit_id", 0xff);
+
+  if (tk_str_start_with(url, "serial://")) {
+    unit_id = conf_doc_get_int(doc, "unit_id", 1);
+  } else {
+    unit_id = conf_doc_get_int(doc, "unit_id", 0xff);
+  }
+  log_debug("url=%s unit_id=%d\n", url, unit_id);
   esm = event_source_manager_default_create();
 
   goto_error_if_fail(memory != NULL && url != NULL && esm != NULL);
