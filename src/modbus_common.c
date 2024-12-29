@@ -169,45 +169,43 @@ static ret_t modbus_common_read_rtu_header(modbus_common_t* common, modbus_rtu_h
       }
     } while (1);
 
-    do {
-      ret = modbus_common_read_len(common, &func_code, 1);
-      return_value_if_fail(ret == 1, RET_IO);
+    ret = modbus_common_read_len(common, &func_code, 1);
+    return_value_if_fail(ret == 1, RET_IO);
 
-      if (expected_func_code != 0) {
-        if (func_code == expected_func_code || (func_code == (expected_func_code | 0x80))) {
+    if (expected_func_code != 0) {
+      if (func_code == expected_func_code || (func_code == (expected_func_code | 0x80))) {
+        header->slave = slave;
+        header->func_code = func_code;
+        return RET_OK;
+      } else {
+        log_debug("skip invalid func_code %d\n", func_code);
+      }
+    } else {
+      switch (func_code) {
+        case MODBUS_FC_READ_COILS:
+        case MODBUS_FC_READ_DISCRETE_INPUTS:
+        case MODBUS_FC_READ_HOLDING_REGISTERS:
+        case MODBUS_FC_READ_INPUT_REGISTERS:
+        case MODBUS_FC_WRITE_SINGLE_COIL:
+        case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
+        case MODBUS_FC_WRITE_MULTIPLE_COILS:
+        case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
+        case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
           header->slave = slave;
           header->func_code = func_code;
           return RET_OK;
-        } else {
+        }
+        default: {
           log_debug("skip invalid func_code %d\n", func_code);
-        }
-      } else {
-        switch (func_code) {
-          case MODBUS_FC_READ_COILS:
-          case MODBUS_FC_READ_DISCRETE_INPUTS:
-          case MODBUS_FC_READ_HOLDING_REGISTERS:
-          case MODBUS_FC_READ_INPUT_REGISTERS:
-          case MODBUS_FC_WRITE_SINGLE_COIL:
-          case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
-          case MODBUS_FC_WRITE_MULTIPLE_COILS:
-          case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
-          case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
-            header->slave = slave;
-            header->func_code = func_code;
-            return RET_OK;
-          }
-          default: {
-            log_debug("skip invalid func_code %d\n", func_code);
-            break;
-          }
+          break;
         }
       }
-      cost_time = time_now_ms() - start_time;
-      if (cost_time > common->read_timeout) {
-        log_debug("read data timeout\n");
-        return RET_FAIL;
-      }
-    } while (1);
+    }
+    cost_time = time_now_ms() - start_time;
+    if (cost_time > common->read_timeout) {
+      log_debug("read data timeout\n");
+      return RET_FAIL;
+    }
   } while (1);
 
   return RET_FAIL;
