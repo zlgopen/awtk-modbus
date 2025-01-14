@@ -232,6 +232,7 @@ static modbus_memory_t* modbus_memory_default_create_foo(void) {
 
 static void* thread_server_func(void* ctx) {
   int port = 2502;
+  uint8_t slave = *(uint8_t*)ctx;
   modbus_memory_t* memory = NULL;
   event_source_manager_t* esm = NULL;
 
@@ -239,7 +240,7 @@ static void* thread_server_func(void* ctx) {
 
   memory = modbus_memory_default_create_foo();
   esm = event_source_manager_default_create();
-  modbus_service_tcp_start(esm, memory, port, MODBUS_PROTO_TCP, 0xff);
+  modbus_service_tcp_start(esm, memory, port, MODBUS_PROTO_TCP, slave);
 
   while (running) {
     event_source_manager_dispatch(esm);
@@ -258,7 +259,9 @@ TEST(modbus_client_channel, with_server_bits) {
   uint32_t i = 0;
   uint16_t* w = NULL;
   uint16_t* r = NULL;
-  tk_thread_t* thread = tk_thread_create(thread_server_func, NULL);
+  uint8_t slave = 0xFF;
+
+  tk_thread_t* thread = tk_thread_create(thread_server_func, &slave);
   running = TRUE;
   tk_thread_start(thread);
   sleep_ms(1000);
@@ -272,7 +275,7 @@ TEST(modbus_client_channel, with_server_bits) {
   for (i = 0; i < write_bits->write_buffer_length / 2; i++) {
     w[i] = i;
   }
-
+  modbus_client_set_slave(client, slave);
   modbus_client_channel_set_client(write_bits, client);
   modbus_client_channel_set_client(read_bits, client);
 
@@ -295,7 +298,8 @@ TEST(modbus_client_channel, with_server_registers) {
   uint32_t i = 0;
   uint16_t* w = NULL;
   uint16_t* r = NULL;
-  tk_thread_t* thread = tk_thread_create(thread_server_func, NULL);
+  uint8_t slave = 1;
+  tk_thread_t* thread = tk_thread_create(thread_server_func, &slave);
   running = TRUE;
   tk_thread_start(thread);
   sleep_ms(1000);
@@ -310,6 +314,7 @@ TEST(modbus_client_channel, with_server_registers) {
     w[i] = i;
   }
 
+  modbus_client_set_slave(client, slave);
   modbus_client_channel_set_client(write_registers, client);
   modbus_client_channel_set_client(read_registers, client);
 
@@ -331,7 +336,8 @@ TEST(modbus_client_channel, with_server_registers) {
 TEST(modbus_client_channel, with_server_input_bits) {
   uint32_t i = 0;
   uint16_t* r = NULL;
-  tk_thread_t* thread = tk_thread_create(thread_server_func, NULL);
+  uint8_t slave = 1;
+  tk_thread_t* thread = tk_thread_create(thread_server_func, &slave);
   running = TRUE;
   tk_thread_start(thread);
   sleep_ms(1000);
@@ -340,6 +346,7 @@ TEST(modbus_client_channel, with_server_input_bits) {
   modbus_client_channel_t* read_bits =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_bits_6000.json");
 
+  modbus_client_set_slave(client, slave);
   modbus_client_channel_set_client(read_bits, client);
 
   ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
@@ -358,7 +365,8 @@ TEST(modbus_client_channel, with_server_input_bits) {
 TEST(modbus_client_channel, with_server_input_registers) {
   uint32_t i = 0;
   uint16_t* r = NULL;
-  tk_thread_t* thread = tk_thread_create(thread_server_func, NULL);
+  uint8_t slave = 2;
+  tk_thread_t* thread = tk_thread_create(thread_server_func, &slave);
   running = TRUE;
   tk_thread_start(thread);
   sleep_ms(1000);
@@ -366,6 +374,7 @@ TEST(modbus_client_channel, with_server_input_registers) {
   modbus_client_channel_t* read_registers =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_registers_1000.json");
 
+  modbus_client_set_slave(client, slave);
   modbus_client_channel_set_client(read_registers, client);
   ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
 

@@ -62,11 +62,9 @@ static ret_t modbus_common_pack_header(modbus_common_t* common, uint8_t function
     modbus_common_pack_uint16(common, 0);
     /*Number of remaining bytes in this frame*/
     modbus_common_pack_uint16(common, data_len + 1 /*function_code*/ + 1 /*unit_id*/);
-    /*Server address (255 if not used)*/
-    wbuffer_write_uint8(wb, 0xff);
-  } else {
-    wbuffer_write_uint8(wb, common->slave);
   }
+  /*Server address*/
+  wbuffer_write_uint8(wb, common->slave);
   /*Function code*/
   wbuffer_write_uint8(wb, function_code);
 
@@ -231,7 +229,6 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     return_value_if_fail(ret == sizeof(*header), RET_IO);
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
-    return_value_if_fail(header->unit_id == 0xff, RET_IO);
     return_value_if_fail(header->protocol_id == 0, RET_IO);
 
     transaction_id = TK_HTONS(header->transaction_id);
@@ -577,7 +574,6 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     return_value_if_fail(ret == sizeof(*header), RET_IO);
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
-    return_value_if_fail(header->unit_id == 0xff, RET_FAIL);
     return_value_if_fail(header->protocol_id == 0, RET_FAIL);
     transaction_id = TK_HTONS(header->transaction_id);
     return_value_if_fail(transaction_id > common->transaction_id || transaction_id == 0, RET_FAIL);

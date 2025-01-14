@@ -270,8 +270,6 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
   service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
   return_value_if_fail(service != NULL, NULL);
 
-  if (service_args->proto == MODBUS_PROTO_RTU) {
-    modbus_service_set_slave(service, service_args->slave);
-  }
+  modbus_service_set_slave(service, service_args->slave);
   return (tk_service_t*)service;
 }

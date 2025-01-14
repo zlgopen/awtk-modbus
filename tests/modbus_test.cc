@@ -22,7 +22,8 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
   tk_iostream_t* io_server = tk_iostream_mem_create(out, sizeof(out), in, sizeof(in), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
   modbus_service_t* service = modbus_service_create_with_io(io_server, MODBUS_PROTO_TCP, NULL);
-
+  modbus_client_set_slave(client, 0xFF);
+  modbus_service_set_slave(service, 0xFF);
   if (func_code == MODBUS_FC_READ_COILS) {
     ret_t ret = modbus_client_read_bits(client, 304, num_bits, buff);
     ASSERT_EQ(ret, RET_OK);
@@ -127,7 +128,8 @@ static void check_read_register_ex(uint16_t func_code, uint16_t* data, uint16_t 
 
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
   modbus_service_t* service = modbus_service_create_with_io(io_server, MODBUS_PROTO_TCP, NULL);
-
+  modbus_client_set_slave(client, 0xFF);
+  modbus_service_set_slave(service, 0xFF);
   if (func_code == MODBUS_FC_READ_HOLDING_REGISTERS) {
     ret_t ret = modbus_client_read_registers(client, 304, n_registers, buff);
     ASSERT_EQ(ret, RET_OK);
@@ -197,7 +199,7 @@ static void check_write_bit(uint8_t value1) {
   uint8_t out[1024] = {0};
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
-
+  modbus_client_set_slave(client, 0xFF);
   ret_t ret = modbus_client_write_bit(client, addr, value1);
   ASSERT_EQ(ret, RET_OK);
 
@@ -243,7 +245,7 @@ static void check_write_register(uint16_t value1) {
   uint8_t out[1024] = {0};
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
-
+  modbus_client_set_slave(client, 0xFF);
   ret_t ret = modbus_client_write_register(client, addr, value1);
   ASSERT_EQ(ret, RET_OK);
 
@@ -290,7 +292,7 @@ static void check_write_bits(uint8_t* value1, uint16_t num_bits) {
 
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
-
+  modbus_client_set_slave(client, 0xFF);
   ret_t ret = modbus_client_write_bits(client, addr, num_bits, value1);
   ASSERT_EQ(ret, RET_OK);
 
@@ -341,7 +343,7 @@ static void check_write_registers(uint16_t* value1, uint16_t num_registers) {
 
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
-
+  modbus_client_set_slave(client, 0xFF);
   ret_t ret = modbus_client_write_registers(client, addr, num_registers, value1);
   ASSERT_EQ(ret, RET_OK);
 
