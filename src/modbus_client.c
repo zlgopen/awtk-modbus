@@ -83,6 +83,7 @@ modbus_client_t* modbus_client_create(const char* url) {
 
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
+    modbus_client_set_slave(client, 0xff); 
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
     client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_UDP)) {
