@@ -739,7 +739,7 @@ ret_t modbus_common_send_resp(modbus_common_t* common, modbus_resp_data_t* resp_
 ret_t modbus_common_send_exception_resp(modbus_common_t* common, uint8_t func_code,
                                         modbus_exeption_code_t code) {
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
-  modbus_common_pack_header(common, func_code | 0x80, 2);
+  modbus_common_pack_header(common, func_code | 0x80, 1);
   modbus_common_pack_uint8(common, code);
   modbus_common_pack_tail(common);
 
