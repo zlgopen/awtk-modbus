@@ -24,8 +24,12 @@
 
 ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* memory,
                                const char* url, uint8_t slave) {
+  static volatile int i = 0;
   static modbus_service_args_t args;
   return_value_if_fail(memory != NULL && url != NULL, RET_BAD_PARAMS);
+
+  assert(i++ == 0);
+  return_value_if_fail(i <= 1, RET_FAIL);
 
   args.memory = memory;
   args.proto = MODBUS_PROTO_RTU;
@@ -33,3 +37,10 @@ ret_t modbus_service_rtu_start(event_source_manager_t* esm, modbus_memory_t* mem
 
   return tk_service_start(esm, url, modbus_service_create, &args);
 }
+
+ret_t modbus_service_rtu_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args,
+                               const char* url) {
+  return_value_if_fail(args != NULL && url != NULL, RET_BAD_PARAMS);
+  return tk_service_start(esm, url, modbus_service_create, args);
+}
+

@@ -44,6 +44,16 @@ BEGIN_C_DECLS
  */
 ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* memory, int port,
                                modbus_proto_t proto, uint8_t slave);
+
+/**
+ * @method modbus_service_tcp_start_by_args
+ * 创建modbus service TCP。
+ * @param {event_source_manager_t*} esm 事件管理对象(为NULL则阻塞运行)。
+ * @param {modbus_service_args_t*} args modbus 服务参数。
+ * @param {int} port 端口。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args, int port);
 END_C_DECLS
 
 #endif /*TK_MODBUS_SERVICE_TCP_H*/
