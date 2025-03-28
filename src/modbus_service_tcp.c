@@ -30,8 +30,8 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
   static volatile int i = 0;
   static modbus_service_args_t args;
   return_value_if_fail(memory != NULL, RET_BAD_PARAMS);
-
-  assert(i++ == 0);
+  i++;
+  assert(i <= 1);
   return_value_if_fail(i <= 1, RET_FAIL);
 
   args.memory = memory;

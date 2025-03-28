@@ -1,3 +1,6 @@
+2025/3/28
+  * 完善测试(感谢智明提供补丁)
+
 2025/3/27
   * 修复错误码长度不正确的问题(感谢智明提供补丁)
   * 增加modbus_service_tcp\(rtu\)_start_by_args函数以及限制modbus_service_tcp\(rtu\)_start只能调用一次(感谢智明提供补丁)
