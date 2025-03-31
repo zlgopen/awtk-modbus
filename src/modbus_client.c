@@ -27,6 +27,10 @@
 
 #include "modbus_client.h"
 
+#define MODBUS_CLIENT_DEFAULT_RETRY_TIMES 3
+
+static ret_t modbus_client_deinit(modbus_client_t* client);
+
 static uint32_t modbus_client_calculate_frame_gap_time(tk_iostream_t* io) {
   float_t frame_bits = 1;
   int32_t baudrate = tk_object_get_prop_uint32(TK_OBJECT(io), TK_IOSTREAM_SERIAL_PROP_BAUDRATE, 115200);
@@ -50,6 +54,15 @@ static uint32_t modbus_client_calculate_frame_gap_time(tk_iostream_t* io) {
   return ceil(3.5f * frame_bits * 1000 * 1000 / baudrate);
 }
 
+static ret_t modbus_client_init_with_io(modbus_client_t* client, tk_iostream_t* io, modbus_proto_t proto, uint32_t retry_times) {
+  return_value_if_fail(client!= NULL && io != NULL, RET_BAD_PARAMS);
+  tk_client_init(&(client->client), io, NULL);
+  modbus_common_init(&client->common, io, proto, &(client->client.wb));
+  modbus_client_set_retry_times(client, retry_times);
+  client->is_connected = TRUE;
+  return RET_OK;
+}
+
 modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t proto) {
   modbus_client_t* client = NULL;
   return_value_if_fail(io != NULL, NULL);
@@ -57,9 +70,7 @@ modbus_client_t* modbus_client_create_with_io(tk_iostream_t* io, modbus_proto_t 
   client = TKMEM_ZALLOC(modbus_client_t);
   goto_error_if_fail(client != NULL);
 
-  tk_client_init(&(client->client), io, NULL);
-  modbus_common_init(&client->common, io, proto, &(client->client.wb));
-  modbus_client_set_retry_times(client, 3);
+  goto_error_if_fail(modbus_client_init_with_io(client, io, proto, MODBUS_CLIENT_DEFAULT_RETRY_TIMES) == RET_OK);
 
   return client;
 error:
@@ -68,36 +79,58 @@ error:
   return NULL;
 }
 
-modbus_client_t* modbus_client_create(const char* url) {
+static tk_iostream_t* modbus_client_create_iostream(const char* url) {
   tk_iostream_t* io = NULL;
-  modbus_client_t* client = NULL;
   return_value_if_fail(url != NULL, NULL);
-
   if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ||
       tk_str_start_with(url, STR_SCHEMA_RTU_OVER_UDP)) {
     io = tk_stream_factory_create_iostream(url + 4 /*rtu+*/);
   } else {
     io = tk_stream_factory_create_iostream(url);
   }
-  return_value_if_fail(io != NULL, NULL);
+  return io;
+}
 
+static ret_t modbus_client_init(modbus_client_t* client, const char* url, tk_iostream_t* io, uint8_t slave, uint32_t retry_times) {
+  ret_t ret = RET_OK;
   if (tk_str_start_with(url, STR_SCHEMA_TCP)) {
-    client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
-    modbus_client_set_slave(client, 0xff); 
+    ret = modbus_client_init_with_io(client, io, MODBUS_PROTO_TCP, retry_times);
+    return_value_if_fail(ret == RET_OK, ret);
+    modbus_client_set_slave(client, slave); 
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP)) {
-    client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+    ret = modbus_client_init_with_io(client, io, MODBUS_PROTO_RTU, retry_times);
+    return_value_if_fail(ret == RET_OK, ret);
   } else if (tk_str_start_with(url, STR_SCHEMA_RTU_OVER_UDP)) {
-    client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+    ret = modbus_client_init_with_io(client, io, MODBUS_PROTO_RTU, retry_times);
+    return_value_if_fail(ret == RET_OK, ret);
   } else if (tk_str_start_with(url, STR_SCHEMA_SERIAL)) {
-    client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
-    if (client != NULL) {
-      modbus_client_set_frame_gap_time(client, modbus_client_calculate_frame_gap_time(io));
-    }
+    ret = modbus_client_init_with_io(client, io, MODBUS_PROTO_RTU, retry_times);
+    return_value_if_fail(ret == RET_OK, ret);
+    modbus_client_set_frame_gap_time(client, modbus_client_calculate_frame_gap_time(io));
   } else {
     log_debug("not support:%s\n", url);
   }
+  return ret;
+}
 
+modbus_client_t* modbus_client_create(const char* url) {
+  tk_iostream_t* io = NULL;
+  modbus_client_t* client = NULL;
+  return_value_if_fail(url != NULL, NULL);
+
+  client = TKMEM_ZALLOC(modbus_client_t);
+  return_value_if_fail(client != NULL, NULL);
+  client->url = tk_strdup(url);
+  goto_error_if_fail(client->url != NULL);
+
+  io = modbus_client_create_iostream(client->url);
+  goto_error_if_fail(io != NULL);
+
+  goto_error_if_fail(modbus_client_init(client, client->url, io, 255, MODBUS_CLIENT_DEFAULT_RETRY_TIMES) == RET_OK);
   return client;
+error :
+  modbus_client_destroy(client);
+  return NULL;
 }
 
 ret_t modbus_client_set_response_timeout(modbus_client_t* client, uint32_t response_timeout) {
@@ -146,6 +179,24 @@ static ret_t modbus_client_check_and_set_recv_timeout(modbus_client_t* client, u
   return RET_OK;
 }
 
+static void modbus_client_check_connect_status(modbus_client_t* client, ret_t ret) {
+  if (ret == RET_IO) {
+    client->is_connected = FALSE;
+    modbus_client_deinit(client);
+  }
+}
+
+static ret_t modbus_client_check_and_auto_connect(modbus_client_t* client) {
+  if (client->is_connected) {
+    return RET_OK;
+  } else {
+    modbus_common_t* common = MODBUS_COMMON(client);
+    tk_iostream_t* io = modbus_client_create_iostream(client->url);
+    return_value_if_fail(io != NULL, RET_IO);
+    return modbus_client_init(client, client->url, io, common->slave, client->retry_times);
+  }
+}
+
 static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_code, uint16_t addr,
                                         uint16_t count, uint8_t* buff) {
   uint64_t t = 0;
@@ -181,16 +232,22 @@ ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t c
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_read_bits_ex(client, MODBUS_FC_READ_COILS, addr, count, buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -201,16 +258,22 @@ ret_t modbus_client_read_input_bits(modbus_client_t* client, uint16_t addr, uint
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_read_bits_ex(client, MODBUS_FC_READ_DISCRETE_INPUTS, addr, count, buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -241,17 +304,23 @@ ret_t modbus_client_read_registers(modbus_client_t* client, uint16_t addr, uint1
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_read_registers_ex(client, MODBUS_FC_READ_HOLDING_REGISTERS, addr, count,
                                           buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -262,17 +331,23 @@ ret_t modbus_client_read_input_registers(modbus_client_t* client, uint16_t addr,
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret =
         modbus_client_read_registers_ex(client, MODBUS_FC_READ_INPUT_REGISTERS, addr, count, buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -387,16 +462,22 @@ ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t va
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_bit_impl(client, addr, value);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -406,16 +487,22 @@ ret_t modbus_client_write_register(modbus_client_t* client, uint16_t addr, uint1
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_register_impl(client, addr, value);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -426,16 +513,22 @@ ret_t modbus_client_write_bits(modbus_client_t* client, uint16_t addr, uint16_t 
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_bits_impl(client, addr, count, buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -446,16 +539,22 @@ ret_t modbus_client_write_registers(modbus_client_t* client, uint16_t addr, uint
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && buff != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_registers_impl(client, addr, count, buff);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -467,16 +566,22 @@ ret_t modbus_client_write_and_read_registers(modbus_client_t* client,
   uint32_t i = 0;
   ret_t ret = RET_OK;
   return_value_if_fail(client != NULL && src != NULL && dest != NULL, RET_BAD_PARAMS);
+  ret = modbus_client_check_and_auto_connect(client);
+  if (ret != RET_OK) {
+    return ret;
+  }
 
   for (i = 0; i < client->retry_times; i++) {
     ret = modbus_client_write_and_read_registers_impl(client, write_addr, write_nb, src, read_addr, read_nb, dest);
     if (!MODBUS_NEED_RETRY(ret)) {
+      modbus_client_check_connect_status(client, ret);
       return ret;
     }
 
     log_debug("%s retry:%d\n", __FUNCTION__, i + 1);
   }
 
+  modbus_client_check_connect_status(client, ret);
   // clear the old resp data when comm error, ensure the next req and resp tid sync
   modbus_client_flush_read_buffer(client);
   return ret;
@@ -491,12 +596,29 @@ ret_t modbus_client_set_slave(modbus_client_t* client, uint8_t slave) {
   return RET_OK;
 }
 
-ret_t modbus_client_destroy(modbus_client_t* client) {
+ret_t modbus_client_set_auto_reconnect(modbus_client_t* client, bool_t auto_reconnect) {
+  return_value_if_fail(client!= NULL, RET_BAD_PARAMS);
+  client->auto_reconnect = auto_reconnect;
+  return RET_OK;
+}
+
+static ret_t modbus_client_deinit(modbus_client_t* client) {
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL, RET_BAD_PARAMS);
 
   tk_client_deinit(&(client->client));
   modbus_common_deinit(common);
+  return RET_OK;
+}
+
+ret_t modbus_client_destroy(modbus_client_t* client) {
+  return_value_if_fail(client != NULL, RET_BAD_PARAMS);
+
+  modbus_client_deinit(client);
+  if (client->url != NULL) {
+    TKMEM_FREE(client->url);
+    client->url = NULL;
+  }
   TKMEM_FREE(client);
 
   return RET_OK;

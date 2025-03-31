@@ -88,10 +88,30 @@ typedef struct _modbus_client_t {
   uint32_t frame_gap_time;
 
   /**
+   * @property {bool_t} auto_reconnect
+   * @annotation ["readable"]
+   * 是否自动断线重连。
+   */
+  bool_t auto_reconnect;
+
+  /**
+   * @property {bool_t} is_connected
+   * @annotation ["readable"]
+   * 是否连接。
+   */
+  bool_t is_connected;
+
+  /**
    * @property {uint32_t} retry_times
    * 重试次数。
    */
   uint32_t retry_times;
+
+  /**
+   * @property {char*} url
+   * modbus server的url。
+   */
+  char* url;
 } modbus_client_t;
 
 /**
@@ -288,6 +308,15 @@ ret_t modbus_client_write_and_read_registers(modbus_client_t* client,
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_client_set_slave(modbus_client_t* client, uint8_t slave);
+
+/**
+ * @method modbus_client_set_auto_reconnect
+ * 设置是否自动断线重连。
+ * @param {modbus_client_t*} client modbus client对象。
+ * @param {bool_t} auto_reconnect 是否自动断线重连。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_client_set_auto_reconnect(modbus_client_t* client, bool_t auto_reconnect);
 
 /**
  * @method modbus_client_destroy

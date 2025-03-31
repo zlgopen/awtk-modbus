@@ -37,7 +37,7 @@ static ret_t start_tcp(event_source_manager_t* esm, const char* url, modbus_memo
   const char* p = strrchr(url, ':');
   int port = p != NULL ? tk_atoi(p + 1) : 502;
 
-  return modbus_service_tcp_start(esm, memory, port, proto, MODBUS_DEMO_SLAVE_ID);
+  return modbus_service_tcp_start(esm, memory, port, proto, 255);
 }
 
 int main(int argc, char* argv[]) {
