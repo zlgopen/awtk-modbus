@@ -294,6 +294,7 @@ TEST(modbus_client_channel, with_server_bits) {
   modbus_client_channel_destroy(write_bits);
   modbus_client_channel_destroy(read_bits);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_registers) {
@@ -339,6 +340,7 @@ TEST(modbus_client_channel, with_server_registers) {
   modbus_client_channel_destroy(write_registers);
   modbus_client_channel_destroy(read_registers);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_input_bits) {
@@ -355,7 +357,6 @@ TEST(modbus_client_channel, with_server_input_bits) {
   tk_thread_start(thread);
   sleep_ms(1000);
   modbus_client_t* client = modbus_client_create("tcp://localhost:2502");
-      modbus_client_channel_create_with_json("file://./tests/testdata/write_bits_6000.json");
   modbus_client_channel_t* read_bits =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_bits_6000.json");
 
@@ -374,6 +375,7 @@ TEST(modbus_client_channel, with_server_input_bits) {
   sleep_ms(1000);
   modbus_client_channel_destroy(read_bits);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_input_registers) {
@@ -407,6 +409,7 @@ TEST(modbus_client_channel, with_server_input_registers) {
   sleep_ms(1000);
   modbus_client_channel_destroy(read_registers);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
@@ -473,6 +476,7 @@ TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
   modbus_client_channel_destroy(write_bits);
   modbus_client_channel_destroy(read_bits);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
@@ -540,6 +544,7 @@ TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
   modbus_client_channel_destroy(write_registers);
   modbus_client_channel_destroy(read_registers);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
@@ -556,7 +561,6 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
   tk_thread_start(thread);
   sleep_ms(1000);
   modbus_client_t* client = modbus_client_create("tcp://localhost:2502");
-      modbus_client_channel_create_with_json("file://./tests/testdata/write_bits_6000.json");
   modbus_client_channel_t* read_bits =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_bits_6000.json");
 
@@ -593,6 +597,7 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
   sleep_ms(1000);
   modbus_client_channel_destroy(read_bits);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
 
 TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
@@ -646,4 +651,5 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
   sleep_ms(1000);
   modbus_client_channel_destroy(read_registers);
   modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
 }
