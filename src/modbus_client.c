@@ -180,7 +180,7 @@ static ret_t modbus_client_check_and_set_recv_timeout(modbus_client_t* client, u
 }
 
 static void modbus_client_check_connect_status(modbus_client_t* client, ret_t ret) {
-  if (ret == RET_IO) {
+  if (ret == RET_IO && client->is_connected) {
     client->is_connected = FALSE;
     modbus_client_deinit(client);
   }
