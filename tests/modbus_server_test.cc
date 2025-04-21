@@ -46,6 +46,7 @@ TEST(modbus, server_tcp_init) {
 
   ASSERT_EQ(esm->sources.size, 1);
   event_source_manager_destroy(esm);
+  modbus_memory_destroy(memory);
 }
 
 TEST(modbus, server_tcp_init_by_args) {
@@ -71,6 +72,7 @@ TEST(modbus, server_tcp_init_by_args) {
   ASSERT_EQ(esm->sources.size, 2);
 
   event_source_manager_destroy(esm);
+  modbus_memory_destroy(memory);
 }
 
 #if 0
