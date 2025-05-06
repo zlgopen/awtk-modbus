@@ -70,6 +70,17 @@ TEST(modbus, server_tcp_init_by_args) {
   args2.slave = MODBUS_DEMO_SLAVE_ID;
   ASSERT_EQ(modbus_service_start_by_args(esm, &args2, url), RET_OK);
   ASSERT_EQ(esm->sources.size, 2);
+#if 0
+  // 指定网卡启动 modbus 服务
+  url = "tcp://localhost:503";
+  modbus_service_args_t args3;
+  args3.memory = memory;
+  args3.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
+  args3.slave = MODBUS_DEMO_SLAVE_ID;
+  args3.ifname = L"以太网 3"; //指定网卡名字
+  ASSERT_EQ(modbus_service_start_by_args(esm, &args3, url), RET_OK);
+  ASSERT_EQ(esm->sources.size, 3);
+#endif
 
   event_source_manager_destroy(esm);
   modbus_memory_destroy(memory);

@@ -28,10 +28,19 @@
 
 BEGIN_C_DECLS
 
+struct _modbus_service_t;
+typedef struct _modbus_service_t modbus_service_t;
+
+typedef ret_t (*modbus_service_on_connected_t)(modbus_service_t* service, void* ctx);
+typedef ret_t (*modbus_service_on_disconnected_t)(modbus_service_t* service, void* ctx);
+
 typedef struct _modbus_service_args_t {
   modbus_proto_t proto;
   modbus_memory_t* memory;
   uint8_t slave;
+  const wchar_t* ifname;
+  void* ctx;
+  modbus_service_on_connected_t on_connected;
 } modbus_service_args_t;
 
 /**
@@ -39,11 +48,13 @@ typedef struct _modbus_service_args_t {
  * 
  * modbus service
  */
-typedef struct _modbus_service_t {
+struct _modbus_service_t {
   tk_service_t service;
   modbus_common_t common;
   modbus_memory_t* memory;
-} modbus_service_t;
+  void* ctx;
+  modbus_service_on_disconnected_t on_disconnected;
+};
 
 /**
  * @method modbus_service_create

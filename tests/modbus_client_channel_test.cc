@@ -252,15 +252,34 @@ static void* thread_server_func(void* ctx) {
   return NULL;
 }
 
+static int s_connected = 0;
+static int s_ended = 0;
+
+static ret_t modbus_service_on_disconnected(modbus_service_t* service, void* ctx) {
+  s_ended++;
+  return RET_OK;
+}
+
+static ret_t modbus_service_on_connected(modbus_service_t* service, void* ctx) {
+  s_connected++;
+  service->on_disconnected = modbus_service_on_disconnected;
+  return RET_OK;
+}
+
 TEST(modbus_client_channel, with_server_bits) {
   uint32_t i = 0;
   uint16_t* w = NULL;
   uint16_t* r = NULL;
   uint8_t slave = 0xFF;
+  uint32_t ret_index = 0;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
+  args.on_connected = modbus_service_on_connected;
+  s_connected = 0;
+  s_ended = 0;
 
   tk_thread_t* thread = tk_thread_create(thread_server_func, &args);
   running = TRUE;
@@ -291,6 +310,8 @@ TEST(modbus_client_channel, with_server_bits) {
   running = FALSE;
   tk_thread_destroy(thread);
   sleep_ms(1000);
+  ASSERT_EQ(s_connected, 1);
+  ASSERT_EQ(s_ended, 1);
   modbus_client_channel_destroy(write_bits);
   modbus_client_channel_destroy(read_bits);
   modbus_memory_destroy(args.memory);
@@ -303,6 +324,7 @@ TEST(modbus_client_channel, with_server_registers) {
   uint16_t* r = NULL;
   uint8_t slave = 1;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -348,6 +370,7 @@ TEST(modbus_client_channel, with_server_input_bits) {
   uint16_t* r = NULL;
   uint8_t slave = 1;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -383,6 +406,7 @@ TEST(modbus_client_channel, with_server_input_registers) {
   uint16_t* r = NULL;
   uint8_t slave = 2;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -418,6 +442,7 @@ TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
   uint16_t* r = NULL;
   uint8_t slave = 0xFF;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -485,6 +510,7 @@ TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
   uint16_t* r = NULL;
   uint8_t slave = 1;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -552,6 +578,7 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
   uint16_t* r = NULL;
   uint8_t slave = 1;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();
@@ -605,6 +632,7 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
   uint16_t* r = NULL;
   uint8_t slave = 2;
   modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;
   args.proto = MODBUS_PROTO_TCP;
   args.memory = modbus_memory_default_create_foo();

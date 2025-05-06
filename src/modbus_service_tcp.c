@@ -44,8 +44,22 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
 
 ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args, int port) {
   char url[128];
+  bool_t is_set_url = FALSE;
   return_value_if_fail(args != NULL, RET_BAD_PARAMS);
-  tk_snprintf(url, sizeof(url), "tcp://localhost:%d", port);
+  if (args->ifname != NULL) {
+    darray_t ips;
+    darray_init(&ips, 10, default_destroy, NULL);
+    if (tk_socket_get_ips_by_ifname(args->ifname, &ips) == RET_OK) {
+      if (ips.size > 0) {
+        tk_snprintf(url, sizeof(url), "tcp://%s:%d", (char*)darray_get(&ips, 0), port);
+        is_set_url = TRUE;
+      }
+    }
+    darray_deinit(&ips);
+  }
+  if (!is_set_url) {
+    tk_snprintf(url, sizeof(url), "tcp://localhost:%d", port);
+  }
   return tk_service_start(esm, url, modbus_service_create, args);
 }
 

@@ -219,6 +219,10 @@ ret_t modbus_service_attach_to_event_source_manager(modbus_service_t* service,
 ret_t modbus_service_destroy(modbus_service_t* service) {
   return_value_if_fail(service != NULL, RET_BAD_PARAMS);
 
+  if (service->on_disconnected != NULL) {
+    service->on_disconnected(service, service->ctx);
+  }
+
   modbus_common_deinit(MODBUS_COMMON(service));
   TKMEM_FREE(service);
 
@@ -269,7 +273,12 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
 
   service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
   return_value_if_fail(service != NULL, NULL);
-
+  if (service_args->on_connected != NULL) {
+    if (service_args->on_connected(service, service_args->ctx) != RET_OK) {
+      modbus_service_destroy(service);
+      return NULL;
+    }
+  }
   modbus_service_set_slave(service, service_args->slave);
   return (tk_service_t*)service;
 }
