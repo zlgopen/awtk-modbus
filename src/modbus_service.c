@@ -169,8 +169,6 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
       }
     }
 
-    log_debug("%d done\n", req_data.func_code);
-
     if (ret == RET_OK) {
       return modbus_common_send_resp(MODBUS_COMMON(service), &resp_data);
     }
