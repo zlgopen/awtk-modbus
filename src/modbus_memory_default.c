@@ -27,7 +27,7 @@ static ret_t modbus_memory_default_read_bits(modbus_memory_t* memory, uint16_t a
                                              uint8_t* buff) {
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
   return modbus_server_channel_read_bits(m->bits, addr, count, buff);
 }
 
@@ -35,7 +35,7 @@ static ret_t modbus_memory_default_read_input_bits(modbus_memory_t* memory, uint
                                                    uint16_t count, uint8_t* buff) {
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->input_bits != NULL, RET_INVALID_ADDR);
   return modbus_server_channel_read_bits(m->input_bits, addr, count, buff);
 }
 
@@ -43,7 +43,7 @@ static ret_t modbus_memory_default_read_registers(modbus_memory_t* memory, uint1
                                                   uint16_t count, uint16_t* buff) {
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
   return modbus_server_channel_read_registers(m->registers, addr, count, buff);
 }
 
@@ -51,7 +51,7 @@ static ret_t modbus_memory_default_read_input_registers(modbus_memory_t* memory,
                                                         uint16_t count, uint16_t* buff) {
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->input_registers != NULL, RET_INVALID_ADDR);
   return modbus_server_channel_read_registers(m->input_registers, addr, count, buff);
 }
 
@@ -60,7 +60,7 @@ static ret_t modbus_memory_default_write_bit(modbus_memory_t* memory, uint16_t a
   ret_t ret = RET_OK;
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_bit(m->bits, addr, value);
   if (ret == RET_OK) {
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
@@ -74,7 +74,7 @@ static ret_t modbus_memory_default_write_bits(modbus_memory_t* memory, uint16_t 
   ret_t ret = RET_OK;                                                
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_bits(m->bits, addr, count, buff);
   if (ret == RET_OK) {
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
@@ -88,7 +88,7 @@ static ret_t modbus_memory_default_write_register(modbus_memory_t* memory, uint1
   ret_t ret = RET_OK;                                                    
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_register(m->registers, addr, value);
   if (ret == RET_OK) {
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
@@ -102,7 +102,7 @@ static ret_t modbus_memory_default_write_registers(modbus_memory_t* memory, uint
   ret_t ret = RET_OK;                                                    
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
-
+  return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_registers(m->registers, addr, count, buff);
   if (ret == RET_OK) {
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
