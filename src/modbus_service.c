@@ -72,7 +72,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 
   if (ret == RET_OK) {
     modbus_memory_t* memory = service->memory;
-
+    service->num_msg_recv++;
     if (req_data.slave != service->common.slave) {
 #ifdef WITH_MULT_SLAVES
       log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
@@ -97,6 +97,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         }
         resp_data.bytes = (req_data.count + 7) / 8;
         ret = modbus_memory_read_bits(memory, req_data.addr, req_data.count, (uint8_t*)buff);
+        service->num_read_requests++;
         break;
       }
       case MODBUS_FC_READ_DISCRETE_INPUTS: {
@@ -106,6 +107,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         }
         resp_data.bytes = (req_data.count + 7) / 8;
         ret = modbus_memory_read_input_bits(memory, req_data.addr, req_data.count, (uint8_t*)buff);
+        service->num_read_requests++;
         break;
       }
       case MODBUS_FC_READ_HOLDING_REGISTERS: {
@@ -115,6 +117,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         }
         resp_data.bytes = req_data.count * 2;
         ret = modbus_memory_read_registers(memory, req_data.addr, req_data.count, buff);
+        service->num_read_requests++;
         break;
       }
       case MODBUS_FC_READ_INPUT_REGISTERS: {
@@ -124,16 +127,19 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         }
         resp_data.bytes = req_data.count * 2;
         ret = modbus_memory_read_input_registers(memory, req_data.addr, req_data.count, buff);
+        service->num_read_requests++;
         break;
       }
       case MODBUS_FC_WRITE_SINGLE_COIL: {
         resp_data.data[0] = req_data.data[0];
         ret = modbus_memory_write_bit(memory, req_data.addr, req_data.data[0]);
+        service->num_write_requests++;
         break;
       }
       case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER: {
         memcpy(resp_data.data, req_data.data, sizeof(uint16_t));
         ret = modbus_memory_write_register(memory, req_data.addr, *(uint16_t*)(req_data.data));
+        service->num_write_requests++;
         break;
       }
       case MODBUS_FC_WRITE_MULTIPLE_COILS: {
@@ -142,6 +148,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
           break;
         }
         ret = modbus_memory_write_bits(memory, req_data.addr, req_data.count, req_data.data);
+        service->num_write_requests++;
         break;
       }
       case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS: {
@@ -151,6 +158,7 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         }
         ret = modbus_memory_write_registers(memory, req_data.addr, req_data.count,
                                             (uint16_t*)req_data.data);
+        service->num_write_requests++; 
         break;
       }
       case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
@@ -161,6 +169,8 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
         resp_data.bytes = req_data.count * 2;
         modbus_memory_write_registers(memory, req_data.addr_ex, req_data.count_ex, (uint16_t*)req_data.data_ex);
         ret = modbus_memory_read_registers(memory, req_data.addr, req_data.count, buff);
+        service->num_read_requests++;
+        service->num_write_requests++;
         break;
       }
       default: {
@@ -170,7 +180,11 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     }
 
     if (ret == RET_OK) {
-      return modbus_common_send_resp(MODBUS_COMMON(service), &resp_data);
+      ret = modbus_common_send_resp(MODBUS_COMMON(service), &resp_data);
+      if (ret == RET_OK) {
+        service->num_msg_reply++;
+      }
+      return ret;
     }
   }
 
@@ -185,7 +199,12 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
   }
 
   log_debug("%d failed\n", req_data.func_code);
-  return modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code, code);
+  ret =  modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code, code);
+  if (ret == RET_OK) {
+    service->num_msg_reply++;
+    service->num_except_reply++;
+  }
+  return ret;
 }
 
 static ret_t service_on_request(event_source_t* source) {

@@ -52,6 +52,11 @@ struct _modbus_service_t {
   tk_service_t service;
   modbus_common_t common;
   modbus_memory_t* memory;
+  uint32_t num_msg_recv;        /* 已接收消息总数 */
+  uint32_t num_msg_reply;       /* 已回复消息总数 */
+  uint32_t num_except_reply;    /* 自服务启用后发送的异常回复数量（标识功能码非法） */
+  uint32_t num_read_requests;   /* 读请求次数 */
+  uint32_t num_write_requests;  /* 写请求次数 */
   void* ctx;
   modbus_service_on_disconnected_t on_disconnected;
 };
