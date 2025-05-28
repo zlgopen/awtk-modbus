@@ -219,6 +219,8 @@ TEST(modbus_client_channel, with_server_bits) {
     w[i] = i;
   }
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(write_bits, slave);
+  modbus_client_channel_set_unit_id(read_bits, slave);
   modbus_client_channel_set_client(write_bits, client);
   modbus_client_channel_set_client(read_bits, client);
 
@@ -268,6 +270,8 @@ TEST(modbus_client_channel, with_server_registers) {
   }
 
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(write_registers, slave);
+  modbus_client_channel_set_unit_id(read_registers, slave);
   modbus_client_channel_set_client(write_registers, client);
   modbus_client_channel_set_client(read_registers, client);
 
@@ -307,6 +311,7 @@ TEST(modbus_client_channel, with_server_input_bits) {
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_bits_6000.json");
 
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(read_bits, slave);
   modbus_client_channel_set_client(read_bits, client);
 
   ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
@@ -343,6 +348,7 @@ TEST(modbus_client_channel, with_server_input_registers) {
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_registers_1000.json");
 
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(read_registers, slave);
   modbus_client_channel_set_client(read_registers, client);
   ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
 
@@ -386,6 +392,8 @@ TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
   }
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(write_bits, slave);
+  modbus_client_channel_set_unit_id(read_bits, slave);
   modbus_client_channel_set_client(write_bits, client);
   modbus_client_channel_set_client(read_bits, client);
 
@@ -455,6 +463,8 @@ TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
 
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(write_registers, slave);
+  modbus_client_channel_set_unit_id(read_registers, slave);
   modbus_client_channel_set_client(write_registers, client);
   modbus_client_channel_set_client(read_registers, client);
 
@@ -516,6 +526,7 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
 
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(read_bits, slave);
   modbus_client_channel_set_client(read_bits, client);
 
   ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
@@ -570,6 +581,7 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
 
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_unit_id(read_registers, slave);
   modbus_client_channel_set_client(read_registers, client);
   ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
 
