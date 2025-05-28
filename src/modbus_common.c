@@ -566,19 +566,24 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
 
   if (common->proto == MODBUS_PROTO_TCP) {
     uint16_t transaction_id = 0;
-    modbus_tcp_header_t* header = (modbus_tcp_header_t*)buff;
-    ret = modbus_common_read_len(common, buff, sizeof(*header));
+    modbus_tcp_header_t header;
+    ret = modbus_common_read_len(common, buff, sizeof(header));
     if (ret == 0) {
       return RET_EOS;
     }
-    return_value_if_fail(ret == sizeof(*header), RET_IO);
-    wbuffer_skip(wb, sizeof(*header));
-    func_code = header->func_code;
-    return_value_if_fail(header->protocol_id == 0, RET_FAIL);
-    transaction_id = TK_HTONS(header->transaction_id);
+    return_value_if_fail(ret == sizeof(header), RET_IO);
+    header.transaction_id = (buff[0] << 8) | (buff[1]);
+    header.protocol_id = (buff[2] << 8) | (buff[3]);
+    header.length = (buff[4] << 8) | (buff[5]);
+    header.unit_id = buff[6];
+    header.func_code = buff[7];
+    wbuffer_skip(wb, sizeof(header));
+    func_code = header.func_code;
+    return_value_if_fail(header.protocol_id == 0, RET_FAIL);
+    transaction_id = TK_HTONS(header.transaction_id);
     return_value_if_fail(transaction_id > common->transaction_id || transaction_id == 0, RET_FAIL);
-    common->transaction_id = TK_HTONS(header->transaction_id);
-    req_data->slave = header->unit_id;
+    common->transaction_id = TK_HTONS(header.transaction_id);
+    req_data->slave = header.unit_id;
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
     ret = modbus_common_read_rtu_header(common, header, 0);
