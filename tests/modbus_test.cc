@@ -9,7 +9,7 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
                                uint16_t num_bits) {
   uint8_t num_bytes = (num_bits + 7) / 8;
 
-  uint8_t in[1024] = {0,         2,             /*tid*/
+  uint8_t in[1024] = {0,         1,             /*tid*/
                       0,         0,             /*protocol id*/
                       0,         3 + num_bytes, /*data len*/
                       0xff,                     /*Server address (255 if not used)*/
@@ -40,7 +40,7 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
   ASSERT_EQ(req.data == NULL, TRUE);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id
@@ -108,7 +108,7 @@ TEST(modbus, read_input_bits_1) {
 static void check_read_register_ex(uint16_t func_code, uint16_t* data, uint16_t n_registers) {
   uint8_t num_bytes = n_registers * 2;
 
-  uint8_t in[1024] = {0,         2,             /*tid*/
+  uint8_t in[1024] = {0,         1,             /*tid*/
                       0,         0,             /*protocol id*/
                       0,         3 + num_bytes, /*data len*/
                       0xff,                     /*Server address (255 if not used)*/
@@ -147,7 +147,7 @@ static void check_read_register_ex(uint16_t func_code, uint16_t* data, uint16_t 
   ASSERT_EQ(req.data == NULL, TRUE);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id
@@ -185,7 +185,7 @@ TEST(modbus, read_input_registers_1) {
 static void check_write_bit(uint8_t value1) {
   uint16_t addr = 0x1234;
   uint8_t in[1024] = {0,
-                      2, /*tid*/
+                      1, /*tid*/
                       0,
                       0, /*protocol id*/
                       0,
@@ -204,7 +204,7 @@ static void check_write_bit(uint8_t value1) {
   ASSERT_EQ(ret, RET_OK);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id
@@ -231,7 +231,7 @@ static void check_write_register(uint16_t value1) {
   uint16_t addr = 0x1234;
   uint8_t in[1024] = {
       0,
-      2, /*tid*/
+      1, /*tid*/
       0,
       0, /*protocol id*/
       0,
@@ -250,7 +250,7 @@ static void check_write_register(uint16_t value1) {
   ASSERT_EQ(ret, RET_OK);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id
@@ -276,7 +276,7 @@ TEST(modbus, write_register) {
 static void check_write_bits(uint8_t* value1, uint16_t num_bits) {
   uint16_t addr = 0x1234;
   uint8_t in[1024] = {0,
-                      2, /*tid*/
+                      1, /*tid*/
                       0,
                       0, /*protocol id*/
                       0,
@@ -297,7 +297,7 @@ static void check_write_bits(uint8_t* value1, uint16_t num_bits) {
   ASSERT_EQ(ret, RET_OK);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id
@@ -327,7 +327,7 @@ static void check_write_registers(uint16_t* value1, uint16_t num_registers) {
   uint16_t addr = 0x1234;
   uint8_t in[1024] = {
       0,
-      2, /*tid*/
+      1, /*tid*/
       0,
       0, /*protocol id*/
       0,
@@ -348,7 +348,7 @@ static void check_write_registers(uint16_t* value1, uint16_t num_registers) {
   ASSERT_EQ(ret, RET_OK);
 
   ASSERT_EQ(out[0], 0);
-  ASSERT_EQ(out[1], 2);  //tid
+  ASSERT_EQ(out[1], 1);  //tid
 
   ASSERT_EQ(out[2], 0);
   ASSERT_EQ(out[3], 0);  //protocol id

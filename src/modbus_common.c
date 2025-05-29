@@ -87,7 +87,7 @@ ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_prot
 
   common->io = io;
   common->proto = proto;
-  common->transaction_id = 1;
+  common->transaction_id = 0;
   common->read_timeout = MODBUS_READ_TIMEOUT;
   common->write_timeout = MODBUS_WRITE_TIMEOUT;
   common->wbuffer = wb;
@@ -290,11 +290,22 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
   }
 }
 
+static ret_t modbus_common_update_transaction_id(modbus_common_t* common) {
+  return_value_if_fail(common != NULL, RET_BAD_PARAMS);
+  /* Increase transaction ID */
+  if (common->transaction_id < UINT16_MAX) {
+    common->transaction_id++;
+  } else {
+    common->transaction_id = 0;
+  }
+  return RET_OK;
+}
+
 ret_t modbus_common_send_read_req(modbus_common_t* common, uint16_t func_code, uint16_t addr,
                                   uint16_t count) {
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
 
-  common->transaction_id++;
+  modbus_common_update_transaction_id(common);
   modbus_common_pack_header(common, func_code, 4);
   modbus_common_pack_uint16(common, addr);
   modbus_common_pack_uint16(common, count);
@@ -420,7 +431,7 @@ static ret_t modbus_common_send_write_single_req(modbus_common_t* common, uint8_
                                                  uint16_t addr, uint16_t value) {
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
 
-  common->transaction_id++;
+  modbus_common_update_transaction_id(common);
   modbus_common_pack_header(common, func_code, 4);
   modbus_common_pack_uint16(common, addr);
   modbus_common_pack_uint16(common, value);
@@ -455,7 +466,7 @@ static ret_t modbus_common_send_write_multi_req(modbus_common_t* common, uint8_t
   uint32_t bytes = is_write_bits ? modbus_bits_to_bytes(count) : count * 2;
   return_value_if_fail(common != NULL && common->io != NULL, RET_BAD_PARAMS);
 
-  common->transaction_id++;
+  modbus_common_update_transaction_id(common);
   modbus_common_pack_header(common, func_code, bytes + 5);
   modbus_common_pack_uint16(common, addr);
   modbus_common_pack_uint16(common, count);
@@ -494,7 +505,7 @@ ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common) {
 ret_t modbus_common_send_write_and_read_registers_req(modbus_common_t* common, uint16_t write_addr,
                                                       uint16_t write_nb, const uint16_t* src,
                                                       uint16_t read_addr, uint16_t read_nb) {
-  common->transaction_id++;
+  modbus_common_update_transaction_id(common);
   modbus_common_pack_header(common, MODBUS_FC_WRITE_AND_READ_REGISTERS, 8 + write_nb * 2 + 1);
   modbus_common_pack_uint16(common, read_addr);
   modbus_common_pack_uint16(common, read_nb);
@@ -582,7 +593,6 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     wbuffer_skip(wb, sizeof(header));
     func_code = header.func_code;
     return_value_if_fail(header.protocol_id == 0, RET_FAIL);
-    return_value_if_fail(header.transaction_id > common->transaction_id || header.transaction_id == 0, RET_FAIL);
     common->transaction_id = header.transaction_id;
     req_data->slave = header.unit_id;
   } else {
