@@ -56,6 +56,7 @@ static void* thread_server_func(void* ctx) {
 
 static int s_connected = 0;
 static int s_ended = 0;
+static modbus_service_t* s_service = NULL;
 
 static ret_t modbus_service_on_disconnected(modbus_service_t* service, void* ctx) {
   s_ended++;
@@ -64,6 +65,7 @@ static ret_t modbus_service_on_disconnected(modbus_service_t* service, void* ctx
 
 static ret_t modbus_service_on_connected(modbus_service_t* service, void* ctx) {
   s_connected++;
+  s_service = service;
   service->on_disconnected = modbus_service_on_disconnected;
   return RET_OK;
 }

@@ -616,3 +616,91 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
   modbus_memory_destroy(args.memory);
   modbus_client_destroy(client);
 }
+
+TEST(modbus_client_channel, statistics) {
+  uint32_t i = 0;
+  uint16_t* w = NULL;
+  uint16_t* r = NULL;
+  uint8_t slave = 0xFF;
+  uint32_t ret_index = 0;
+  modbus_service_args_t args;
+  memset(&args, 0x0, sizeof(modbus_service_args_t));
+  args.slave = slave;
+  args.proto = MODBUS_PROTO_TCP;
+  args.memory = modbus_memory_default_create_foo();
+  args.on_connected = modbus_service_on_connected;
+  s_connected = 0;
+  s_ended = 0;
+
+  tk_thread_t* thread = tk_thread_create(thread_server_func, &args);
+  running = TRUE;
+  tk_thread_start(thread);
+  sleep_ms(1000);
+  modbus_client_t* client = modbus_client_create("tcp://localhost:2502");
+  sleep_ms(500);
+  modbus_client_channel_t* write_bits =
+      modbus_client_channel_create_with_json("file://./tests/testdata/write_bits.json");
+  modbus_client_channel_t* read_bits =
+      modbus_client_channel_create_with_json("file://./tests/testdata/read_bits.json");
+  modbus_client_channel_t* write_registers =
+      modbus_client_channel_create_with_json("file://./tests/testdata/write_registers.json");
+  modbus_client_channel_t* read_registers =
+      modbus_client_channel_create_with_json("file://./tests/testdata/read_registers.json");
+
+  modbus_client_set_slave(client, slave);
+  modbus_client_channel_set_client(write_bits, client);
+  modbus_client_channel_set_client(read_bits, client);
+  modbus_client_channel_set_client(write_registers, client);
+  modbus_client_channel_set_client(read_registers, client);
+
+  modbus_client_channel_set_unit_id(write_bits, slave);
+  modbus_client_channel_set_unit_id(read_bits, slave);
+  modbus_client_channel_set_unit_id(write_registers, slave);
+  modbus_client_channel_set_unit_id(read_registers, slave);
+
+  ASSERT_EQ(s_service->num_msg_recv, 0);
+  ASSERT_EQ(s_service->num_msg_reply, 0);
+  ASSERT_EQ(s_service->num_except_reply, 0);
+  ASSERT_EQ(s_service->num_read_requests, 0);
+  ASSERT_EQ(s_service->num_write_requests, 0);
+
+  ASSERT_EQ(modbus_client_channel_write(write_bits), RET_OK);
+  ASSERT_EQ(s_service->num_msg_recv, 1);
+  ASSERT_EQ(s_service->num_msg_reply, 1);
+  ASSERT_EQ(s_service->num_except_reply, 0);
+  ASSERT_EQ(s_service->num_read_requests, 0);
+  ASSERT_EQ(s_service->num_write_requests, 1);
+
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
+  ASSERT_EQ(s_service->num_msg_recv, 2);
+  ASSERT_EQ(s_service->num_msg_reply, 2);
+  ASSERT_EQ(s_service->num_except_reply, 0);
+  ASSERT_EQ(s_service->num_read_requests, 1);
+  ASSERT_EQ(s_service->num_write_requests, 1);
+
+  ASSERT_EQ(modbus_client_channel_write(write_registers), RET_OK);
+  ASSERT_EQ(s_service->num_msg_recv, 3);
+  ASSERT_EQ(s_service->num_msg_reply, 3);
+  ASSERT_EQ(s_service->num_except_reply, 0);
+  ASSERT_EQ(s_service->num_read_requests, 1);
+  ASSERT_EQ(s_service->num_write_requests, 2);
+
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
+  ASSERT_EQ(s_service->num_msg_recv, 4);
+  ASSERT_EQ(s_service->num_msg_reply, 4);
+  ASSERT_EQ(s_service->num_except_reply, 0);
+  ASSERT_EQ(s_service->num_read_requests, 2);
+  ASSERT_EQ(s_service->num_write_requests, 2);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(s_connected, 1);
+  ASSERT_EQ(s_ended, 1);
+  modbus_client_channel_destroy(write_bits);
+  modbus_client_channel_destroy(read_bits);
+  modbus_client_channel_destroy(write_registers);
+  modbus_client_channel_destroy(read_registers);
+  modbus_memory_destroy(args.memory);
+  modbus_client_destroy(client);
+}
