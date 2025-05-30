@@ -65,7 +65,7 @@ ret_t application_init(void) {
     memory = modbus_memory_default_create_test();
   }
 
-  socket_init();
+  tk_socket_init();
   main_window_create();
   s_memory = memory;
 
@@ -81,7 +81,7 @@ ret_t application_init(void) {
 }
 
 ret_t application_exit(void) {
-  socket_deinit();
+  tk_socket_deinit();
   modbus_memory_destroy(s_memory);
 
   return RET_OK;

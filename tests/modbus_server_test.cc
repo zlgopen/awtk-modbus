@@ -35,7 +35,7 @@ TEST(modbus, server_tcp_init) {
   modbus_memory_t* memory = modbus_memory_default_create_test();
   event_source_manager_t* esm = event_source_manager_default_create();
 
-  socket_init();
+  tk_socket_init();
 
   const char* url = "tcp://localhost:502";
   ASSERT_EQ(modbus_service_start(esm, memory, url), RET_OK);
@@ -53,7 +53,7 @@ TEST(modbus, server_tcp_init_by_args) {
   modbus_memory_t* memory = modbus_memory_default_create_test();
   event_source_manager_t* esm = event_source_manager_default_create();
 
-  socket_init();
+  tk_socket_init();
 
   const char* url = "tcp://localhost:502";
   modbus_service_args_t args1;
@@ -92,7 +92,7 @@ TEST(modbus, server_rtu_init) {
   modbus_memory_t* memory = modbus_memory_default_create_test();
   event_source_manager_t* esm = event_source_manager_default_create();
 
-  socket_init();
+  tk_socket_init();
 
   const char* url = "serial://COM1?baudrate=115200";
   ASSERT_EQ(modbus_service_start(esm, memory, url), RET_OK);
@@ -109,7 +109,7 @@ TEST(modbus, server_rtu_init_by_args) {
   modbus_memory_t* memory = modbus_memory_default_create_test();
   event_source_manager_t* esm = event_source_manager_default_create();
 
-  socket_init();
+  tk_socket_init();
 
   const char* url = "serial://COM9?baudrate=115200";
   modbus_service_args_t args1;

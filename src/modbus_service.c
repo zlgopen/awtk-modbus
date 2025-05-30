@@ -228,7 +228,7 @@ ret_t modbus_service_attach_to_event_source_manager(modbus_service_t* service,
   int fd = tk_object_get_prop_int(TK_OBJECT(service->common.io), TK_STREAM_PROP_FD, -1);
   event_source_t* source = event_source_fd_create(fd, service_on_request, service);
   event_source_manager_add(esm, source);
-  OBJECT_UNREF(source);
+  TK_OBJECT_UNREF(source);
 
   return RET_OK;
 }
