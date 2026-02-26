@@ -41,6 +41,11 @@ typedef struct _modbus_service_args_t {
   const wchar_t* ifname;
   void* ctx;
   modbus_service_on_connected_t on_connected;
+
+  /* tcp prop */
+  int keep_idle;
+  int keep_interval;
+  int keep_count;
 } modbus_service_args_t;
 
 /**

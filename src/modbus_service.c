@@ -21,6 +21,7 @@
 
 #include "modbus_service.h"
 #include "tkc/event_source_fd.h"
+#include "streams/inet/iostream_tcp.h"
 
 BEGIN_C_DECLS
 
@@ -297,5 +298,10 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
     }
   }
   modbus_service_set_slave(service, service_args->slave);
+  if (service_args->proto == MODBUS_PROTO_TCP) {
+    if (service_args->keep_idle > 0 && service_args->keep_interval > 0 && service_args->keep_count > 0) {
+      tk_iostream_tcp_set_tcp_keep_info(io, service_args->keep_idle, service_args->keep_interval, service_args->keep_count);
+    }
+  }
   return (tk_service_t*)service;
 }
