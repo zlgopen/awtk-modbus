@@ -145,7 +145,7 @@ typedef struct _modbus_client_t {
  * * baudrate {int} 波特率。常用值： 9600, 38400, 57600, 115200。(默认值：115200)
  * * stopbits {string} 停止位。可选值：1, 1.5, 2。(默认值：1)
  * * parity {string} 校验位。可选值：none, odd, even, mark, space。(默认值：none)
- * * flowcontrol {string} 流控。可选值：none, hardware, software。(默认值：none)
+ * * flowcontrol {string} 流控。可选值：none, hard, soft。(默认值：none)
  * * bytesize {string} 数据位。可选值：5, 6, 7, 8 。(默认值：8) 
  * 
  * > 示例：
