@@ -159,12 +159,12 @@ TEST(modbus, memory) {
 
   ASSERT_EQ(modbus_memory_read_registers(memory, REGISTERS_START, MODBUS_MAX_READ_REGISTERS, registers_data),
             RET_OK);
-  ASSERT_EQ(registers_data[0], 0x3412);
-  ASSERT_EQ(registers_data[1], 0x7856);
-  ASSERT_EQ(registers_data[2], 0xbc9a);
-  ASSERT_EQ(registers_data[3], 0xf0de);
-  ASSERT_EQ(registers_data[4], 0x3412);
-  ASSERT_EQ(registers_data[5], 0x7856);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[0]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[1]), 0x5678);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[2]), 0x9abc);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[3]), 0xdef0);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[4]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(registers_data[5]), 0x5678);
 
   registers_data[0] = 0x1234;
   registers_data[1] = 0x5678;
@@ -175,18 +175,18 @@ TEST(modbus, memory) {
 
   ASSERT_EQ(modbus_memory_write_registers(memory, REGISTERS_START, 6, registers_data), RET_OK);
 
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[0], 0x3412);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[1], 0x7856);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[2], 0xbc9a);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[3], 0xf0de);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[4], 0x3412);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[5], 0x7856);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[0]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[1]), 0x5678);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[2]), 0x9abc);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[3]), 0xdef0);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[4]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[5]), 0x5678);
 
   ASSERT_EQ(modbus_memory_write_register(memory, REGISTERS_START + 1, 0x1234), RET_OK);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[1], 0x3412);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[1]), 0x1234);
 
   ASSERT_EQ(modbus_memory_write_register(memory, REGISTERS_START + 5, 0x1234), RET_OK);
-  ASSERT_EQ(((uint16_t*)memory_default->registers->data)[5], 0x3412);
+  ASSERT_EQ(uint16_from_big_endian(((uint16_t*)memory_default->registers->data)[5]), 0x1234);
 
   ((uint16_t*)memory_default->input_registers->data)[0] = 0x1234;
   ((uint16_t*)memory_default->input_registers->data)[1] = 0x5678;
@@ -197,12 +197,12 @@ TEST(modbus, memory) {
   ASSERT_EQ(modbus_memory_read_input_registers(memory, INPUT_REGISTERS_START, MODBUS_MAX_READ_REGISTERS,
                                                input_registers_data),
             RET_OK);
-  ASSERT_EQ(input_registers_data[0], 0x3412);
-  ASSERT_EQ(input_registers_data[1], 0x7856);
-  ASSERT_EQ(input_registers_data[2], 0xbc9a);
-  ASSERT_EQ(input_registers_data[3], 0xf0de);
-  ASSERT_EQ(input_registers_data[4], 0x3412);
-  ASSERT_EQ(input_registers_data[5], 0x7856);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[0]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[1]), 0x5678);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[2]), 0x9abc);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[3]), 0xdef0);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[4]), 0x1234);
+  ASSERT_EQ(uint16_from_big_endian(input_registers_data[5]), 0x5678);
 
   modbus_memory_destroy(memory);
 }

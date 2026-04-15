@@ -375,3 +375,110 @@ TEST(modbus, write_registers) {
   check_write_registers(data, 3);
   check_write_registers(data, 4);
 }
+
+TEST(modbus, rtu_write_registers_crc) {
+  const uint16_t addr = 0x1234;
+  const uint16_t num_registers = 0x0002;
+  const uint16_t data[] = {0x1234, 0x5678};
+  const uint8_t slave = 0x01;
+  uint8_t in[1024] = {
+    slave,
+    MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
+    addr >> 8,
+    addr & 0xff,
+    num_registers >> 8,
+    num_registers & 0xff,
+    0x05, // crc
+    0x7e
+  };
+
+  uint8_t out[1024] = {0};
+  const uint8_t bytes = num_registers * 2;
+
+  tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
+  modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+  modbus_client_set_slave(client, slave);
+  modbus_client_set_retry_times(client, 1);
+  ret_t ret = modbus_client_write_registers(client, addr, num_registers, data);
+  ASSERT_EQ(ret, RET_OK);
+
+  ASSERT_EQ(out[0], slave);
+
+  ASSERT_EQ(out[1], MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS);
+
+  ASSERT_EQ(out[2], addr >> 8);
+  ASSERT_EQ(out[3], addr & 0xff);
+  ASSERT_EQ(out[4], num_registers >> 8);
+  ASSERT_EQ(out[5], num_registers & 0xff);
+  ASSERT_EQ(out[6], bytes);
+
+  ASSERT_EQ(out[7], data[0] >> 8);
+  ASSERT_EQ(out[8], data[0] & 0xff);
+
+  ASSERT_EQ(out[9], data[1] >> 8);
+  ASSERT_EQ(out[10], data[1] & 0xff);
+  
+  ASSERT_EQ(out[11], 0x5e); //crc
+  ASSERT_EQ(out[12], 0xdc);
+
+
+  modbus_client_destroy(client);
+}
+
+TEST(modbus, rtu_write_registers_crc_error1) {
+  const uint16_t addr = 0x1234;
+  const uint16_t num_registers = 0x0002;
+  const uint16_t data[] = {0x1234, 0x5678};
+  const uint8_t slave = 0x01;
+  // CRC本身错误
+  uint8_t in[1024] = {
+    slave,
+    MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
+    addr >> 8,
+    addr & 0xff,
+    num_registers >> 8,
+    num_registers & 0xff,
+    0x4d, // 从站CRC计算错误
+    0x05
+  };
+
+  uint8_t out[1024] = {0};
+
+  tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
+  modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+  modbus_client_set_slave(client, slave);
+  modbus_client_set_retry_times(client, 1);
+  ret_t ret = modbus_client_write_registers(client, addr, num_registers, data);
+  ASSERT_EQ(ret, RET_CRC);
+
+  modbus_client_destroy(client);
+}
+
+TEST(modbus, rtu_write_registers_crc_error2) {
+  const uint16_t addr = 0x1234;
+  const uint16_t num_registers = 0x0002;
+  const uint16_t data[] = {0x1234, 0x5678};
+  const uint8_t slave = 0x01;
+  // 数据传输过程中错误
+  uint8_t in[1024] = {
+    slave,
+    MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
+    addr >> 8,
+    addr & 0xff,
+    (num_registers >> 8) ^ 1, // 数据传输过程中bit0发生反转
+    num_registers & 0xff,
+    0x05, // crc
+    0x7e
+  };
+
+  uint8_t out[1024] = {0};
+
+  tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
+  modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_RTU);
+  modbus_client_set_slave(client, slave);
+  modbus_client_set_retry_times(client, 1);
+  ret_t ret = modbus_client_write_registers(client, addr, num_registers, data);
+  ASSERT_EQ(ret, RET_CRC);
+
+  modbus_client_destroy(client);
+}

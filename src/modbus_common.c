@@ -43,6 +43,7 @@ static ret_t modbus_common_write_crc16(modbus_common_t* common) {
   uint16_t crc = 0;
   return_value_if_fail(common != NULL && common->wbuffer != NULL, RET_BAD_PARAMS);
   crc = tk_crc16_modbus(common->wbuffer->data, common->wbuffer->cursor);
+  crc = uint16_to_little_endian(crc);
 
   return wbuffer_write_uint16(common->wbuffer, crc);
 }
@@ -134,6 +135,8 @@ static ret_t modbus_common_check_crc(modbus_common_t* common, const uint8_t* dat
     uint16_t get_crc = 0;
     uint16_t calc_crc = tk_crc16_modbus(data, size);
     int32_t len = modbus_common_read_len(common, (uint8_t*)&get_crc, 2);
+
+    get_crc = uint16_from_little_endian(get_crc);
 
     return (len != 2 || get_crc != calc_crc) ? RET_CRC : RET_OK;
   }

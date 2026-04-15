@@ -36,14 +36,14 @@ TEST(modbus, server_channel_bits) {
 
 TEST(modbus, server_channel_registers) {
     uint32_t i = 0;
-    uint16_t buff[16];
-    uint16_t data[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0xa121, 0xa212, 0xb331, 0xc411, 0xd532, 0xe612};
+    uint16_t buff[17];
+    uint16_t data[17] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0xa121, 0x21a1, 0xa212, 0xb331, 0xc411, 0xd532, 0xe612};
     uint32_t registers = ARRAY_SIZE(data);
     modbus_server_channel_t *channel = modbus_server_channel_create("registers", 100, 300, TRUE);
 
     for(i = 0; i < registers; i++) {
       ASSERT_EQ(modbus_server_channel_write_register(channel, channel->start + i, data[i]), RET_OK);
-      ASSERT_EQ(*(((uint16_t *)channel->data) + i), int16_to_big_endian(data[i]));
+      ASSERT_EQ(*(((uint16_t *)channel->data) + i), uint16_to_big_endian(data[i]));
     }
 
     ASSERT_EQ(modbus_server_channel_read_registers(channel, channel->start, registers, buff), RET_OK);
