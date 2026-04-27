@@ -179,7 +179,7 @@ ret_t modbus_client_set_retry_times(modbus_client_t* client, uint32_t retry_time
  * @method modbus_client_set_response_timeout
  * 设置数据帧应答超时时间。
  * @param {modbus_client_t*} client modbus client对象。
- * @param {uint32_t} response_timeout 数据帧应答超时时间。(单位：us)
+ * @param {uint32_t} response_timeout 数据帧应答超时时间。
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_client_set_response_timeout(modbus_client_t* client, uint32_t response_timeout);
@@ -188,7 +188,7 @@ ret_t modbus_client_set_response_timeout(modbus_client_t* client, uint32_t respo
  * @method modbus_client_set_frame_gap_time
  * 设置数据帧帧间隔时间。
  * @param {modbus_client_t*} client modbus client对象。
- * @param {uint32_t} response_timeout 数据帧应答超时时间。
+ * @param {uint32_t} frame_gap_time 帧间间隔时间。(单位：us)
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_client_set_frame_gap_time(modbus_client_t* client, uint32_t frame_gap_time);
