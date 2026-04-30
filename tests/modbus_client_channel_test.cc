@@ -19,7 +19,7 @@ TEST(modbus_client_channel, read_bits) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/read_bits.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "read_bits");
@@ -42,7 +42,7 @@ TEST(modbus_client_channel, read_input_bits) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/read_input_bits.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "read_input_bits");
@@ -65,7 +65,7 @@ TEST(modbus_client_channel, read_registers) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/read_registers.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 2);
   ASSERT_STREQ(channel->name, "read_registers");
@@ -88,7 +88,7 @@ TEST(modbus_client_channel, read_input_registers) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/read_input_registers.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 2);
   ASSERT_STREQ(channel->name, "read_input_registers");
@@ -111,7 +111,7 @@ TEST(modbus_client_channel, write_1_bit) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/write_1_bit.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "write_1_bit");
@@ -133,7 +133,7 @@ TEST(modbus_client_channel, write_bits) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/write_bits.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "write_bits");
@@ -155,7 +155,7 @@ TEST(modbus_client_channel, write_1_register) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/write_1_register.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
 
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "write_1_register");
@@ -176,7 +176,7 @@ TEST(modbus_client_channel, write_1_register) {
 TEST(modbus_client_channel, write_registers) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/write_registers.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
-  return_if_fail(conf != NULL);
+  ASSERT_EQ(conf != NULL, true);
   modbus_client_channel_t* channel = modbus_client_channel_create(conf->root);
   ASSERT_EQ(channel->unit_id, 1);
   ASSERT_STREQ(channel->name, "write_registers");
@@ -618,11 +618,7 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
 }
 
 TEST(modbus_client_channel, statistics) {
-  uint32_t i = 0;
-  uint16_t* w = NULL;
-  uint16_t* r = NULL;
   uint8_t slave = 0xFF;
-  uint32_t ret_index = 0;
   modbus_service_args_t args;
   memset(&args, 0x0, sizeof(modbus_service_args_t));
   args.slave = slave;

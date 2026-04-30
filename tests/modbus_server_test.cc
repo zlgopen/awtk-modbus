@@ -56,7 +56,7 @@ TEST(modbus, server_tcp_init_by_args) {
   tk_socket_init();
 
   const char* url = "tcp://localhost:502";
-  modbus_service_args_t args1;
+  modbus_service_args_t args1 = {};
   args1.memory = memory;
   args1.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
   args1.slave = MODBUS_DEMO_SLAVE_ID;
@@ -64,7 +64,7 @@ TEST(modbus, server_tcp_init_by_args) {
   ASSERT_EQ(esm->sources.size, 1);
 
   url = "tcp://localhost:503";
-  modbus_service_args_t args2;
+  modbus_service_args_t args2 = {};
   args2.memory = memory;
   args2.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
   args2.slave = MODBUS_DEMO_SLAVE_ID;
@@ -73,7 +73,7 @@ TEST(modbus, server_tcp_init_by_args) {
 #if 0
   // 指定网卡启动 modbus 服务
   url = "tcp://localhost:503";
-  modbus_service_args_t args3;
+  modbus_service_args_t args3 = {};
   args3.memory = memory;
   args3.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
   args3.slave = MODBUS_DEMO_SLAVE_ID;
@@ -112,7 +112,7 @@ TEST(modbus, server_rtu_init_by_args) {
   tk_socket_init();
 
   const char* url = "serial://COM9?baudrate=115200";
-  modbus_service_args_t args1;
+  modbus_service_args_t args1 = {};
   args1.memory = memory;
   args1.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
   args1.slave = MODBUS_DEMO_SLAVE_ID;
@@ -120,7 +120,7 @@ TEST(modbus, server_rtu_init_by_args) {
   ASSERT_EQ(esm->sources.size, 1);
 
   url = "serial://COM7?baudrate=115200";
-  modbus_service_args_t args2;
+  modbus_service_args_t args2 = {};
   args2.memory = memory;
   args2.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;;
   args2.slave = MODBUS_DEMO_SLAVE_ID;

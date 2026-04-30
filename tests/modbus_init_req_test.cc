@@ -6,7 +6,7 @@
 TEST(modbus_init_req, init5) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/init_5.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
-  return_if_fail(conf);
+  ASSERT_EQ(conf != NULL, true);
   modbus_init_req_t* init = modbus_init_req_create(conf->root);
 
   ASSERT_EQ(init->access_type, 5);
@@ -22,7 +22,7 @@ TEST(modbus_init_req, init5) {
 TEST(modbus_init_req, init15) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/init_15.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
-  return_if_fail(conf);
+  ASSERT_EQ(conf != NULL, true);
   modbus_init_req_t* init = modbus_init_req_create(conf->root);
 
   ASSERT_EQ(init->access_type, 15);
@@ -38,7 +38,7 @@ TEST(modbus_init_req, init15) {
 TEST(modbus_init_req, init6) {
   tk_object_t* obj = conf_json_load("file://./tests/testdata/init_6.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
-  return_if_fail(conf);
+  ASSERT_EQ(conf != NULL, true);
   modbus_init_req_t* init = modbus_init_req_create(conf->root);
 
   ASSERT_EQ(init->access_type, 6);
@@ -53,9 +53,9 @@ TEST(modbus_init_req, init6) {
 
 
 TEST(modbus_init_req, init16) {
-  tk_object_t* obj = conf_json_load("file://./tests/testdata/16.json", FALSE);
+  tk_object_t* obj = conf_json_load("file://./tests/testdata/init_16.json", FALSE);
   conf_doc_t* conf = conf_obj_get_doc(obj);
-  return_if_fail(conf);
+  ASSERT_EQ(conf != NULL, true);
   modbus_init_req_t* init = modbus_init_req_create(conf->root);
 
   ASSERT_EQ(init->access_type, 16);
