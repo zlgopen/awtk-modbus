@@ -51,7 +51,7 @@ typedef ret_t (*modbus_memory_destroy_t)(modbus_memory_t* memory);
  * 
  * modbus memory接口。
  */
-typedef struct _modbus_memory_t {
+struct _modbus_memory_t {
   modbus_memory_read_bits_t read_bits;
   modbus_memory_read_input_bits_t read_input_bits;
   modbus_memory_read_registers_t read_registers;
@@ -61,7 +61,7 @@ typedef struct _modbus_memory_t {
   modbus_memory_write_bits_t write_bits;
   modbus_memory_write_registers_t write_registers;
   modbus_memory_destroy_t destroy;
-} modbus_memory_t;
+};
 
 /**
  * @method modbus_memory_read_bits

@@ -22,6 +22,12 @@
 #include "tkc/crc.h"
 #include "tkc/time_now.h"
 #include "modbus_common.h"
+
+/* log.h (MSVC) expands log_* to printf; link UCRT stdio shim (see CMakeLists). */
+#ifdef _MSC_VER
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+#endif
+
 #define MODBUS_MAX_PAYLOAD 1024
 
 static ret_t modbus_common_pack_uint16(modbus_common_t* common, uint16_t value) {
