@@ -27,7 +27,12 @@ set_target_properties(modbus PROPERTIES
 )
 
 if(WIN32)
-  target_sources(modbus PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/modbus.def")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/modbus.def")
+    target_sources(modbus PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/modbus.def")
+  else()
+    # SCons expects src/modbus.def but it may be absent from VCS; MSVC needs exports or there is no modbus.lib.
+    set_target_properties(modbus PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  endif()
 endif()
 
 target_include_directories(modbus PUBLIC
