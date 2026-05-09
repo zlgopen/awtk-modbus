@@ -60,6 +60,7 @@ static ret_t modbus_client_init_with_io(modbus_client_t* client, tk_iostream_t* 
   modbus_common_init(&client->common, io, proto, &(client->client.wb));
   modbus_client_set_retry_times(client, retry_times);
   client->is_connected = TRUE;
+  client->auto_reconnect = TRUE;
   return RET_OK;
 }
 
@@ -189,12 +190,16 @@ static void modbus_client_check_connect_status(modbus_client_t* client, ret_t re
 static ret_t modbus_client_check_and_auto_connect(modbus_client_t* client) {
   if (client->is_connected) {
     return RET_OK;
-  } else {
-    modbus_common_t* common = MODBUS_COMMON(client);
-    tk_iostream_t* io = modbus_client_create_iostream(client->url);
-    return_value_if_fail(io != NULL, RET_IO);
-    return modbus_client_init(client, client->url, io, common->slave, client->retry_times);
   }
+  
+  if (!client->auto_reconnect) {
+    return RET_IO;
+  }
+  
+  modbus_common_t* common = MODBUS_COMMON(client);
+  tk_iostream_t* io = modbus_client_create_iostream(client->url);
+  return_value_if_fail(io != NULL, RET_IO);
+  return modbus_client_init(client, client->url, io, common->slave, client->retry_times);
 }
 
 static ret_t modbus_client_read_bits_ex(modbus_client_t* client, uint16_t func_code, uint16_t addr,

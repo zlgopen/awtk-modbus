@@ -390,6 +390,7 @@ TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
   for (i = 0; i < write_bits->write_buffer_length / 2; i++) {
     w[i] = i;
   }
+  // ====== 开启自动重连 ======
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
   modbus_client_channel_set_unit_id(write_bits, slave);
@@ -417,6 +418,33 @@ TEST(modbus_client_channel, with_server_bits_auto_reconnect) {
   tk_thread_start(thread);
   sleep_ms(1000);
 
+  memset(read_bits->read_buffer, 0x0, read_bits->read_buffer_length);
+  ASSERT_EQ(modbus_client_channel_write(write_bits), RET_OK);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
+
+  r = (uint16_t*)read_bits->read_buffer;
+  for (i = 0; i < read_bits->read_buffer_length / 2; i++) {
+    ASSERT_EQ(r[i], i);
+  }
+
+  // ====== 关闭自动重连 ======
+  modbus_client_set_auto_reconnect(client, FALSE);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_write(write_bits), RET_IO);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_IO);
+
+  thread = tk_thread_create(thread_server_func, &args);
+  running = TRUE;
+  tk_thread_start(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_write(write_bits), RET_IO);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_IO);
+
+  // ====== 开启自动重连 ======
+  modbus_client_set_auto_reconnect(client, TRUE);
   memset(read_bits->read_buffer, 0x0, read_bits->read_buffer_length);
   ASSERT_EQ(modbus_client_channel_write(write_bits), RET_OK);
   ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
@@ -460,7 +488,7 @@ TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
   for (i = 0; i < write_registers->write_buffer_length / 2; i++) {
     w[i] = i;
   }
-
+  // ====== 开启自动重连 ======
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
   modbus_client_channel_set_unit_id(write_registers, slave);
@@ -497,6 +525,33 @@ TEST(modbus_client_channel, with_server_registers_auto_reconnect) {
     ASSERT_EQ(r[i], i);
   }
 
+  // ====== 关闭自动重连 ======
+  modbus_client_set_auto_reconnect(client, FALSE);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_write(write_registers), RET_IO);
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_IO);
+
+  thread = tk_thread_create(thread_server_func, &args);
+  running = TRUE;
+  tk_thread_start(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_write(write_registers), RET_IO);
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_IO);
+
+  // ====== 开启自动重连 ======
+  modbus_client_set_auto_reconnect(client, TRUE);
+  memset(read_registers->read_buffer, 0x0, read_registers->read_buffer_length); 
+  ASSERT_EQ(modbus_client_channel_write(write_registers), RET_OK);
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
+
+  r = (uint16_t*)read_registers->read_buffer;
+  for (i = 0; i < read_registers->read_buffer_length / 2; i++) {
+    ASSERT_EQ(r[i], i);
+  }
+
   running = FALSE;
   tk_thread_destroy(thread);
   sleep_ms(1000);
@@ -524,6 +579,7 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
   modbus_client_channel_t* read_bits =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_bits_6000.json");
 
+  // ====== 开启自动重连 ======
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
   modbus_client_channel_set_unit_id(read_bits, slave);
@@ -546,6 +602,29 @@ TEST(modbus_client_channel, with_server_input_bits_auto_reconnect) {
   tk_thread_start(thread);
   sleep_ms(1000);
 
+  memset(read_bits->read_buffer, 0x0, read_bits->read_buffer_length);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
+  r = (uint16_t*)read_bits->read_buffer;
+  for (i = 0; i < read_bits->read_buffer_length / 2; i++) {
+    ASSERT_EQ(r[i], i);
+  }
+
+  // ====== 关闭自动重连 ======
+  modbus_client_set_auto_reconnect(client, FALSE);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_IO);
+
+  thread = tk_thread_create(thread_server_func, &args);
+  running = TRUE;
+  tk_thread_start(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_read(read_bits), RET_IO);
+
+  // ====== 开启自动重连 ======
+  modbus_client_set_auto_reconnect(client, TRUE);
   memset(read_bits->read_buffer, 0x0, read_bits->read_buffer_length);
   ASSERT_EQ(modbus_client_channel_read(read_bits), RET_OK);
   r = (uint16_t*)read_bits->read_buffer;
@@ -579,6 +658,7 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
   modbus_client_channel_t* read_registers =
       modbus_client_channel_create_with_json("file://./tests/testdata/read_input_registers_1000.json");
 
+  // ====== 开启自动重连 ======
   modbus_client_set_auto_reconnect(client, TRUE);
   modbus_client_set_slave(client, slave);
   modbus_client_channel_set_unit_id(read_registers, slave);
@@ -602,6 +682,30 @@ TEST(modbus_client_channel, with_server_input_registers_auto_reconnect) {
   tk_thread_start(thread);
   sleep_ms(1000);
 
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
+
+  r = (uint16_t*)read_registers->read_buffer;
+  for (i = 0; i < read_registers->read_buffer_length / 2; i++) {
+    ASSERT_EQ(r[i], i * 2);
+  }
+
+  // ====== 关闭自动重连 ======
+  modbus_client_set_auto_reconnect(client, FALSE);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_IO);
+
+  thread = tk_thread_create(thread_server_func, &args);
+  running = TRUE;
+  tk_thread_start(thread);
+  sleep_ms(1000);
+  ASSERT_EQ(modbus_client_channel_read(read_registers), RET_IO);
+
+  // ====== 开启自动重连 ======
+  modbus_client_set_auto_reconnect(client, TRUE);
+  memset(read_registers->read_buffer, 0x0, read_registers->read_buffer_length);
   ASSERT_EQ(modbus_client_channel_read(read_registers), RET_OK);
 
   r = (uint16_t*)read_registers->read_buffer;
