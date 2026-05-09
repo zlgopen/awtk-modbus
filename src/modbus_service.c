@@ -67,23 +67,33 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
 
   ret = modbus_common_recv_req(MODBUS_COMMON(service), &req_data);
 
+  // 从站地址不匹配，跳过当前帧（返回时已清空缓冲区）
+  if (ret == RET_SKIP) {
+    service->num_msg_recv++;
+    ENSURE(req_data.slave != service->common.slave);
+#ifdef WITH_MULT_SLAVES
+    log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
+#else
+    log_debug("slave id not match: %d != %d\n", req_data.slave, service->common.slave);
+    if (RET_OK == modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code,
+                                                    MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS)) {
+      service->num_msg_reply++;
+      service->num_except_reply++;
+    }
+#endif
+    return RET_OK;
+  }
+
   if (ret == RET_EOS || ret == RET_IO) {
-    return RET_REMOVE;
+    if (!service->common.is_shared_transport) {
+      return RET_REMOVE;
+    }
+    goto shared_transport_error;
   }
 
   if (ret == RET_OK) {
     modbus_memory_t* memory = service->memory;
     service->num_msg_recv++;
-    if (req_data.slave != service->common.slave) {
-#ifdef WITH_MULT_SLAVES
-      log_debug("slave %d != %d, not send to me.\n", req_data.slave, service->common.slave);
-#else
-      log_debug("slave id not match: %d != %d\n", req_data.slave, service->common.slave);
-      modbus_common_send_exception_resp(MODBUS_COMMON(service), req_data.func_code,
-                                        MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS);
-#endif
-      return RET_OK;
-    }
 
     resp_data.addr = req_data.addr;
     resp_data.count = req_data.count;
@@ -185,6 +195,9 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
       if (ret == RET_OK) {
         service->num_msg_reply++;
       }
+      if (ret != RET_OK && service->common.is_shared_transport) {
+        goto shared_transport_error;
+      }
       return ret;
     }
   }
@@ -205,7 +218,15 @@ ret_t modbus_service_dispatch(modbus_service_t* service) {
     service->num_msg_reply++;
     service->num_except_reply++;
   }
+  if (ret != RET_OK && service->common.is_shared_transport) {
+    goto shared_transport_error;
+  }
   return ret;
+
+shared_transport_error:
+  log_debug("shared transport error, flush buffer and continue\n");
+  modbus_common_flush_read_buffer(MODBUS_COMMON(service));
+  return RET_OK;
 }
 
 static ret_t service_on_request(event_source_t* source) {
@@ -284,6 +305,14 @@ ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave) {
   return RET_OK;
 }
 
+ret_t modbus_service_set_shared_transport(modbus_service_t* service, bool_t is_shared_transport) {
+  return_value_if_fail(service != NULL, RET_BAD_PARAMS);
+
+  service->common.is_shared_transport = is_shared_transport;
+
+  return RET_OK;
+}
+
 tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
   modbus_service_t* service = NULL;
   modbus_service_args_t* service_args = (modbus_service_args_t*)args;
@@ -291,6 +320,7 @@ tk_service_t* modbus_service_create(tk_iostream_t* io, void* args) {
 
   service = modbus_service_create_with_io(io, service_args->proto, service_args->memory);
   return_value_if_fail(service != NULL, NULL);
+  service->common.is_shared_transport = service_args->is_shared_transport;
   if (service_args->on_connected != NULL) {
     if (service_args->on_connected(service, service_args->ctx) != RET_OK) {
       modbus_service_destroy(service);

@@ -41,6 +41,7 @@ typedef struct _modbus_service_args_t {
   const wchar_t* ifname;
   void* ctx;
   modbus_service_on_connected_t on_connected;
+  bool_t is_shared_transport; // 是共享资源（如串口），错误时不能直接断开，需要flush继续
 
   /* tcp prop */
   int keep_idle;
@@ -94,6 +95,15 @@ modbus_service_t* modbus_service_create_with_io(tk_iostream_t* io, modbus_proto_
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_service_set_slave(modbus_service_t* service, uint8_t slave);
+
+/**
+ * @method modbus_service_set_shared_transport
+ * 设置底层传输是否是共享资源。
+ * @param {modbus_service_t*} service modbus service对象。
+ * @param {bool_t} is_shared_transport 是否是共享资源（如串口），错误时不能直接断开，需要flush继续。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_service_set_shared_transport(modbus_service_t* service, bool_t is_shared_transport);
 
 /**
  * @method modbus_service_dispatch

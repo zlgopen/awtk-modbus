@@ -98,6 +98,7 @@ ret_t modbus_common_init(modbus_common_t* common, tk_iostream_t* io, modbus_prot
   common->read_timeout = MODBUS_READ_TIMEOUT;
   common->write_timeout = MODBUS_WRITE_TIMEOUT;
   common->wbuffer = wb;
+  common->is_shared_transport = FALSE;
 
   return RET_OK;
 }
@@ -150,78 +151,29 @@ static ret_t modbus_common_check_crc(modbus_common_t* common, const uint8_t* dat
   return RET_OK;
 }
 
-static ret_t modbus_common_read_rtu_header(modbus_common_t* common, modbus_rtu_header_t* header,
-                                      uint8_t expected_func_code) {
+// NOTE: 仅读取数据，不验证合法性
+static ret_t modbus_common_read_rtu_header(modbus_common_t* common, modbus_rtu_header_t* header) {
   int32_t ret = 0;
   uint8_t slave = 0;
   uint8_t func_code = 0;
-  int32_t cost_time = 0;
-  uint64_t start_time = time_now_ms();
   return_value_if_fail(common != NULL && header != NULL, RET_BAD_PARAMS);
 
-  do {
-    do {
-      ret = modbus_common_read_len(common, &slave, 1);
-      return_value_if_fail(ret == 1, RET_IO);
+  ret = modbus_common_read_len(common, &slave, 1);
+  return_value_if_fail(ret == 1, RET_IO);
 
-      if (slave == common->slave) {
-        break;
-      } else {
-        log_debug("skip invalid slave %d\n", slave);
-      }
-      cost_time = time_now_ms() - start_time;
-      if (cost_time > common->read_timeout) {
-        log_debug("read data timeout\n");
-        return RET_FAIL;
-      }
-    } while (1);
+  ret = modbus_common_read_len(common, &func_code, 1);
+  return_value_if_fail(ret == 1, RET_IO);
 
-    ret = modbus_common_read_len(common, &func_code, 1);
-    return_value_if_fail(ret == 1, RET_IO);
-
-    if (expected_func_code != 0) {
-      if (func_code == expected_func_code || (func_code == (expected_func_code | 0x80))) {
-        header->slave = slave;
-        header->func_code = func_code;
-        return RET_OK;
-      } else {
-        log_debug("skip invalid func_code %d\n", func_code);
-      }
-    } else {
-      switch (func_code) {
-        case MODBUS_FC_READ_COILS:
-        case MODBUS_FC_READ_DISCRETE_INPUTS:
-        case MODBUS_FC_READ_HOLDING_REGISTERS:
-        case MODBUS_FC_READ_INPUT_REGISTERS:
-        case MODBUS_FC_WRITE_SINGLE_COIL:
-        case MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER:
-        case MODBUS_FC_WRITE_MULTIPLE_COILS:
-        case MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS:
-        case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
-          header->slave = slave;
-          header->func_code = func_code;
-          return RET_OK;
-        }
-        default: {
-          log_debug("skip invalid func_code %d\n", func_code);
-          break;
-        }
-      }
-    }
-    cost_time = time_now_ms() - start_time;
-    if (cost_time > common->read_timeout) {
-      log_debug("read data timeout\n");
-      return RET_FAIL;
-    }
-  } while (1);
-
-  return RET_FAIL;
+  header->slave = slave;
+  header->func_code = func_code;
+  return RET_OK;
 }
 
 static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_func_code,
                                      modbus_resp_data_t* resp) {
   int32_t len = 0;
   uint8_t bytes = 0;
+  uint8_t slave;
   uint8_t func_code = 0;
   wbuffer_t* wb = NULL;
   uint8_t* buff = NULL;
@@ -242,16 +194,24 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
     header.unit_id = buff[6];
     header.func_code = buff[7];
 
+    slave = header.unit_id;
+
     func_code = header.func_code;
     return_value_if_fail(header.protocol_id == 0, RET_IO);
     return_value_if_fail(header.transaction_id == common->transaction_id, RET_IO);
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
-    ret_t ret = modbus_common_read_rtu_header(common, header, expected_func_code);
+    ret_t ret = modbus_common_read_rtu_header(common, header);
     return_value_if_fail(ret == RET_OK, ret);
 
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
+    slave = header->slave;
+  }
+  
+  if (slave != common->slave) {
+    modbus_common_flush_read_buffer(common);
+    return RET_SKIP; // 忽略当前帧
   }
 
   if (func_code == expected_func_code) {
@@ -606,12 +566,17 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     req_data->slave = header.unit_id;
   } else {
     modbus_rtu_header_t* header = (modbus_rtu_header_t*)buff;
-    ret = modbus_common_read_rtu_header(common, header, 0);
+    ret = modbus_common_read_rtu_header(common, header);
     return_value_if_fail(ret == RET_OK, ret);
     
     wbuffer_skip(wb, sizeof(*header));
     func_code = header->func_code;
     req_data->slave = header->slave;
+  }
+
+  if (req_data->slave != common->slave) {
+    modbus_common_flush_read_buffer(common);
+    return RET_SKIP; // 忽略当前帧
   }
 
   req_data->func_code = func_code;

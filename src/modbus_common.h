@@ -77,6 +77,11 @@ typedef struct _modbus_common_t {
    * 最后一次的错误码。
   */
   modbus_exeption_code_t last_exception_code;
+  /**
+   * @property {bool_t} is_shared_transport
+   * 底层传输是否是共享资源(如串口)，错误时不能直接断开，需要flush继续。(仅从站使用)
+   */
+  bool_t is_shared_transport;
 } modbus_common_t;
 
 /**

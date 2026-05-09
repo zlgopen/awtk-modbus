@@ -11,9 +11,9 @@ static void check_read_bits_ex(uint16_t func_code, uint8_t value1, uint8_t value
 
   uint8_t in[1024] = {0,         1,             /*tid*/
                       0,         0,             /*protocol id*/
-                      0,         3 + num_bytes, /*data len*/
+                      0,         static_cast<uint8_t>(3 + num_bytes), /*data len*/
                       0xff,                     /*Server address (255 if not used)*/
-                      (uint8_t)func_code,                /*Function codes as in other variants*/
+                      static_cast<uint8_t>(func_code),                /*Function codes as in other variants*/
                       num_bytes, value1,
                       value2};
   uint8_t out[1024] = {0};
@@ -110,9 +110,9 @@ static void check_read_register_ex(uint16_t func_code, uint16_t* data, uint16_t 
 
   uint8_t in[1024] = {0,         1,             /*tid*/
                       0,         0,             /*protocol id*/
-                      0,         3 + num_bytes, /*data len*/
+                      0,         static_cast<uint8_t>(3 + num_bytes), /*data len*/
                       0xff,                     /*Server address (255 if not used)*/
-                      func_code,                /*Function codes as in other variants*/
+                      static_cast<uint8_t>(func_code),                /*Function codes as in other variants*/
                       num_bytes};
   uint16_t i = 0;
   for (i = 0; i < n_registers; i++) {
@@ -192,9 +192,9 @@ static void check_write_bit(uint8_t value1) {
                       4 + 2,                       /*data len*/
                       0xff,                        /*Server address (255 if not used)*/
                       MODBUS_FC_WRITE_SINGLE_COIL, /*Function codes as in other variants*/
-                      addr >> 8,
-                      addr & 0xff,
-                      value1 ? 0xff : 0,
+                      static_cast<uint8_t>(addr >> 8),
+                      static_cast<uint8_t>(addr & 0xff),
+                      static_cast<uint8_t>(value1 ? 0xff : 0),
                       0};
   uint8_t out[1024] = {0};
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
@@ -238,10 +238,10 @@ static void check_write_register(uint16_t value1) {
       4 + 2,                                   /*data len*/
       0xff,                                    /*Server address (255 if not used)*/
       MODBUS_FC_WRITE_SINGLE_HOLDING_REGISTER, /*Function codes as in other variants*/
-      addr >> 8,
-      addr & 0xff,
-      value1 >> 8,
-      value1 & 0xff};
+      static_cast<uint8_t>(addr >> 8),
+      static_cast<uint8_t>(addr & 0xff),
+      static_cast<uint8_t>(value1 >> 8),
+      static_cast<uint8_t>(value1 & 0xff)};
   uint8_t out[1024] = {0};
   tk_iostream_t* io = tk_iostream_mem_create(in, sizeof(in), out, sizeof(out), FALSE);
   modbus_client_t* client = modbus_client_create_with_io(io, MODBUS_PROTO_TCP);
@@ -283,10 +283,10 @@ static void check_write_bits(uint8_t* value1, uint16_t num_bits) {
                       4 + 2,                          /*data len*/
                       0xff,                           /*Server address (255 if not used)*/
                       MODBUS_FC_WRITE_MULTIPLE_COILS, /*Function codes as in other variants*/
-                      addr >> 8,
-                      addr & 0xff,
-                      num_bits >> 8,
-                      num_bits & 0xff};
+                      static_cast<uint8_t>(addr >> 8),
+                      static_cast<uint8_t>(addr & 0xff),
+                      static_cast<uint8_t>(num_bits >> 8),
+                      static_cast<uint8_t>(num_bits & 0xff)};
   uint8_t out[1024] = {0};
   uint8_t bytes = (num_bits + 7) / 8;
 
@@ -334,10 +334,10 @@ static void check_write_registers(uint16_t* value1, uint16_t num_registers) {
       4 + 2,                                      /*data len*/
       0xff,                                       /*Server address (255 if not used)*/
       MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS, /*Function codes as in other variants*/
-      addr >> 8,
-      addr & 0xff,
-      num_registers >> 8,
-      num_registers & 0xff};
+      static_cast<uint8_t>(addr >> 8),
+      static_cast<uint8_t>(addr & 0xff),
+      static_cast<uint8_t>(num_registers >> 8),
+      static_cast<uint8_t>(num_registers & 0xff)};
   uint8_t out[1024] = {0};
   uint8_t bytes = num_registers * 2;
 
@@ -384,10 +384,10 @@ TEST(modbus, rtu_write_registers_crc) {
   uint8_t in[1024] = {
     slave,
     MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
-    addr >> 8,
-    addr & 0xff,
-    num_registers >> 8,
-    num_registers & 0xff,
+    static_cast<uint8_t>(addr >> 8),
+    static_cast<uint8_t>(addr & 0xff),
+    static_cast<uint8_t>(num_registers >> 8),
+    static_cast<uint8_t>(num_registers & 0xff),
     0x05, // crc
     0x7e
   };
@@ -434,10 +434,10 @@ TEST(modbus, rtu_write_registers_crc_error1) {
   uint8_t in[1024] = {
     slave,
     MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
-    addr >> 8,
-    addr & 0xff,
-    num_registers >> 8,
-    num_registers & 0xff,
+    static_cast<uint8_t>(addr >> 8),
+    static_cast<uint8_t>(addr & 0xff),
+    static_cast<uint8_t>(num_registers >> 8),
+    static_cast<uint8_t>(num_registers & 0xff),
     0x4d, // 从站CRC计算错误
     0x05
   };
@@ -463,10 +463,10 @@ TEST(modbus, rtu_write_registers_crc_error2) {
   uint8_t in[1024] = {
     slave,
     MODBUS_FC_WRITE_MULTIPLE_HOLDING_REGISTERS,
-    addr >> 8,
-    addr & 0xff,
-    (num_registers >> 8) ^ 1, // 数据传输过程中bit0发生反转
-    num_registers & 0xff,
+    static_cast<uint8_t>(addr >> 8),
+    static_cast<uint8_t>(addr & 0xff),
+    static_cast<uint8_t>((num_registers >> 8) ^ 1), // 数据传输过程中bit0发生反转
+    static_cast<uint8_t>(num_registers & 0xff),
     0x05, // crc
     0x7e
   };

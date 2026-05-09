@@ -225,7 +225,8 @@ static ret_t modbus_client_flush_read_buffer(modbus_client_t* client) {
   return modbus_common_flush_read_buffer(common);
 }
 
-#define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC)
+// RET_SKIP 表示slave不匹配，需要跳过。（返回时已清空缓冲区）
+#define MODBUS_NEED_RETRY(ret) ((ret) == RET_CRC || (ret) == RET_SKIP)
 
 ret_t modbus_client_read_bits(modbus_client_t* client, uint16_t addr, uint16_t count,
                               uint8_t* buff) {
