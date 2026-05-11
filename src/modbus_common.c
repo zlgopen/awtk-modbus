@@ -586,7 +586,7 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     case MODBUS_FC_WRITE_AND_READ_REGISTERS: {
       ret = modbus_common_read_len(common, buff, 9);
       return_value_if_fail(ret == 9, RET_IO);
-      wbuffer_skip(wb, 4);
+      wbuffer_skip(wb, 9);
       addr = buff[0] << 8 | buff[1];
       count = buff[2] << 8 | buff[3];
       req_data->addr = addr;
