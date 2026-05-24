@@ -2,8 +2,10 @@ import os
 
 env=DefaultEnvironment().Clone()
 BIN_DIR=os.environ['BIN_DIR'];
+LIB_DIR=os.environ['LIB_DIR'];
 
 env.Program(os.path.join(BIN_DIR, 'modbus_client'), Glob('client.c'))
 env.Program(os.path.join(BIN_DIR, 'modbus_server'), ['server.c', 'modbus_memory_custom.c'])
 env.Program(os.path.join(BIN_DIR, 'modbus_server_ex'), ['server_ex.c'])
-env.Program(os.path.join(BIN_DIR, 'modbus_server_awtk'), ['server_awtk.c', 'modbus_memory_custom.c'])
+env.Library(os.path.join(LIB_DIR, 'assets'), ['assets.c'])
+env.Program(os.path.join(BIN_DIR, 'modbus_server_awtk'), ['server_awtk.c', 'modbus_memory_custom.c'], LIBS=['assets'] + env['LIBS'])

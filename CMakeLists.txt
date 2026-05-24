@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(awtk-modbus
   VERSION 1.0.0
-  LANGUAGES C
+  LANGUAGES C CXX
   DESCRIPTION "Modbus library for AWTK"
 )
 
@@ -107,3 +107,101 @@ install(
     "${CMAKE_CURRENT_BINARY_DIR}/awtk-modbusConfigVersion.cmake"
   DESTINATION "${AWTK_MODBUS_CMAKE_DIR}"
 )
+
+option(AWTK_MODBUS_BUILD_DEMOS "Build demo programs" ON)
+
+if(AWTK_MODBUS_BUILD_DEMOS)
+  set(_awtk_modbus_demos_dir "${CMAKE_CURRENT_SOURCE_DIR}/demos")
+  set(_awtk_modbus_demo_runtime_dir "${CMAKE_BINARY_DIR}/bin")
+
+  function(_awtk_modbus_add_cli_demo target)
+    add_executable(${target} ${ARGN})
+    target_include_directories(${target} PRIVATE "${_awtk_modbus_demos_dir}")
+    target_link_libraries(${target} PRIVATE modbus)
+    set_target_properties(${target} PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${_awtk_modbus_demo_runtime_dir}"
+    )
+    if(MSVC)
+      target_link_libraries(${target} PRIVATE legacy_stdio_definitions)
+    endif()
+    if(UNIX)
+      set_target_properties(${target} PROPERTIES
+        INSTALL_RPATH "${_modbus_install_rpath}"
+        BUILD_WITH_INSTALL_RPATH FALSE
+        MACOSX_RPATH ON
+      )
+    endif()
+  endfunction()
+
+  _awtk_modbus_add_cli_demo(modbus_client "${_awtk_modbus_demos_dir}/client.c")
+  _awtk_modbus_add_cli_demo(modbus_server
+    "${_awtk_modbus_demos_dir}/server.c"
+    "${_awtk_modbus_demos_dir}/modbus_memory_custom.c"
+  )
+  _awtk_modbus_add_cli_demo(modbus_server_ex "${_awtk_modbus_demos_dir}/server_ex.c")
+
+  # modbus_server_awtk mirrors awtk/demos/CMakeLists.txt (demoui + assets static lib).
+  set(AWTK_MODBUS_AWTK_SOURCE "" CACHE PATH
+    "AWTK source tree; used by update_res.py when res/assets.inc is missing")
+
+  if(NOT AWTK_MODBUS_AWTK_SOURCE)
+    foreach(_awtk_source_candidate IN ITEMS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../awtk"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../awtk")
+      if(EXISTS "${_awtk_source_candidate}/scripts/update_res_app.py")
+        set(AWTK_MODBUS_AWTK_SOURCE "${_awtk_source_candidate}" CACHE PATH
+          "AWTK source tree" FORCE)
+        break()
+      endif()
+    endforeach()
+  endif()
+
+  set(_awtk_modbus_assets_inc "${CMAKE_CURRENT_SOURCE_DIR}/res/assets.inc")
+  if(AWTK_MODBUS_AWTK_SOURCE AND NOT EXISTS "${_awtk_modbus_assets_inc}")
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_custom_command(
+      OUTPUT "${_awtk_modbus_assets_inc}"
+      COMMAND ${Python3_EXECUTABLE}
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/update_res.py"
+        all
+        "--awtk_root=${AWTK_MODBUS_AWTK_SOURCE}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      COMMENT "Generating AWTK resources for modbus_server_awtk"
+      VERBATIM
+    )
+    add_custom_target(awtk_modbus_update_res DEPENDS "${_awtk_modbus_assets_inc}")
+  endif()
+
+  if(EXISTS "${_awtk_modbus_assets_inc}" OR AWTK_MODBUS_AWTK_SOURCE)
+    add_library(modbus_server_awtk_assets STATIC "${_awtk_modbus_demos_dir}/assets.c")
+    target_link_libraries(modbus_server_awtk_assets PUBLIC modbus)
+    if(TARGET awtk_modbus_update_res)
+      add_dependencies(modbus_server_awtk_assets awtk_modbus_update_res)
+    endif()
+
+    add_executable(modbus_server_awtk
+      "${_awtk_modbus_demos_dir}/server_awtk.c"
+      "${_awtk_modbus_demos_dir}/modbus_memory_custom.c"
+    )
+    target_include_directories(modbus_server_awtk PRIVATE "${_awtk_modbus_demos_dir}")
+    target_link_libraries(modbus_server_awtk PRIVATE modbus_server_awtk_assets modbus)
+    set_target_properties(modbus_server_awtk PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${_awtk_modbus_demo_runtime_dir}"
+      LINKER_LANGUAGE CXX
+    )
+    if(MSVC)
+      target_link_libraries(modbus_server_awtk PRIVATE legacy_stdio_definitions)
+      set_target_properties(modbus_server_awtk PROPERTIES WIN32_EXECUTABLE TRUE)
+    endif()
+    if(UNIX)
+      set_target_properties(modbus_server_awtk PROPERTIES
+        INSTALL_RPATH "${_modbus_install_rpath}"
+        BUILD_WITH_INSTALL_RPATH FALSE
+        MACOSX_RPATH ON
+        BUILD_RPATH "$<TARGET_FILE_DIR:modbus>"
+      )
+    endif()
+  else()
+    message(STATUS "Skip modbus_server_awtk: res/assets.inc not found and AWTK_MODBUS_AWTK_SOURCE is unset")
+  endif()
+endif()

@@ -87,5 +87,4 @@ ret_t application_exit(void) {
   return RET_OK;
 }
 
-#include "../res/assets.inc"
 #include "awtk_main.inc"
