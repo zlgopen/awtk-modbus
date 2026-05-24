@@ -25,6 +25,5 @@ release
 res
 t*.ini
 idl/idl.json
-src/modbus.def
 build/
 cmake-build-*/
