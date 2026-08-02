@@ -42,6 +42,17 @@ target_include_directories(modbus PUBLIC
 
 target_link_libraries(modbus PUBLIC awtk::awtk)
 
+# awtk/src/tkc/types_def.h enables WITH_SOCKET only when WIN32/LINUX/MACOS/... is set.
+# awtk itself gets those macros via PRIVATE platform flags, which are NOT propagated to
+# dependents. Without them, modbus_service_tcp_start() compiles as RET_NOT_IMPL stub.
+if(APPLE)
+  target_compile_definitions(modbus PRIVATE MACOS=1)
+elseif(UNIX)
+  target_compile_definitions(modbus PRIVATE LINUX=1)
+elseif(WIN32)
+  target_compile_definitions(modbus PRIVATE WIN32=1 WINDOWS=1)
+endif()
+
 # log.h (MSVC) expands log_debug to printf; ensure the UCRT stdio compatibility
 # symbols are linked when building modbus.dll (avoids LNK2001 printf).
 if(MSVC)
