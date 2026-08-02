@@ -210,8 +210,10 @@ static ret_t modbus_common_recv_resp(modbus_common_t* common, uint8_t expected_f
   }
   
   if (slave != common->slave) {
+    log_warn("[modbus] slave/unit id mismatch: got=%u expect=%u\n", (unsigned)slave,
+             (unsigned)common->slave);
     modbus_common_flush_read_buffer(common);
-    return RET_SKIP; // 忽略当前帧
+    return RET_SKIP;
   }
 
   if (func_code == expected_func_code) {
@@ -574,12 +576,14 @@ ret_t modbus_common_recv_req(modbus_common_t* common, modbus_req_data_t* req_dat
     req_data->slave = header->slave;
   }
 
-  if (req_data->slave != common->slave) {
-    modbus_common_flush_read_buffer(common);
-    return RET_SKIP; // 忽略当前帧
-  }
-
   req_data->func_code = func_code;
+
+  if (req_data->slave != common->slave) {
+    log_warn("[modbus] slave/unit id mismatch: got=%u expect=%u\n", (unsigned)req_data->slave,
+             (unsigned)common->slave);
+    modbus_common_flush_read_buffer(common);
+    return RET_SKIP;
+  }
   buff = wb->data + wb->cursor;
 
   switch (func_code) {

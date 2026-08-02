@@ -42,9 +42,11 @@ target_include_directories(modbus PUBLIC
 
 target_link_libraries(modbus PUBLIC awtk::awtk)
 
-# awtk/src/tkc/types_def.h enables WITH_SOCKET only when WIN32/LINUX/MACOS/... is set.
-# awtk itself gets those macros via PRIVATE platform flags, which are NOT propagated to
-# dependents. Without them, modbus_service_tcp_start() compiles as RET_NOT_IMPL stub.
+# awtk applies HAS_STDIO / platform macros as PRIVATE defs, which are NOT propagated.
+# Without them:
+# - types_def.h never enables WITH_SOCKET → modbus_service_tcp_start() is RET_NOT_IMPL
+# - log.h log_warn/log_debug become no-ops → mismatch diagnostics never print
+target_compile_definitions(modbus PRIVATE HAS_STDIO HAVE_STDIO_H)
 if(APPLE)
   target_compile_definitions(modbus PRIVATE MACOS=1)
 elseif(UNIX)

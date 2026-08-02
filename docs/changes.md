@@ -1,3 +1,6 @@
+2026/8/2
+  * slave/unit id 不匹配时在 modbus_common 输出明确告警；CMake 补充 HAS_STDIO 使 log_warn 生效
+
 2026/5/26
   * scons 脚本添加了 BUILD_DEMOS/BUILD_TESTS 参数(感谢雪飞提供补丁)
 
