@@ -220,7 +220,7 @@ ret_t modbus_common_send_write_registers_req(modbus_common_t* common, uint16_t a
 ret_t modbus_common_recv_write_registers_resp(modbus_common_t* common);
 
 /**
- * @method modbus_common_send_write_registers_req
+ * @method modbus_common_send_write_and_read_registers_req
  * 发送写入和读取 holding registers请求。
  * @param {modbus_common_t*} common modbus_common_t对象。
  * @param {uint16_t} write_addr 写入地址。

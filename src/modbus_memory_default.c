@@ -23,11 +23,95 @@
 #include "tkc/utils.h"
 #include "modbus_memory_default.h"
 
+static void modbus_memory_default_on_hook_error(const char* hook_name, ret_t ret) {
+  log_warn("%s hook failed: %d\n", hook_name, ret);
+}
+
+static void modbus_memory_default_before_read_bits(modbus_memory_default_t* memory, uint16_t addr,
+                                                   uint16_t count) {
+  if (memory->hooks.before_read_bits != NULL) {
+    ret_t ret = memory->hooks.before_read_bits(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("before_read_bits", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_before_read_input_bits(modbus_memory_default_t* memory,
+                                                         uint16_t addr, uint16_t count) {
+  if (memory->hooks.before_read_input_bits != NULL) {
+    ret_t ret = memory->hooks.before_read_input_bits(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("before_read_input_bits", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_before_read_registers(modbus_memory_default_t* memory,
+                                                        uint16_t addr, uint16_t count) {
+  if (memory->hooks.before_read_registers != NULL) {
+    ret_t ret = memory->hooks.before_read_registers(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("before_read_registers", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_before_read_input_registers(modbus_memory_default_t* memory,
+                                                              uint16_t addr, uint16_t count) {
+  if (memory->hooks.before_read_input_registers != NULL) {
+    ret_t ret = memory->hooks.before_read_input_registers(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("before_read_input_registers", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_after_write_bit(modbus_memory_default_t* memory, uint16_t addr) {
+  if (memory->hooks.after_write_bit != NULL) {
+    ret_t ret = memory->hooks.after_write_bit(memory->hooks.ctx, addr);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("after_write_bit", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_after_write_bits(modbus_memory_default_t* memory, uint16_t addr,
+                                                   uint16_t count) {
+  if (memory->hooks.after_write_bits != NULL) {
+    ret_t ret = memory->hooks.after_write_bits(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("after_write_bits", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_after_write_register(modbus_memory_default_t* memory,
+                                                       uint16_t addr) {
+  if (memory->hooks.after_write_register != NULL) {
+    ret_t ret = memory->hooks.after_write_register(memory->hooks.ctx, addr);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("after_write_register", ret);
+    }
+  }
+}
+
+static void modbus_memory_default_after_write_registers(modbus_memory_default_t* memory,
+                                                        uint16_t addr, uint16_t count) {
+  if (memory->hooks.after_write_registers != NULL) {
+    ret_t ret = memory->hooks.after_write_registers(memory->hooks.ctx, addr, count);
+    if (ret != RET_OK) {
+      modbus_memory_default_on_hook_error("after_write_registers", ret);
+    }
+  }
+}
+
 static ret_t modbus_memory_default_read_bits(modbus_memory_t* memory, uint16_t addr, uint16_t count,
                                              uint8_t* buff) {
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
   return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
+  modbus_memory_default_before_read_bits(m, addr, count);
   return modbus_server_channel_read_bits(m->bits, addr, count, buff);
 }
 
@@ -36,6 +120,7 @@ static ret_t modbus_memory_default_read_input_bits(modbus_memory_t* memory, uint
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
   return_value_if_fail(m->input_bits != NULL, RET_INVALID_ADDR);
+  modbus_memory_default_before_read_input_bits(m, addr, count);
   return modbus_server_channel_read_bits(m->input_bits, addr, count, buff);
 }
 
@@ -44,6 +129,7 @@ static ret_t modbus_memory_default_read_registers(modbus_memory_t* memory, uint1
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
   return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
+  modbus_memory_default_before_read_registers(m, addr, count);
   return modbus_server_channel_read_registers(m->registers, addr, count, buff);
 }
 
@@ -52,6 +138,7 @@ static ret_t modbus_memory_default_read_input_registers(modbus_memory_t* memory,
   modbus_memory_default_t* m = MODBUS_MEMORY_DEFAULT(memory);
   return_value_if_fail(m != NULL, RET_BAD_PARAMS);
   return_value_if_fail(m->input_registers != NULL, RET_INVALID_ADDR);
+  modbus_memory_default_before_read_input_registers(m, addr, count);
   return modbus_server_channel_read_registers(m->input_registers, addr, count, buff);
 }
 
@@ -63,6 +150,7 @@ static ret_t modbus_memory_default_write_bit(modbus_memory_t* memory, uint16_t a
   return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_bit(m->bits, addr, value);
   if (ret == RET_OK) {
+    modbus_memory_default_after_write_bit(m, addr);
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
   }
 
@@ -77,6 +165,7 @@ static ret_t modbus_memory_default_write_bits(modbus_memory_t* memory, uint16_t 
   return_value_if_fail(m->bits != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_bits(m->bits, addr, count, buff);
   if (ret == RET_OK) {
+    modbus_memory_default_after_write_bits(m, addr, count);
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
   }
 
@@ -91,6 +180,7 @@ static ret_t modbus_memory_default_write_register(modbus_memory_t* memory, uint1
   return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_register(m->registers, addr, value);
   if (ret == RET_OK) {
+    modbus_memory_default_after_write_register(m, addr);
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
   }
 
@@ -105,6 +195,7 @@ static ret_t modbus_memory_default_write_registers(modbus_memory_t* memory, uint
   return_value_if_fail(m->registers != NULL, RET_INVALID_ADDR);
   ret = modbus_server_channel_write_registers(m->registers, addr, count, buff);
   if (ret == RET_OK) {
+    modbus_memory_default_after_write_registers(m, addr, count);
     emitter_dispatch_simple_event(m->emitter, EVT_PROPS_CHANGED);
   }
 
@@ -222,6 +313,20 @@ modbus_memory_t* modbus_memory_default_create_with_conf(conf_node_t* node) {
   }
 
   return modbus_memory_default_create(bits, input_bits, registers, input_registers);
+}
+
+ret_t modbus_memory_default_set_hooks(modbus_memory_t* memory,
+                                      const modbus_memory_default_hooks_t* hooks) {
+  modbus_memory_default_t* memory_default = MODBUS_MEMORY_DEFAULT(memory);
+  return_value_if_fail(memory_default != NULL, RET_BAD_PARAMS);
+
+  if (hooks != NULL) {
+    memory_default->hooks = *hooks;
+  } else {
+    memset(&(memory_default->hooks), 0x00, sizeof(memory_default->hooks));
+  }
+
+  return RET_OK;
 }
 
 modbus_memory_default_t* modbus_memory_default_cast(modbus_memory_t* memory) {

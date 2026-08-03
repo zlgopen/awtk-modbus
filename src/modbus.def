@@ -55,6 +55,7 @@ EXPORTS
     modbus_memory_default_create
     modbus_memory_default_create_test
     modbus_memory_default_create_with_conf
+    modbus_memory_default_set_hooks
     modbus_memory_default_cast
     modbus_memory_read_bits
     modbus_memory_read_input_bits

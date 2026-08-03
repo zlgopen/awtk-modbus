@@ -29,6 +29,31 @@
 
 BEGIN_C_DECLS
 
+typedef ret_t (*modbus_memory_default_before_read_bits_hook_t)(void* ctx, uint16_t addr,
+                                                               uint16_t count);
+typedef ret_t (*modbus_memory_default_before_read_registers_hook_t)(void* ctx, uint16_t addr,
+                                                                    uint16_t count);
+typedef ret_t (*modbus_memory_default_before_read_input_registers_hook_t)(void* ctx, uint16_t addr,
+                                                                          uint16_t count);
+typedef ret_t (*modbus_memory_default_after_write_bit_hook_t)(void* ctx, uint16_t addr);
+typedef ret_t (*modbus_memory_default_after_write_bits_hook_t)(void* ctx, uint16_t addr,
+                                                               uint16_t count);
+typedef ret_t (*modbus_memory_default_after_write_register_hook_t)(void* ctx, uint16_t addr);
+typedef ret_t (*modbus_memory_default_after_write_registers_hook_t)(void* ctx, uint16_t addr,
+                                                                    uint16_t count);
+
+typedef struct _modbus_memory_default_hooks_t {
+  void* ctx;
+  modbus_memory_default_before_read_bits_hook_t before_read_bits;
+  modbus_memory_default_before_read_bits_hook_t before_read_input_bits;
+  modbus_memory_default_before_read_registers_hook_t before_read_registers;
+  modbus_memory_default_before_read_input_registers_hook_t before_read_input_registers;
+  modbus_memory_default_after_write_bit_hook_t after_write_bit;
+  modbus_memory_default_after_write_bits_hook_t after_write_bits;
+  modbus_memory_default_after_write_register_hook_t after_write_register;
+  modbus_memory_default_after_write_registers_hook_t after_write_registers;
+} modbus_memory_default_hooks_t;
+
 /**
  * @class modbus_memory_default_t
  * 
@@ -48,6 +73,7 @@ typedef struct _modbus_memory_default_t {
   modbus_server_channel_t* input_bits;
   modbus_server_channel_t* registers;
   modbus_server_channel_t* input_registers;
+  modbus_memory_default_hooks_t hooks;
 } modbus_memory_default_t;
 
 /**
@@ -81,6 +107,17 @@ modbus_memory_t* modbus_memory_default_create_test(void);
  * @return {modbus_memory_t*} 返回modbus_memory_t对象。
  */
 modbus_memory_t* modbus_memory_default_create_with_conf(conf_node_t* node);
+
+/**
+ * @method modbus_memory_default_set_hooks
+ * 设置modbus_memory_default hooks。
+ * @param {modbus_memory_t*} memory modbus memory对象。
+ * @param {const modbus_memory_default_hooks_t*} hooks hooks配置，传NULL则清空hooks。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_memory_default_set_hooks(modbus_memory_t* memory,
+                                      const modbus_memory_default_hooks_t* hooks);
 
 /**
  * @method modbus_memory_default_cast

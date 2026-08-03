@@ -206,3 +206,123 @@ TEST(modbus, memory) {
 
   modbus_memory_destroy(memory);
 }
+
+typedef struct _memory_hooks_ctx_t {
+  int before_read_bits_count;
+  int before_read_input_bits_count;
+  int before_read_registers_count;
+  int before_read_input_registers_count;
+  int after_write_bit_count;
+  int after_write_bits_count;
+  int after_write_register_count;
+  int after_write_registers_count;
+  uint16_t last_addr;
+  uint16_t last_count;
+} memory_hooks_ctx_t;
+
+static ret_t on_before_read_bits(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->before_read_bits_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_OK;
+}
+
+static ret_t on_before_read_input_bits(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->before_read_input_bits_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_OK;
+}
+
+static ret_t on_before_read_registers(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->before_read_registers_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_FAIL;
+}
+
+static ret_t on_before_read_input_registers(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->before_read_input_registers_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_OK;
+}
+
+static ret_t on_after_write_bit(void* ctx, uint16_t addr) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->after_write_bit_count++;
+  c->last_addr = addr;
+  c->last_count = 1;
+  return RET_OK;
+}
+
+static ret_t on_after_write_bits(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->after_write_bits_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_OK;
+}
+
+static ret_t on_after_write_register(void* ctx, uint16_t addr) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->after_write_register_count++;
+  c->last_addr = addr;
+  c->last_count = 1;
+  return RET_FAIL;
+}
+
+static ret_t on_after_write_registers(void* ctx, uint16_t addr, uint16_t count) {
+  memory_hooks_ctx_t* c = (memory_hooks_ctx_t*)ctx;
+  c->after_write_registers_count++;
+  c->last_addr = addr;
+  c->last_count = count;
+  return RET_OK;
+}
+
+TEST(modbus, memory_default_hooks) {
+  uint8_t bits_data[2] = {0};
+  uint16_t registers_data[2] = {0x1234, 0x5678};
+  modbus_memory_t* memory = modbus_memory_default_create_test();
+  memory_hooks_ctx_t hooks_ctx = {0};
+  modbus_memory_default_hooks_t hooks = {0};
+
+  hooks.ctx = &hooks_ctx;
+  hooks.before_read_bits = on_before_read_bits;
+  hooks.before_read_input_bits = on_before_read_input_bits;
+  hooks.before_read_registers = on_before_read_registers;
+  hooks.before_read_input_registers = on_before_read_input_registers;
+  hooks.after_write_bit = on_after_write_bit;
+  hooks.after_write_bits = on_after_write_bits;
+  hooks.after_write_register = on_after_write_register;
+  hooks.after_write_registers = on_after_write_registers;
+  ASSERT_EQ(modbus_memory_default_set_hooks(memory, &hooks), RET_OK);
+
+  ASSERT_EQ(modbus_memory_read_bits(memory, BITS_START, 2, bits_data), RET_OK);
+  ASSERT_EQ(modbus_memory_read_input_bits(memory, INPUT_BITS_START, 2, bits_data), RET_OK);
+  ASSERT_EQ(modbus_memory_read_registers(memory, REGISTERS_START, 2, registers_data), RET_OK);
+  ASSERT_EQ(modbus_memory_read_input_registers(memory, INPUT_REGISTERS_START, 2, registers_data),
+            RET_OK);
+  ASSERT_EQ(modbus_memory_write_bit(memory, BITS_START, 1), RET_OK);
+  ASSERT_EQ(modbus_memory_write_bits(memory, BITS_START, 2, bits_data), RET_OK);
+  ASSERT_EQ(modbus_memory_write_register(memory, REGISTERS_START, 0x1234), RET_OK);
+  ASSERT_EQ(modbus_memory_write_registers(memory, REGISTERS_START, 2, registers_data), RET_OK);
+
+  ASSERT_EQ(hooks_ctx.before_read_bits_count, 1);
+  ASSERT_EQ(hooks_ctx.before_read_input_bits_count, 1);
+  ASSERT_EQ(hooks_ctx.before_read_registers_count, 1);
+  ASSERT_EQ(hooks_ctx.before_read_input_registers_count, 1);
+  ASSERT_EQ(hooks_ctx.after_write_bit_count, 1);
+  ASSERT_EQ(hooks_ctx.after_write_bits_count, 1);
+  ASSERT_EQ(hooks_ctx.after_write_register_count, 1);
+  ASSERT_EQ(hooks_ctx.after_write_registers_count, 1);
+  ASSERT_EQ(hooks_ctx.last_addr, REGISTERS_START);
+  ASSERT_EQ(hooks_ctx.last_count, 2);
+
+  ASSERT_EQ(modbus_memory_default_set_hooks(memory, NULL), RET_OK);
+  modbus_memory_destroy(memory);
+}
