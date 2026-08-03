@@ -1,3 +1,6 @@
+2026/8/3
+  * 增加函数 modbus_service_rtu_stop/modbus_service_tcp_stop
+
 2026/8/2
   * slave/unit id 不匹配时在 modbus_common 输出明确告警；CMake 补充 HAS_STDIO 使 log_warn 生效
 

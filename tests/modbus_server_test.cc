@@ -41,13 +41,17 @@ TEST(modbus, server_tcp_init) {
   tk_socket_init();
 
   const char* url = "tcp://localhost:502";
+  ASSERT_EQ(modbus_service_tcp_is_started(), FALSE);
   ASSERT_EQ(modbus_service_start(esm, memory, url), RET_OK);
-#ifdef NDEBUG
+  ASSERT_EQ(modbus_service_tcp_is_started(), TRUE);
   url = "tcp://localhost:503";
   ASSERT_EQ(modbus_service_start(esm, memory, url), RET_FAIL);
-#endif
 
   ASSERT_EQ(esm->sources.size, 1);
+  ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);
+  ASSERT_EQ(modbus_service_tcp_is_started(), FALSE);
+  ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);
+  ASSERT_EQ(esm->sources.size, 0);
   event_source_manager_destroy(esm);
   modbus_memory_destroy(memory);
 }
@@ -59,11 +63,13 @@ TEST(modbus, server_tcp_init_by_args) {
   tk_socket_init();
 
   const char* url = "tcp://localhost:502";
+  ASSERT_EQ(modbus_service_tcp_is_started(), FALSE);
   modbus_service_args_t args1 = {};
   args1.memory = memory;
   args1.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;
   args1.slave = MODBUS_DEMO_SLAVE_ID;
   ASSERT_EQ(modbus_service_start_by_args(esm, &args1, url), RET_OK);
+  ASSERT_EQ(modbus_service_tcp_is_started(), TRUE);
   ASSERT_EQ(esm->sources.size, 1);
 
   url = "tcp://localhost:503";
@@ -71,8 +77,8 @@ TEST(modbus, server_tcp_init_by_args) {
   args2.memory = memory;
   args2.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;
   args2.slave = MODBUS_DEMO_SLAVE_ID;
-  ASSERT_EQ(modbus_service_start_by_args(esm, &args2, url), RET_OK);
-  ASSERT_EQ(esm->sources.size, 2);
+  ASSERT_EQ(modbus_service_start_by_args(esm, &args2, url), RET_FAIL);
+  ASSERT_EQ(esm->sources.size, 1);
 #if 0
   // 指定网卡启动 modbus 服务
   url = "tcp://localhost:503";
@@ -85,8 +91,18 @@ TEST(modbus, server_tcp_init_by_args) {
   ASSERT_EQ(esm->sources.size, 3);
 #endif
 
+  ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);
+  ASSERT_EQ(modbus_service_tcp_is_started(), FALSE);
+  ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);
+  ASSERT_EQ(esm->sources.size, 0);
   event_source_manager_destroy(esm);
   modbus_memory_destroy(memory);
+}
+
+TEST(modbus, server_rtu_stop_without_start) {
+  ASSERT_EQ(modbus_service_rtu_is_started(), FALSE);
+  ASSERT_EQ(modbus_service_rtu_stop(), RET_OK);
+  ASSERT_EQ(modbus_service_rtu_is_started(), FALSE);
 }
 
 static void test_server_slave_error(const char* server_url, const char* client_url, uint8_t slave, modbus_proto_t proto) {

@@ -24,6 +24,31 @@
 
 #include "streams/inet/iostream_tcp.h"
 
+static event_source_t* s_service_source = NULL;
+
+static ret_t on_service_source_destroy(void* ctx, event_t* e) {
+  (void)ctx;
+  (void)e;
+  s_service_source = NULL;
+
+  return RET_OK;
+}
+
+static ret_t modbus_service_tcp_start_impl(event_source_manager_t* esm, const char* url,
+                                           modbus_service_args_t* args) {
+  event_source_t* source = NULL;
+  return_value_if_fail(args != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(s_service_source == NULL, RET_FAIL);
+
+  return_value_if_fail(tk_service_start_ex(esm, url, modbus_service_create, args, &source) == RET_OK, RET_FAIL);
+  return_value_if_fail(source != NULL, RET_FAIL);
+
+  s_service_source = source;
+  emitter_on(EMITTER(source), EVT_DESTROY, on_service_source_destroy, NULL);
+
+  return RET_OK;
+}
+
 ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* memory, int port,
                                modbus_proto_t proto, uint8_t slave) {
   char url[128];
@@ -35,7 +60,7 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
   args.slave = slave;
   tk_snprintf(url, sizeof(url), "tcp://localhost:%d", port);
 
-  return tk_service_start(esm, url, modbus_service_create, &args);
+  return modbus_service_tcp_start_impl(esm, url, &args);
 }
 
 ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args, int port) {
@@ -56,7 +81,21 @@ ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_servi
   if (!is_set_url) {
     tk_snprintf(url, sizeof(url), "tcp://localhost:%d", port);
   }
-  return tk_service_start(esm, url, modbus_service_create, args);
+  return modbus_service_tcp_start_impl(esm, url, args);
+}
+
+ret_t modbus_service_tcp_stop(void) {
+  if (s_service_source != NULL) {
+    event_source_manager_t* manager = s_service_source->manager;
+    return_value_if_fail(manager != NULL, RET_FAIL);
+    return event_source_manager_remove(manager, s_service_source);
+  }
+
+  return RET_OK;
+}
+
+bool_t modbus_service_tcp_is_started(void) {
+  return s_service_source != NULL;
 }
 
 #else
@@ -66,5 +105,12 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
 }
 ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args, int port) {
   return RET_NOT_IMPL;
+}
+ret_t modbus_service_tcp_stop(void) {
+  return RET_OK;
+}
+
+bool_t modbus_service_tcp_is_started(void) {
+  return FALSE;
 }
 #endif /*WITH_SOCKET*/

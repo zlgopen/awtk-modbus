@@ -78,8 +78,12 @@ EXPORTS
     modbus_server_channel_destroy
     modbus_service_rtu_start
     modbus_service_rtu_start_by_args
+    modbus_service_rtu_stop
+    modbus_service_rtu_is_started
     modbus_service_tcp_start
     modbus_service_tcp_start_by_args
+    modbus_service_tcp_stop
+    modbus_service_tcp_is_started
     modbus_service_create
     modbus_service_create_with_io
     modbus_service_set_slave

@@ -54,6 +54,20 @@ ret_t modbus_service_tcp_start(event_source_manager_t* esm, modbus_memory_t* mem
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_service_args_t* args, int port);
+
+/**
+ * @method modbus_service_tcp_stop
+ * 停止modbus service TCP。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t modbus_service_tcp_stop(void);
+
+/**
+ * @method modbus_service_tcp_is_started
+ * 判断modbus service TCP是否已启动。
+ * @return {bool_t} 返回TRUE表示已启动，否则表示未启动。
+ */
+bool_t modbus_service_tcp_is_started(void);
 END_C_DECLS
 
 #endif /*TK_MODBUS_SERVICE_TCP_H*/
