@@ -41,7 +41,7 @@ EXPORTS
     modbus_common_recv_write_bits_resp
     modbus_common_send_write_registers_req
     modbus_common_recv_write_registers_resp
-    modbus_common_send_write_registers_req
+    modbus_common_send_write_and_read_registers_req
     modbus_common_get_last_exception_code
     modbus_common_get_last_exception_str
     modbus_common_deinit

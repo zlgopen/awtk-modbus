@@ -255,28 +255,28 @@ modbus_memory_t* modbus_memory_default_create(modbus_server_channel_t* bits,
   memory->registers = registers;
   memory->input_registers = input_registers;
 
-  log_debug("-------------------------------------------------\n");
+  log_info("-------------------------------------------------\n");
   if (bits != NULL) {
-    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", bits->name, bits->start,
-              bits->length, bits->bytes, bits->writable);
+    log_info("%s: start=%u length=%u bytes=%u writable=%d\n", bits->name, bits->start,
+             bits->length, bits->bytes, bits->writable);
   }
 
   if (input_bits != NULL) {
-    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", input_bits->name, input_bits->start,
-              input_bits->length, input_bits->bytes, input_bits->writable);
+    log_info("%s: start=%u length=%u bytes=%u writable=%d\n", input_bits->name,
+             input_bits->start, input_bits->length, input_bits->bytes, input_bits->writable);
   }
 
   if (registers != NULL) {
-    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", registers->name, registers->start,
-              registers->length, registers->bytes, registers->writable);
+    log_info("%s: start=%u length=%u bytes=%u writable=%d\n", registers->name, registers->start,
+             registers->length, registers->bytes, registers->writable);
   }
 
   if (input_registers != NULL) {
-    log_debug("%s: start=%u length=%u bytes=%u writable=%d\n", input_registers->name,
-              input_registers->start, input_registers->length, input_registers->bytes,
-              input_registers->writable);
+    log_info("%s: start=%u length=%u bytes=%u writable=%d\n", input_registers->name,
+             input_registers->start, input_registers->length, input_registers->bytes,
+             input_registers->writable);
   }
-  log_debug("-------------------------------------------------\n");
+  log_info("-------------------------------------------------\n");
 
   memory->emitter = emitter_create();
 

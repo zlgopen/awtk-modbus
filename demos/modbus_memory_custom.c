@@ -45,6 +45,8 @@ static ret_t modbus_memory_custom_read_bits(modbus_memory_t* memory, uint16_t ad
   /*检测地址和范围是否合法*/
   if (addr < MODBUS_CUSTOM_BITS_ADDRESS ||
       (count + addr) > (MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT)) {
+    log_warn("read_bits invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_BITS_ADDRESS, MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -120,6 +122,9 @@ static ret_t modbus_memory_custom_read_input_bits(modbus_memory_t* memory, uint1
   /*检测地址和范围是否合法*/
   if (addr < MODBUS_CUSTOM_INPUT_BITS_ADDRESS ||
       (count + addr) > (MODBUS_CUSTOM_INPUT_BITS_ADDRESS + MODBUS_CUSTOM_INPUT_BITS_COUNT)) {
+    log_warn("read_input_bits invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_INPUT_BITS_ADDRESS,
+             MODBUS_CUSTOM_INPUT_BITS_ADDRESS + MODBUS_CUSTOM_INPUT_BITS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -179,6 +184,9 @@ static ret_t modbus_memory_custom_read_registers(modbus_memory_t* memory, uint16
   /*检测地址和范围是否合法*/
   if (addr < MODBUS_CUSTOM_REGISTERS_ADDRESS ||
       (count + addr) > (MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT)) {
+    log_warn("read_registers invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -230,6 +238,9 @@ static ret_t modbus_memory_custom_read_input_registers(modbus_memory_t* memory, 
   if (addr < MODBUS_CUSTOM_INPUT_REGISTERS_ADDRESS ||
       (count + addr) >
           (MODBUS_CUSTOM_INPUT_REGISTERS_ADDRESS + MODBUS_CUSTOM_INPUT_REGISTERS_COUNT)) {
+    log_warn("read_input_registers invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_INPUT_REGISTERS_ADDRESS,
+             MODBUS_CUSTOM_INPUT_REGISTERS_ADDRESS + MODBUS_CUSTOM_INPUT_REGISTERS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -247,6 +258,8 @@ static ret_t modbus_memory_custom_write_bit(modbus_memory_t* memory, uint16_t ad
   /*检测地址是否合法*/
   if (addr < MODBUS_CUSTOM_BITS_ADDRESS ||
       addr >= (MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT)) {
+    log_warn("write_bit invalid: addr=%u, valid range=[%u, %u)\n", addr,
+             MODBUS_CUSTOM_BITS_ADDRESS, MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -263,6 +276,8 @@ static ret_t modbus_memory_custom_write_bits(modbus_memory_t* memory, uint16_t a
   /*检测地址和范围是否合法*/
   if (addr < MODBUS_CUSTOM_BITS_ADDRESS ||
       (count + addr) > (MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT)) {
+    log_warn("write_bits invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_BITS_ADDRESS, MODBUS_CUSTOM_BITS_ADDRESS + MODBUS_CUSTOM_BITS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -282,6 +297,9 @@ static ret_t modbus_memory_custom_write_register(modbus_memory_t* memory, uint16
   /*检测地址是否合法*/
   if (addr < MODBUS_CUSTOM_REGISTERS_ADDRESS ||
       addr >= (MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT)) {
+    log_warn("write_register invalid: addr=%u, valid range=[%u, %u)\n", addr,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT);
     return RET_INVALID_ADDR;
   }
 
@@ -321,6 +339,9 @@ static ret_t modbus_memory_custom_write_registers(modbus_memory_t* memory, uint1
   /*检测地址和范围是否合法*/
   if (addr < MODBUS_CUSTOM_REGISTERS_ADDRESS ||
       (count + addr) > (MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT)) {
+    log_warn("write_registers invalid: addr=%u count=%u, valid range=[%u, %u)\n", addr, count,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS,
+             MODBUS_CUSTOM_REGISTERS_ADDRESS + MODBUS_CUSTOM_REGISTERS_COUNT);
     return RET_INVALID_ADDR;
   }
 
