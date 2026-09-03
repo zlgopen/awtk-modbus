@@ -79,6 +79,9 @@ ret_t modbus_service_tcp_start_by_args(event_source_manager_t* esm, modbus_servi
     darray_deinit(&ips);
   }
   if (!is_set_url) {
+    if (args->is_not_has_default_url) {
+      return RET_NOT_FOUND;
+    }
     tk_snprintf(url, sizeof(url), "tcp://localhost:%d", port);
   }
   return modbus_service_tcp_start_impl(esm, url, args);

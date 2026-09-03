@@ -91,6 +91,16 @@ TEST(modbus, server_tcp_init_by_args) {
   ASSERT_EQ(esm->sources.size, 3);
 #endif
 
+  // 指定网卡不存在的情况启动 modbus 服务
+  url = "tcp://localhost:503";
+  modbus_service_args_t args4 = {};
+  args4.memory = memory;
+  args4.proto = tk_str_start_with(url, STR_SCHEMA_RTU_OVER_TCP) ? MODBUS_PROTO_RTU : MODBUS_PROTO_TCP;
+  args4.slave = MODBUS_DEMO_SLAVE_ID;
+  args4.is_not_has_default_url = TRUE;
+  args4.ifname = L"XXXXXXXXXXX"; //指定网卡名字
+  ASSERT_EQ(modbus_service_start_by_args(esm, &args4, url), RET_NOT_FOUND);
+
   ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);
   ASSERT_EQ(modbus_service_tcp_is_started(), FALSE);
   ASSERT_EQ(modbus_service_tcp_stop(), RET_OK);

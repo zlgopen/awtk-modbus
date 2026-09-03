@@ -42,6 +42,7 @@ typedef struct _modbus_service_args_t {
   void* ctx;
   modbus_service_on_connected_t on_connected;
   bool_t is_shared_transport; // 是共享资源（如串口），错误时不能直接断开，需要flush继续
+  bool_t is_not_has_default_url; // 当查找网卡失败的时候，不使用默认的 localhost 作为服务器 ip。
 
   /* tcp prop */
   int keep_idle;
