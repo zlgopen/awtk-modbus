@@ -449,7 +449,7 @@ static ret_t modbus_client_write_and_read_registers_impl(modbus_client_t* client
   uint16_t dest_count = read_nb;
   modbus_common_t* common = MODBUS_COMMON(client);
   return_value_if_fail(common != NULL && src != NULL && dest != NULL, RET_BAD_PARAMS);
-  memset(dest, 0x0, read_nb);
+  memset(dest, 0x0, read_nb * sizeof(uint16_t));
   t = time_now_ms();
   ret = modbus_common_send_write_and_read_registers_req(common, write_addr, write_nb, src, read_addr, read_nb);
   return_value_if_fail(ret == RET_OK, ret);
@@ -461,7 +461,12 @@ static ret_t modbus_client_write_and_read_registers_impl(modbus_client_t* client
   t = time_now_us();
   ret = modbus_common_recv_read_registers_resp(common, MODBUS_FC_WRITE_AND_READ_REGISTERS, dest, &dest_count);
   modbus_client_wait_for_frame_gap_time(client, t);
-  return ret == RET_OK && read_nb == dest_count ? RET_OK : RET_FAIL;
+
+  if (ret != RET_OK) {
+    return ret;
+  }
+
+  return dest_count == read_nb ? RET_OK : RET_FAIL;
 }
 
 ret_t modbus_client_write_bit(modbus_client_t* client, uint16_t addr, uint8_t value) {

@@ -35,6 +35,38 @@ TEST(modbus_client, write_registers) {
   modbus_client_destroy(client);
 }
 
+TEST(modbus_client, different_slave) {
+  modbus_memory_t* memory = modbus_memory_default_create_foo();
+  tk_thread_t* thread = create_modbus_service(0xff, memory);
+  sleep_ms(1000);
+  modbus_client_t* client = modbus_client_create("tcp://localhost:2502");
+
+  uint8_t bits[1] = {0};
+  uint16_t registers[1] = {0};
+  uint8_t write_bits[] = {TRUE};
+  uint16_t write_registers[] = {0x1122};
+
+  modbus_client_set_slave(client, 0x01);
+
+  ASSERT_EQ(modbus_client_write_bit(client, 0, TRUE), RET_SKIP);
+  ASSERT_EQ(modbus_client_write_bits(client, 0, 1, write_bits), RET_SKIP);
+  ASSERT_EQ(modbus_client_write_register(client, 0, 0xaabb), RET_SKIP);
+  ASSERT_EQ(modbus_client_write_registers(client, 0, 1, write_registers), RET_SKIP);
+  ASSERT_EQ(modbus_client_write_and_read_registers(client, 0, 1, write_registers, 0, 1, registers),
+            RET_SKIP);
+
+  ASSERT_EQ(modbus_client_read_bits(client, 0, 1, bits), RET_SKIP);
+  ASSERT_EQ(modbus_client_read_input_bits(client, 0, 1, bits), RET_SKIP);
+  ASSERT_EQ(modbus_client_read_registers(client, 0, 1, registers), RET_SKIP);
+  ASSERT_EQ(modbus_client_read_input_registers(client, 0, 1, registers), RET_SKIP);
+
+  running = FALSE;
+  tk_thread_destroy(thread);
+  sleep_ms(1000);
+  modbus_memory_destroy(memory);
+  modbus_client_destroy(client);
+}
+
 TEST(modbus_client, write_register) {
   modbus_memory_t* memory = modbus_memory_default_create_foo();
   modbus_memory_default_t* default_memory = (modbus_memory_default_t*)memory;
